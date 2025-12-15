@@ -2,10 +2,8 @@
 
 namespace DirectoryService.Domain.ValueObjects;
 
-public class PositonName
+public record PositonName
 {
-    private const int MAX_NAME_LENGTH = 100;
-
     private PositonName(
     string value)
     {
@@ -18,7 +16,7 @@ public class PositonName
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<PositonName>("Name cannot be empty or whitespace.");
-        if (value.Length > MAX_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
+        if (value.Length > Constants.MAX_POSITION_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
             return Result.Failure<PositonName>("Name can be from 3 to 100 characters long.");
 
         var name = new PositonName(value);

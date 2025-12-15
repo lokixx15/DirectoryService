@@ -2,10 +2,8 @@
 
 namespace DirectoryService.Domain.ValueObjects;
 
-public class LocationAddress
+public record LocationAddress
 {
-    private const int MAX_ADDRESS_LENGTH = 200;
-
     private LocationAddress(
     string value)
     {
@@ -18,11 +16,10 @@ public class LocationAddress
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<LocationAddress>("Address cannot be empty or whitespace.");
-        if (value.Length > MAX_ADDRESS_LENGTH)
+        if (value.Length > Constants.MAX_LOCATION_ADDRESS_LENGTH)
             return Result.Failure<LocationAddress>("Address cannot be longer than 200 characters.");
 
         var address = new LocationAddress(value);
-
         return Result.Success(address);
     }
 }

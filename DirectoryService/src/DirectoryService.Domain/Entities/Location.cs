@@ -5,7 +5,10 @@ namespace DirectoryService.Domain.Entities;
 
 public class Location
 {
-    private readonly List<DepartmentLocation> _departments;
+    //ef core
+    private Location() { }
+
+    private readonly List<DepartmentLocation> _departments = [];
 
     private Location(
         Guid? id,
@@ -26,9 +29,9 @@ public class Location
     }
 
     public Guid Id { get; private set; }
-    public LocationName Name { get; private set; }
-    public LocationAddress Address { get; private set; }
-    public LocationTimezone Timezone { get; private set; }
+    public LocationName Name { get; private set; } = null!;
+    public LocationAddress Address { get; private set; } = null!;
+    public LocationTimezone Timezone { get; private set; } = null!;
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }

@@ -2,10 +2,8 @@
 
 namespace DirectoryService.Domain.ValueObjects;
 
-public class LocationName
+public record LocationName
 {
-    private const int MAX_NAME_LENGTH = 120;
-
     private LocationName(
     string value)
     {
@@ -18,7 +16,7 @@ public class LocationName
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<LocationName>("Name cannot be empty or whitespace.");
-        if (value.Length > MAX_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
+        if (value.Length > Constants.MAX_LOCATION_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
             return Result.Failure<LocationName>("Name can be from 3 to 120 characters long.");
 
         var name = new LocationName(value);

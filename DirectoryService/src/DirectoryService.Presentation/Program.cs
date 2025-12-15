@@ -1,4 +1,9 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using DirectoryService.Infrastructure;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped(_ =>
+new DirectoryServiceDbContext(builder.Configuration.GetConnectionString("DirectoryServiceDb")!));
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();

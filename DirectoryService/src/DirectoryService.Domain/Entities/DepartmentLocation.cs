@@ -4,6 +4,9 @@ namespace DirectoryService.Domain.Entities;
 
 public class DepartmentLocation
 {
+    //ef core
+    private DepartmentLocation() { }
+
     private DepartmentLocation(
         Guid departmentId, 
         Guid locationId)
