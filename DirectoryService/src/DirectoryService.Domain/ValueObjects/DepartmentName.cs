@@ -2,10 +2,8 @@
 
 namespace DirectoryService.Domain.ValueObjects;
 
-public class DepartmentName
+public record DepartmentName
 {
-    private const int MAX_NAME_LENGTH = 150;
-
     private DepartmentName(
     string value)
     {
@@ -18,7 +16,7 @@ public class DepartmentName
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<DepartmentName>("Name cannot be empty or whitespace.");
-        if (value.Length > MAX_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
+        if (value.Length > Constants.MAX_DEPARTMENT_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
             return Result.Failure<DepartmentName>("Name can be from 3 to 150 characters long.");
 
         var name = new DepartmentName(value);

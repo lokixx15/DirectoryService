@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Domain.ValueObjects;
 
-public class DepartmentPath
+public record DepartmentPath
 {
     private DepartmentPath(
         string value)
@@ -14,8 +14,10 @@ public class DepartmentPath
 
     public static Result<DepartmentPath> Create(string value)
     {
-        var path = new DepartmentPath(value);
+        if (value.Length > Constants.MAX_DEPARTMENT_PATH_LENGTH)
+            return Result.Failure<DepartmentPath>("Path cannot be longer than 300 characters.");
 
+        var path = new DepartmentPath(value);
         return Result.Success(path);
     }
 }

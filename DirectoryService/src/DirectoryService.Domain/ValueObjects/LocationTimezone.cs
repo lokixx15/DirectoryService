@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Domain.ValueObjects;
 
-public class LocationTimezone
+public record LocationTimezone
 {
     private LocationTimezone(
     string value)
@@ -14,8 +14,10 @@ public class LocationTimezone
 
     public static Result<LocationTimezone> Create(string value)
     {
-        var timezone = new LocationTimezone(value);
+        if (string.IsNullOrWhiteSpace(value)) 
+            return Result.Failure<LocationTimezone>("Timezone cannot be empty.");
 
+        var timezone = new LocationTimezone(value);
         return Result.Success(timezone);
     }
 }
