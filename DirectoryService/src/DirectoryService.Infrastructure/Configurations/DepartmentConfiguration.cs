@@ -1,10 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain;
+﻿using DirectoryService.Domain;
 using DirectoryService.Domain.Entities;
-using DirectoryService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Security.Cryptography.X509Certificates;
 
 namespace DirectoryService.Infrastructure.Configurations
 {
