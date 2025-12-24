@@ -10,5 +10,5 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services) =>
         services
             .AddScoped<DirectoryServiceDbContext>()
-            .AddScoped<ILocationsRepository, EfCoreLocationsRepository>();
+            .AddScoped<ILocationsRepository, LocationsRepository>();
 }

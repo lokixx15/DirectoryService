@@ -16,7 +16,7 @@ public class Location
         LocationAddress address,
         LocationTimezone timezone, 
         bool isActive,
-        IEnumerable<DepartmentLocation>? departments)
+        IEnumerable<DepartmentLocation> departments)
     {
         Id = id ?? Guid.NewGuid();
         Name = name;

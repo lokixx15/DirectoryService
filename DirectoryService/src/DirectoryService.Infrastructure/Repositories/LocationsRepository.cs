@@ -3,11 +3,11 @@ using DirectoryService.Application.Locations;
 
 namespace DirectoryService.Infrastructure.Repositories;
 
-public class EfCoreLocationsRepository : ILocationsRepository
+public class LocationsRepository : ILocationsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
 
-    public EfCoreLocationsRepository(DirectoryServiceDbContext dbContext)
+    public LocationsRepository(DirectoryServiceDbContext dbContext)
     {
         _dbContext = dbContext;
     }

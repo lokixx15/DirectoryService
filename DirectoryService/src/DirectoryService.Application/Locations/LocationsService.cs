@@ -24,7 +24,7 @@ public class LocationsService : ILocationsService
         var locationTimezone = LocationTimezone.Create(locationDto.Timezone);
 
         var location = Location.Create(
-            locationDto.Id,
+            Guid.Empty,
             locationName.Value,
             locationAddress.Value,
             locationTimezone.Value,
