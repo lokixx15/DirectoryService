@@ -1,22 +1,16 @@
 ﻿using DirectoryService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure;
 
 
-public class DirectoryServiceDbContext : DbContext
+public class DirectoryServiceDbContext(IConfiguration configuration) : DbContext
 {
-    private readonly string _connectionString;
-
-    public DirectoryServiceDbContext(string connectionString) 
-    { 
-        _connectionString = connectionString;   
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(_connectionString);
+        optionsBuilder.UseNpgsql(configuration.GetConnectionString("DirectoryServiceDb"));
         optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
     }
 

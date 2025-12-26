@@ -17,6 +17,10 @@ public record LocationTimezone
         if (string.IsNullOrWhiteSpace(value)) 
             return Result.Failure<LocationTimezone>("Timezone cannot be empty.");
 
+        if (!TimeZoneInfo.TryFindSystemTimeZoneById(value, out _))
+            return Result.Failure<LocationTimezone>("Timezone is not valid.");
+
+
         var timezone = new LocationTimezone(value);
         return Result.Success(timezone);
     }

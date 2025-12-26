@@ -25,7 +25,7 @@ public class Location
         IsActive = isActive;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = CreatedAt;
-        _departments = departments.ToList();
+        _departments = departments?.ToList() ?? new List<DepartmentLocation>();
     }
 
     public Guid Id { get; private set; }
@@ -43,7 +43,7 @@ public class Location
         LocationAddress address,
         LocationTimezone timezone,
         bool isActive,
-        IEnumerable<DepartmentLocation> departments)
+        IEnumerable<DepartmentLocation>? departments = null)
     {
         var location = new Location(id, name, address, timezone, isActive, departments);
 
