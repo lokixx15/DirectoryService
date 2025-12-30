@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.ValueObjects;
+using SharedKernel;
 
 namespace DirectoryService.Domain.Entities;
 
@@ -34,21 +35,27 @@ public class Position
     public DateTime UpdatedAt { get; private set; }
     public IReadOnlyList<DepartmentPosition> Departments => _departments;
 
-    public static Result<Position> Create(
+    public static Result<Position, Errors> Create(
         Guid? id,
         PositonName name,
         string description,
         bool isActive,
         IEnumerable<DepartmentPosition> departments)
     {
+        var errors = new List<Error>(); 
+
         if (string.IsNullOrWhiteSpace(description))
-            return Result.Failure<Position>("Description cannot be empty or whitespace.");
+            return Result.Failure<Position, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Description"));
+
         if (description.Length > Constants.MAX_POSITION_DESCRIPTION_LENGTH)
-            return Result.Failure<Position>("Description cannot be longer than 1000 characters.");
+            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_POSITION_DESCRIPTION_LENGTH, "Description"));
+
+        if (errors.Any())
+            return Result.Failure<Position, Errors>(errors);
 
         var position = new Position(id, name, description, isActive, departments);
 
-        return Result.Success(position);
+        return Result.Success<Position, Errors>(position);
     }
 }
 

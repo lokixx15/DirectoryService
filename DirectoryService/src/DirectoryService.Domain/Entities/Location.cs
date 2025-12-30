@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using SharedKernel;
 using DirectoryService.Domain.ValueObjects;
 
 namespace DirectoryService.Domain.Entities;
@@ -37,7 +38,7 @@ public class Location
     public DateTime UpdatedAt { get; private set; }
     public IReadOnlyList<DepartmentLocation> Departments => _departments;
 
-    public static Result<Location> Create(
+    public static Result<Location, Errors> Create(
         Guid? id,
         LocationName name,
         LocationAddress address,
@@ -45,9 +46,9 @@ public class Location
         bool isActive,
         IEnumerable<DepartmentLocation>? departments = null)
     {
-        var location = new Location(id, name, address, timezone, isActive, departments);
+        var location = new Location(id, name, address, timezone, isActive, departments!);
 
-        return Result.Success(location);
+        return Result.Success<Location, Errors>(location);
     }
 }
 

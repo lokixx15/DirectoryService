@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using SharedKernel;
 using DirectoryService.Domain.ValueObjects;
 using System.Text.RegularExpressions;
 
@@ -48,7 +49,7 @@ public class Department
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
     public IReadOnlyList<DepartmentPosition> Positions => _positions;
 
-    public static Result<Department> Create(
+    public static Result<Department, Errors> Create(
         Guid? id,
         DepartmentName name,
         string identifier,
@@ -59,20 +60,24 @@ public class Department
         IEnumerable<DepartmentLocation> locations,
         IEnumerable<DepartmentPosition> positions)
     {
+        var errors = new List<Error>();
+
         string isLatinPattern = @"^[A-Za-z]+$";
 
         if (string.IsNullOrWhiteSpace(identifier))
-            return Result.Failure<Department>("Identifier cannot be empty or whitespace.");
+            return Result.Failure<Department, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Identifier"));
 
         if (identifier.Length > Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH || identifier.Length < Constants.MIN_NAME_LENGTH)
-            return Result.Failure<Department>("Identifier can be from 3 to 150 characters long.");
+            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH, "Identifier", Constants.MIN_NAME_LENGTH));
 
         if (!Regex.IsMatch(identifier, isLatinPattern))
-            return Result.Failure<Department>("Identifier must be in Latin.");
+            errors.Add(GeneralErrors.ValueIsNotValid("Identifier must be in Latin", "Identifier"));
 
-        var departnent = new Department(id, name, identifier, parentId, path, depth, isActive, locations, positions);
+        if (errors.Any())
+            return Result.Failure<Department, Errors>(errors);
 
-        return Result.Success(departnent);
+        var department = new Department(id, name, identifier, parentId, path, depth, isActive, locations, positions);
+
+        return Result.Success<Department, Errors>(department);
     }
 }
-

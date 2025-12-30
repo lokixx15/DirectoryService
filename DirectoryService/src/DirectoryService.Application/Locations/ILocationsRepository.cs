@@ -1,8 +1,10 @@
-﻿using DirectoryService.Domain.Entities;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Entities;
+using SharedKernel;
 
 namespace DirectoryService.Application.Locations;
 
 public interface ILocationsRepository
 {
-    Task<Guid> AddAsync(Location location, CancellationToken cancellationToken);
+    Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken);
 }

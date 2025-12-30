@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using SharedKernel;
 
 namespace DirectoryService.Domain.Entities;
 
@@ -19,13 +20,13 @@ public class DepartmentPosition
     public Guid DepartmentId { get; private set; }
     public Guid PositionId { get; private set; }
 
-    public static Result<DepartmentPosition> Create(
+    public static Result<DepartmentPosition, Errors> Create(
         Guid departmentId,
         Guid positionId)
     {
         var departmentPosition = new DepartmentPosition(departmentId, positionId);
 
-        return Result.Success(departmentPosition);
+        return Result.Success<DepartmentPosition, Errors>(departmentPosition);
     }
 }
 

@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using SharedKernel;
 
 namespace DirectoryService.Domain.ValueObjects;
 
@@ -12,15 +13,21 @@ public record LocationName
 
     public string Value { get; private set; } = string.Empty;
 
-    public static Result<LocationName> Create(string value)
+    public static Result<LocationName, Errors> Create(string value)
     {
+        var errors = new List<Error>();
+
         if (string.IsNullOrWhiteSpace(value))
-            return Result.Failure<LocationName>("Name cannot be empty or whitespace.");
+            return Result.Failure<LocationName, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Name"));
+
         if (value.Length > Constants.MAX_LOCATION_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
-            return Result.Failure<LocationName>("Name can be from 3 to 120 characters long.");
+            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_LOCATION_NAME_LENGTH, "Name", Constants.MIN_NAME_LENGTH));
+
+        if (errors.Any())
+            return Result.Failure<LocationName, Errors>(errors);
 
         var name = new LocationName(value);
-        return Result.Success(name);
+
+        return Result.Success<LocationName, Errors>(name);
     }
 }
-
