@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using SharedKernel;
 
 namespace DirectoryService.Domain.ValueObjects;
 
@@ -12,13 +13,19 @@ public record DepartmentPath
 
     public string Value { get; private set; } = string.Empty;
 
-    public static Result<DepartmentPath> Create(string value)
+    public static Result<DepartmentPath, Errors> Create(string value)
     {
+        var errors = new List<Error>();
+
         if (value.Length > Constants.MAX_DEPARTMENT_PATH_LENGTH)
-            return Result.Failure<DepartmentPath>("Path cannot be longer than 300 characters.");
+            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_DEPARTMENT_PATH_LENGTH, "Path"));
+
+        if (errors.Any())
+            return Result.Failure<DepartmentPath, Errors>(errors);
 
         var path = new DepartmentPath(value);
-        return Result.Success(path);
+
+        return Result.Success<DepartmentPath, Errors>(path);
     }
 }
 
