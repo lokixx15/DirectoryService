@@ -2,9 +2,9 @@
 using DirectoryService.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DirectoryService.Presentation;
+namespace DirectoryService.Presentation.Configuration;
 
-public static class DependencyInjection
+public static class DependencyInjectionExtensions
 {
     public static IServiceCollection AddProgramDependencies(this IServiceCollection services) =>
         services

@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
+using DirectoryService.Domain.Exceptions;
 
 namespace DirectoryService.Domain.ValueObjects;
 
@@ -17,14 +18,14 @@ public record LocationTimezone
     {
         var errors = new List<Error>();
 
-        if (string.IsNullOrWhiteSpace(value))
+         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<LocationTimezone, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Timezone"));
 
         if (value.Length > Constants.MAX_LOCATION_TIMEZONE_LENGTH)
             errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_LOCATION_TIMEZONE_LENGTH, "Timezone"));
 
         if (!TimeZoneInfo.TryFindSystemTimeZoneById(value, out _))
-            errors.Add(GeneralErrors.ValueIsNotValid("Timezone is not valid", "Timezone"));
+            throw new ValidationException(GeneralErrors.ValueIsNotValid("Timezone is not valid", "Timezone"));
 
         if (errors.Any())
                 return Result.Failure<LocationTimezone, Errors>(errors);

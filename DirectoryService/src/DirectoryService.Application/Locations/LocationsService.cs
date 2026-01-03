@@ -4,6 +4,7 @@ using DirectoryService.Domain.Entities;
 using SharedKernel;
 using DirectoryService.Domain.ValueObjects;
 using FluentValidation;
+using DirectoryService.Application.Validation;
 
 namespace DirectoryService.Application.Locations;
 
