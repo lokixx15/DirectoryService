@@ -25,7 +25,7 @@ public record LocationTimezone
             errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_LOCATION_TIMEZONE_LENGTH, "Timezone"));
 
         if (!TimeZoneInfo.TryFindSystemTimeZoneById(value, out _))
-            throw new ValidationException(GeneralErrors.ValueIsNotValid("Timezone is not valid", "Timezone"));
+            errors.Add(GeneralErrors.ValueIsNotValid("Timezone is not valid", "Timezone"));
 
         if (errors.Any())
                 return Result.Failure<LocationTimezone, Errors>(errors);

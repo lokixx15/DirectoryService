@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Presentation.Middlewares;
+using Serilog;
 
 namespace DirectoryService.Presentation.Configuration;
 
@@ -7,6 +8,8 @@ public static class AppExtensions
     public static IApplicationBuilder Configure(this WebApplication app)
     {
         app.UseMiddleware<ExceptionMiddleware>();
+
+        app.UseSerilogRequestLogging();
 
         if (app.Environment.IsDevelopment())
         {

@@ -1,12 +1,31 @@
 ﻿using DirectoryService.Presentation.Configuration;
+using Serilog;
+using System.Globalization;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+    .CreateBootstrapLogger();
 
-builder.Services.AddProgramDependencies();
+try
+{
+    Log.Information("Starting web application");
 
-var app = builder.Build();
+    var builder = WebApplication.CreateBuilder(args);
 
-app.Configure();  
+    builder.Services.AddProgramDependencies(builder.Configuration);
 
-app.Run();
+    var app = builder.Build();
 
+    app.Configure();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
