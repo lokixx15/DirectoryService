@@ -36,6 +36,8 @@ public class Error
         new(code ?? "value.is.conflict", message, ErrorType.CONFLICT);
 
     public Errors ToErrors() => this;
+
+    public string GetMessage() => Message;
 }
 
 public enum ErrorType
