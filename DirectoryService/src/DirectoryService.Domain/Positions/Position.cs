@@ -1,8 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.ValueObjects;
+using DirectoryService.Domain.DepartmentPositions;
+using DirectoryService.Domain.Positions.VO;
 using SharedKernel;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.Positions;
 
 public class Position
 {

@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Locations;
 using SharedKernel;
 
 namespace DirectoryService.Application.Locations;

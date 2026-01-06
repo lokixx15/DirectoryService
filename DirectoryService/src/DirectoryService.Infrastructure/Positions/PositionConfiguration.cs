@@ -1,9 +1,9 @@
 ﻿using DirectoryService.Domain;
-using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Configurations;
+namespace DirectoryService.Infrastructure.Positions;
 
 public class PositionConfiguration : IEntityTypeConfiguration<Position>
 {

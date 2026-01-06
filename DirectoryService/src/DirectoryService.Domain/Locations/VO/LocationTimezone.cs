@@ -2,7 +2,7 @@
 using SharedKernel;
 using DirectoryService.Domain.Exceptions;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationTimezone
 {

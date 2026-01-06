@@ -1,9 +1,9 @@
-﻿using DirectoryService.Domain.Entities;
-using DirectoryService.Application.Locations;
+﻿using DirectoryService.Application.Locations;
 using CSharpFunctionalExtensions;
 using SharedKernel;
+using DirectoryService.Domain.Locations;
 
-namespace DirectoryService.Infrastructure.Repositories;
+namespace DirectoryService.Infrastructure.Locations;
 
 public class LocationsRepository : ILocationsRepository
 {

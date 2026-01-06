@@ -1,9 +1,9 @@
 ﻿using DirectoryService.Domain;
-using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Configurations;
+namespace DirectoryService.Infrastructure.Locations;
 
 public class LocationConfiguration : IEntityTypeConfiguration<Location>
 {

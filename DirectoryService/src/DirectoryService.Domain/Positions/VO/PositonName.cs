@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.Positions.VO;
 
 public record PositonName
 {

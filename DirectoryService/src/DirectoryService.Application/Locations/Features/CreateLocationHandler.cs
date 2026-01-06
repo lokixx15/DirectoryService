@@ -1,34 +1,35 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Contracts.Locations;
-using DirectoryService.Domain.Entities;
 using SharedKernel;
-using DirectoryService.Domain.ValueObjects;
 using FluentValidation;
 using DirectoryService.Application.Validation;
 using Microsoft.Extensions.Logging;
+using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Locations.VO;
+using DirectoryService.Application.Abstractions;
 
-namespace DirectoryService.Application.Locations;
+namespace DirectoryService.Application.Locations.Features;
 
-public class LocationsService : ILocationsService
+public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
     private readonly IValidator<CreateLocationDto> _createLocationDtoValidator;
-    private readonly ILogger<LocationsService> _logger;
+    private readonly ILogger<CreateLocationHandler> _logger;
 
-    public LocationsService(ILocationsRepository locationsRepository,
+    public CreateLocationHandler(ILocationsRepository locationsRepository,
         IValidator<CreateLocationDto> createLocationDtoValidator,
-        ILogger<LocationsService> logger)
+        ILogger<CreateLocationHandler> logger)
     {
         _locationsRepository = locationsRepository;
         _createLocationDtoValidator = createLocationDtoValidator;
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Errors>> Create(
-        CreateLocationDto locationDto, 
+    public async Task<Result<Guid, Errors>> Handle(
+        CreateLocationCommand command, 
         CancellationToken cancellationToken)
     {
-        var locationDtoResult = await _createLocationDtoValidator.ValidateAsync(locationDto, cancellationToken);
+        var locationDtoResult = await _createLocationDtoValidator.ValidateAsync(command.createLocationDto, cancellationToken);
 
         if (!locationDtoResult.IsValid)
         {
@@ -36,18 +37,18 @@ public class LocationsService : ILocationsService
             return locationDtoResult.ToErrors();
         }
 
-        var locationName = LocationName.Create(locationDto.Name);
+        var locationName = LocationName.Create(command.createLocationDto.Name);
 
-        var locationAddress = LocationAddress.Create(locationDto.Address);
+        var locationAddress = LocationAddress.Create(command.createLocationDto.Address);
 
-        var locationTimezone = LocationTimezone.Create(locationDto.Timezone);
+        var locationTimezone = LocationTimezone.Create(command.createLocationDto.Timezone);
 
         var location = Location.Create(
             Guid.Empty,
             locationName.Value,
             locationAddress.Value,
             locationTimezone.Value,
-            locationDto.IsActive);
+            command.createLocationDto.IsActive);
 
         if (location.IsFailure)
         {

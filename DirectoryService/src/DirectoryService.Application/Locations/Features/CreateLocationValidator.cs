@@ -1,13 +1,13 @@
 ﻿using DirectoryService.Contracts.Locations;
-using DirectoryService.Domain.ValueObjects;
 using FluentValidation;
 using DirectoryService.Application.Validation;
+using DirectoryService.Domain.Locations.VO;
 
-namespace DirectoryService.Application.Locations.Validators;
+namespace DirectoryService.Application.Locations.Features;
 
-public class CreateLocationDtoValidator : AbstractValidator<CreateLocationDto>
+public class CreateLocationValidator : AbstractValidator<CreateLocationDto>
 {
-    public CreateLocationDtoValidator()
+    public CreateLocationValidator()
     {
         RuleFor(dto => dto.Name)
             .MustBeValueObject(LocationName.Create);

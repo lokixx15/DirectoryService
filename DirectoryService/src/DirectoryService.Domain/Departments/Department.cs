@@ -1,9 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
-using DirectoryService.Domain.ValueObjects;
 using System.Text.RegularExpressions;
+using DirectoryService.Domain.Departments.VO;
+using DirectoryService.Domain.DepartmentLocations;
+using DirectoryService.Domain.DepartmentPositions;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.Departments;
 
 public class Department
 {

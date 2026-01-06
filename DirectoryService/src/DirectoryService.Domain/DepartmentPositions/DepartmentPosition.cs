@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.DepartmentPositions;
 
 public class DepartmentPosition
 {
