@@ -3,7 +3,6 @@ using DirectoryService.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-
 namespace DirectoryService.Presentation.Configuration;
 
 public static class DependencyInjectionExtensions

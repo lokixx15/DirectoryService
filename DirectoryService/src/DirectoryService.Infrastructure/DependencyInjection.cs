@@ -1,5 +1,5 @@
 ﻿using DirectoryService.Application.Locations;
-using DirectoryService.Infrastructure.Repositories;
+using DirectoryService.Infrastructure.Locations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DirectoryService.Infrastructure;

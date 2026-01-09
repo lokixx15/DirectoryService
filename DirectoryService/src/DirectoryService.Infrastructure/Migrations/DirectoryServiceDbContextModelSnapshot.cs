@@ -23,7 +23,55 @@ namespace DirectoryService.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Department", b =>
+            modelBuilder.Entity("DirectoryService.Domain.DepartmentLocations.DepartmentLocation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("fk_departmentlocation_department_id");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("fk_departmentlocation_location_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_departmetntlocation_id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("department_location", (string)null);
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.DepartmentPositions.DepartmentPosition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("fk_departmentposition_department_id");
+
+                    b.Property<Guid>("PositionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("fk_departmentposition_position_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_departmentposition_id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("PositionId");
+
+                    b.ToTable("department_position", (string)null);
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.Departments.Department", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,7 +103,7 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Entities.Department.Name#DepartmentName", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Departments.Department.Name#DepartmentName", b1 =>
                         {
                             b1.IsRequired();
 
@@ -66,7 +114,7 @@ namespace DirectoryService.Infrastructure.Migrations
                                 .HasColumnName("name");
                         });
 
-                    b.ComplexProperty<Dictionary<string, object>>("Path", "DirectoryService.Domain.Entities.Department.Path#DepartmentPath", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Path", "DirectoryService.Domain.Departments.Department.Path#DepartmentPath", b1 =>
                         {
                             b1.IsRequired();
 
@@ -85,55 +133,7 @@ namespace DirectoryService.Infrastructure.Migrations
                     b.ToTable("departments", (string)null);
                 });
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentLocation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("fk_departmentlocation_department_id");
-
-                    b.Property<Guid>("LocationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("fk_departmentlocation_location_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_departmetntlocation_id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("department_location", (string)null);
-                });
-
-            modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentPosition", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("fk_departmentposition_department_id");
-
-                    b.Property<Guid>("PositionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("fk_departmentposition_position_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_departmentposition_id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("PositionId");
-
-                    b.ToTable("department_position", (string)null);
-                });
-
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Location", b =>
+            modelBuilder.Entity("DirectoryService.Domain.Locations.Location", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -151,18 +151,7 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Address", "DirectoryService.Domain.Entities.Location.Address#LocationAddress", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(200)
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("address");
-                        });
-
-                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Entities.Location.Name#LocationName", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Locations.Location.Name#LocationName", b1 =>
                         {
                             b1.IsRequired();
 
@@ -173,7 +162,7 @@ namespace DirectoryService.Infrastructure.Migrations
                                 .HasColumnName("name");
                         });
 
-                    b.ComplexProperty<Dictionary<string, object>>("Timezone", "DirectoryService.Domain.Entities.Location.Timezone#LocationTimezone", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Timezone", "DirectoryService.Domain.Locations.Location.Timezone#LocationTimezone", b1 =>
                         {
                             b1.IsRequired();
 
@@ -190,7 +179,7 @@ namespace DirectoryService.Infrastructure.Migrations
                     b.ToTable("locations", (string)null);
                 });
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Position", b =>
+            modelBuilder.Entity("DirectoryService.Domain.Positions.Position", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -214,7 +203,7 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Entities.Position.Name#PositonName", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Positions.Position.Name#PositonName", b1 =>
                         {
                             b1.IsRequired();
 
@@ -231,56 +220,106 @@ namespace DirectoryService.Infrastructure.Migrations
                     b.ToTable("positions", (string)null);
                 });
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Department", b =>
+            modelBuilder.Entity("DirectoryService.Domain.DepartmentLocations.DepartmentLocation", b =>
                 {
-                    b.HasOne("DirectoryService.Domain.Entities.Department", null)
-                        .WithMany()
-                        .HasForeignKey("ParentId");
-                });
-
-            modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentLocation", b =>
-                {
-                    b.HasOne("DirectoryService.Domain.Entities.Department", null)
+                    b.HasOne("DirectoryService.Domain.Departments.Department", null)
                         .WithMany("Locations")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("DirectoryService.Domain.Entities.Location", null)
+                    b.HasOne("DirectoryService.Domain.Locations.Location", null)
                         .WithMany("Departments")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.DepartmentPosition", b =>
+            modelBuilder.Entity("DirectoryService.Domain.DepartmentPositions.DepartmentPosition", b =>
                 {
-                    b.HasOne("DirectoryService.Domain.Entities.Department", null)
+                    b.HasOne("DirectoryService.Domain.Departments.Department", null)
                         .WithMany("Positions")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("DirectoryService.Domain.Entities.Position", null)
+                    b.HasOne("DirectoryService.Domain.Positions.Position", null)
                         .WithMany("Departments")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Department", b =>
+            modelBuilder.Entity("DirectoryService.Domain.Departments.Department", b =>
+                {
+                    b.HasOne("DirectoryService.Domain.Departments.Department", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId");
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.Locations.Location", b =>
+                {
+                    b.OwnsOne("DirectoryService.Domain.Locations.VO.LocationAddress", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("LocationId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Apartment")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Building")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("District")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("FullAddress")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Region")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("LocationId");
+
+                            b1.ToTable("locations");
+
+                            b1.ToJson("address");
+
+                            b1.WithOwner()
+                                .HasForeignKey("LocationId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.Departments.Department", b =>
                 {
                     b.Navigation("Locations");
 
                     b.Navigation("Positions");
                 });
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Location", b =>
+            modelBuilder.Entity("DirectoryService.Domain.Locations.Location", b =>
                 {
                     b.Navigation("Departments");
                 });
 
-            modelBuilder.Entity("DirectoryService.Domain.Entities.Position", b =>
+            modelBuilder.Entity("DirectoryService.Domain.Positions.Position", b =>
                 {
                     b.Navigation("Departments");
                 });

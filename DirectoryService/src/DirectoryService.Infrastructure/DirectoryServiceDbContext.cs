@@ -1,10 +1,13 @@
-﻿using DirectoryService.Domain.Entities;
+﻿using DirectoryService.Domain.DepartmentLocations;
+using DirectoryService.Domain.DepartmentPositions;
+using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure;
-
 
 public class DirectoryServiceDbContext(IConfiguration configuration) : DbContext
 {

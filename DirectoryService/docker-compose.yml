@@ -1,8 +1,22 @@
 ﻿services:
+
+  directory-service:
+    container_name: directory-service
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+    - "9001:9001"
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Docker
+    - ASPNETCORE_URLS=http://s+:9001
+    env_file:
+    - ./directory.service.env
+    restart: always
+
   postgres:
     container_name: postgres
     image: postgres
-    restart: always
     environment:
       POSTGRES_DB: reservation_service_db
       POSTGRES_USER: postgres
@@ -11,6 +25,7 @@
       - "5435:5432"
     volumes:
       - postgres-data:/var/lib/postgresql
+    restart: always
 
   seq:
     container_name: seq

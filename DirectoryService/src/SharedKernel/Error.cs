@@ -4,6 +4,7 @@ namespace SharedKernel;
 
 public class Error
 {
+    public const string SEPARATOR = "||";
     public string Code { get; } = string.Empty;
 
     public string Message { get; } = string.Empty;
@@ -32,12 +33,30 @@ public class Error
     public static Error Failure(string? code, string message) =>
         new(code ?? "failure", message, ErrorType.FAILURE);
 
-    public static Error Conflict(string? code, string message, string? invalidField) =>
+    public static Error Conflict(string? code, string message) =>
         new(code ?? "value.is.conflict", message, ErrorType.CONFLICT);
 
     public Errors ToErrors() => this;
 
     public string GetMessage() => Message;
+
+    public string Serialize()
+    {
+        return string.Join(SEPARATOR, Code, Message, Type, InvalidField);
+    }
+
+    public static Error Deserialize(string error)
+    {
+        string[] errorParts = error.Split(SEPARATOR);
+
+        if (errorParts.Length < 3)
+            throw new ArgumentException("Error string has an invalid format for deserialization");
+
+        if (Enum.TryParse<ErrorType>(errorParts[2], out var type) == false)
+            throw new Exception("Error string has an invalid format for deserialization");
+
+        return new(errorParts[0], errorParts[1], type);
+    }
 }
 
 public enum ErrorType
