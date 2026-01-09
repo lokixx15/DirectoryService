@@ -2,6 +2,6 @@
 
 public record CreateLocationDto(
     string Name,
-    string Address,
     string Timezone,
-    bool IsActive);
+    bool IsActive,
+    CreateLocationAddressDto Address);

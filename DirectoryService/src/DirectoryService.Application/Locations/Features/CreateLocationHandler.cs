@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Contracts.Locations;
 using SharedKernel;
 using FluentValidation;
 using DirectoryService.Application.Validation;
@@ -13,15 +12,15 @@ namespace DirectoryService.Application.Locations.Features;
 public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
-    private readonly IValidator<CreateLocationDto> _createLocationDtoValidator;
+    private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(ILocationsRepository locationsRepository,
-        IValidator<CreateLocationDto> createLocationDtoValidator,
+        IValidator<CreateLocationCommand> validator,
         ILogger<CreateLocationHandler> logger)
     {
         _locationsRepository = locationsRepository;
-        _createLocationDtoValidator = createLocationDtoValidator;
+        _validator = validator;
         _logger = logger;
     }
 
@@ -29,17 +28,24 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         CreateLocationCommand command, 
         CancellationToken cancellationToken)
     {
-        var locationDtoResult = await _createLocationDtoValidator.ValidateAsync(command.createLocationDto, cancellationToken);
+        var comandValidationResult = await _validator.ValidateAsync(command, cancellationToken);
 
-        if (!locationDtoResult.IsValid)
+        if (!comandValidationResult.IsValid)
         {
             _logger.LogError("Errors occured when validating locationDto");
-            return locationDtoResult.ToErrors();
+            return comandValidationResult.ToErrors();
         }
 
         var locationName = LocationName.Create(command.createLocationDto.Name);
 
-        var locationAddress = LocationAddress.Create(command.createLocationDto.Address);
+        var locationAddress = LocationAddress.Create(
+            command.createLocationDto.Address.Country,
+            command.createLocationDto.Address.City,
+            command.createLocationDto.Address.Street,
+            command.createLocationDto.Address.Building,
+            command.createLocationDto.Address.Region,
+            command.createLocationDto.Address.District,
+            command.createLocationDto.Address.Apartment);
 
         var locationTimezone = LocationTimezone.Create(command.createLocationDto.Timezone);
 
@@ -66,7 +72,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             return insertResult.Error.ToErrors();
         }
 
-        _logger.LogInformation("The location has been inserted into the database");
+        _logger.LogInformation("The location has been inserted into database");
 
         return location.Value.Id;
     }

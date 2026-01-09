@@ -3,6 +3,7 @@ using DirectoryService.Application.Locations.Features;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Presentation.EnpointResults;
 using Microsoft.AspNetCore.Mvc;
+
 namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]

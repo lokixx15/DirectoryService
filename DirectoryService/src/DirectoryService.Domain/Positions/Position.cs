@@ -49,7 +49,7 @@ public class Position
             return Result.Failure<Position, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Description"));
 
         if (description.Length > Constants.MAX_POSITION_DESCRIPTION_LENGTH)
-            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_POSITION_DESCRIPTION_LENGTH, "Description"));
+            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_POSITION_DESCRIPTION_LENGTH, "Description"));
 
         if (errors.Any())
             return Result.Failure<Position, Errors>(errors);

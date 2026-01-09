@@ -1,7 +1,5 @@
-﻿using DirectoryService.Application.Locations;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
-using Scrutor;
 using DirectoryService.Application.Abstractions;
 
 namespace DirectoryService.Application;

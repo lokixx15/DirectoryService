@@ -21,7 +21,7 @@ public record LocationName
             return Result.Failure<LocationName, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Name"));
 
         if (value.Length > Constants.MAX_LOCATION_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
-            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_LOCATION_NAME_LENGTH, "Name", Constants.MIN_NAME_LENGTH));
+            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_LOCATION_NAME_LENGTH, "Name", Constants.MIN_NAME_LENGTH));
 
         if (errors.Any())
             return Result.Failure<LocationName, Errors>(errors);

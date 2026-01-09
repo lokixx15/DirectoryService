@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using SharedKernel;
 using FluentValidation.Results;
+using SharedKernel;
 
 namespace DirectoryService.Application.Validation;
 
-public static class CustomValidator
+public static class CustomValidators
 {
     public static IRuleBuilderOptionsConditions<T, TElement> MustBeValueObject<T, TElement, TValueObject>(
         this IRuleBuilder<T, TElement> ruleBuilder,
@@ -24,5 +24,12 @@ public static class CustomValidator
                 { ErrorCode = e.Code });
             }
         }); 
+    }
+
+    public static IRuleBuilderOptions<T, TElement> WithError<T, TElement>(
+        this IRuleBuilderOptions<T, TElement> ruleBuilderOptions,
+        Error error)
+    {
+        return ruleBuilderOptions.WithMessage(error.Serialize());
     }
 }

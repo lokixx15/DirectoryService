@@ -18,20 +18,16 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder
             .ComplexProperty(l => l.Name, bp =>
             {
-                bp.Property(l => l.Value)
+                bp.Property(l => l.Value)          
                     .HasMaxLength(Constants.MAX_LOCATION_NAME_LENGTH)
                     .IsRequired()
                     .HasColumnName("name");
             });
 
-        builder
-            .ComplexProperty(l => l.Address, bp =>
-            {
-                bp.Property(l => l.Value)
-                    .HasMaxLength(Constants.MAX_LOCATION_ADDRESS_LENGTH)
-                    .IsRequired()
-                    .HasColumnName("address");
-            });
+        builder.OwnsOne(l => l.Address, bp =>
+        {
+            bp.ToJson("address");
+        });
 
         builder
             .ComplexProperty(l => l.Timezone, bp =>

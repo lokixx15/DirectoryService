@@ -18,7 +18,7 @@ public record DepartmentPath
         var errors = new List<Error>();
 
         if (value.Length > Constants.MAX_DEPARTMENT_PATH_LENGTH)
-            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_DEPARTMENT_PATH_LENGTH, "Path"));
+            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_DEPARTMENT_PATH_LENGTH, "Path"));
 
         if (errors.Any())
             return Result.Failure<DepartmentPath, Errors>(errors);

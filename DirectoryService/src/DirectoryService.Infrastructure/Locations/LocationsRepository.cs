@@ -2,16 +2,23 @@
 using CSharpFunctionalExtensions;
 using SharedKernel;
 using DirectoryService.Domain.Locations;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Locations;
 
 public class LocationsRepository : ILocationsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
+    private readonly ILogger<LocationsRepository> _logger;
 
-    public LocationsRepository(DirectoryServiceDbContext dbContext)
+    public LocationsRepository(
+        DirectoryServiceDbContext dbContext, 
+        ILogger<LocationsRepository> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
 
     public async Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken)
@@ -24,9 +31,24 @@ public class LocationsRepository : ILocationsRepository
 
             return location.Id;
         }
-        catch(Exception ex) 
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx)
         {
-            return GeneralErrors.InsertFailed(ex.Message, "database.insert.failed");
+            if (pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
+                return GeneralErrors.ValueAlreadyExists("Value already exists");
+
+            _logger.LogError(ex, "Database update error while creating location with name {Name}", location.Name.Value);
+
+            return GeneralErrors.DatabaseInsertFailed(ex.Message);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled while creating location with name {Name}", location.Name.Value);
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while creating location with name {Name}", location.Name.Value);
+            return GeneralErrors.DatabaseInsertFailed(ex.Message);
         }
     }
 }

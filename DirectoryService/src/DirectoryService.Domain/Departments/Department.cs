@@ -70,7 +70,7 @@ public class Department
             return Result.Failure<Department, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Identifier"));
 
         if (identifier.Length > Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH || identifier.Length < Constants.MIN_NAME_LENGTH)
-            errors.Add(GeneralErrors.ValueLengthIsNotInvalid(Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH, "Identifier", Constants.MIN_NAME_LENGTH));
+            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH, "Identifier", Constants.MIN_NAME_LENGTH));
 
         if (!Regex.IsMatch(identifier, isLatinPattern))
             errors.Add(GeneralErrors.ValueIsNotValid("Identifier must be in Latin", "Identifier"));
