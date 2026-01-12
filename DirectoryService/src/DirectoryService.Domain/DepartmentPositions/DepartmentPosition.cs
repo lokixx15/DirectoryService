@@ -7,6 +7,7 @@ public class DepartmentPosition
 {
     //ef core
     private DepartmentPosition() { }
+
     private DepartmentPosition(
     Guid departmentId,
     Guid positionId)

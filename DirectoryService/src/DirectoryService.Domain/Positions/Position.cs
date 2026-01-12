@@ -14,22 +14,21 @@ public class Position
 
     private Position(
         Guid? id,
-        PositonName name, 
+        PositionName name, 
         string description, 
-        bool isActive,
         IEnumerable<DepartmentPosition> departments)
     {
         Id = id ?? Guid.NewGuid();
         Name = name;
         Description = description;
-        IsActive = isActive;
+        IsActive = true;
         CreatedAt = DateTime.UtcNow;    
         UpdatedAt = CreatedAt;
         _departments = departments.ToList();
     }
                     
     public Guid Id { get; private set; }
-    public PositonName Name { get; private set; } = null!;
+    public PositionName Name { get; private set; } = null!;
     public string Description { get; private set; } = string.Empty;
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -38,9 +37,8 @@ public class Position
 
     public static Result<Position, Errors> Create(
         Guid? id,
-        PositonName name,
+        PositionName name,
         string description,
-        bool isActive,
         IEnumerable<DepartmentPosition> departments)
     {
         var errors = new List<Error>(); 
@@ -54,7 +52,7 @@ public class Position
         if (errors.Any())
             return Result.Failure<Position, Errors>(errors);
 
-        var position = new Position(id, name, description, isActive, departments);
+        var position = new Position(id, name, description, departments);
 
         return Result.Success<Position, Errors>(position);
     }

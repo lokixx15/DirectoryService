@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DirectoryService.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    partial class DirectoryServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260111173552_IndexesForDepIdentifierAndPosName")]
+    partial class IndexesForDepIdentifierAndPosName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,7 +211,7 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Positions.Position.Name#PositionName", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Positions.Position.Name#PositonName", b1 =>
                         {
                             b1.IsRequired();
 
@@ -245,13 +248,13 @@ namespace DirectoryService.Infrastructure.Migrations
                     b.HasOne("DirectoryService.Domain.Departments.Department", null)
                         .WithMany("Positions")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.HasOne("DirectoryService.Domain.Positions.Position", null)
                         .WithMany("Departments")
                         .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
                 });
 
@@ -259,8 +262,7 @@ namespace DirectoryService.Infrastructure.Migrations
                 {
                     b.HasOne("DirectoryService.Domain.Departments.Department", null)
                         .WithMany("ChildrenDepartments")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ParentId");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Locations.Location", b =>
@@ -286,6 +288,10 @@ namespace DirectoryService.Infrastructure.Migrations
                                 .HasColumnType("text");
 
                             b1.Property<string>("District")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("FullAddress")
+                                .IsRequired()
                                 .HasColumnType("text");
 
                             b1.Property<string>("Region")

@@ -27,6 +27,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.OwnsOne(l => l.Address, bp =>
         {
             bp.ToJson("address");
+            bp.Ignore(a => a.FullAddress);
         });
 
         builder

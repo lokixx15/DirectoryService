@@ -20,6 +20,27 @@ public static class GeneralErrors
     public static Error ValueAlreadyExists(string message) =>
         Error.Conflict("value.already.exists", message);
 
+    public static Error EntityNotFound(string? name = null, string? message = null) =>
+        Error.Validation(
+            "entity.not.found",
+            message ?? $"{name ?? "Entity"} was not found in the database.",
+            name ?? "Entity");
+
+    public static Error CollectionIsNullOrEmpty(string? name = null) =>
+        Error.Validation(
+            "collection.is.empty",
+            $"Collection {name ?? ""} cannot be null or empty",
+            $"Collection {name ?? ""}");
+
+    public static Error CollectionContainsDuplicates(string? name = null) =>
+    Error.Validation(
+        "collection.duplicates",
+        $"Collection {name ?? ""} cannot contains duplicates",
+        $"Collection {name ?? ""}");
+
+    public static Error DatabaseReadFailed(string message, string? code = null) =>
+        Error.Failure(code ?? "database.read.failed", message);
+
     public static Error DatabaseInsertFailed(string message, string? code = null) =>
         Error.Failure(code ?? "database.insert.failed", message);
 

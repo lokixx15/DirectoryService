@@ -24,11 +24,15 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
                 .HasColumnName("name");
             });
 
+
         builder
-            .Property(d => d.Identifier)
-            .HasMaxLength(Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH)
-            .IsRequired()
-            .HasColumnName("identifier");
+            .ComplexProperty(d => d.Identifier, bp =>
+            {
+                bp.Property(d => d.Value)
+                .HasMaxLength(Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH)
+                .IsRequired()
+                .HasColumnName("identifier");
+            });
 
         builder
             .Property(d => d.ParentId)
@@ -67,7 +71,8 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         builder
             .HasOne<Department>()
-            .WithMany()
-            .HasForeignKey(d => d.ParentId);
+            .WithMany(d => d.ChildrenDepartments)
+            .HasForeignKey(d => d.ParentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

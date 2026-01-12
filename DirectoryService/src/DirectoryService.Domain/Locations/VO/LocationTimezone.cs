@@ -5,6 +5,9 @@ namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationTimezone
 {
+    //ef core 
+    private LocationTimezone() { }
+
     private LocationTimezone(
     string value)
     {
