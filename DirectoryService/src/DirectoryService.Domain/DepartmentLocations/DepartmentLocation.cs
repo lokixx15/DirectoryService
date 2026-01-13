@@ -17,9 +17,9 @@ public class DepartmentLocation
         LocationId = locationId;
     }
 
-    public Guid Id { get; private set; }
-    public Guid DepartmentId { get; private set; }
-    public Guid LocationId { get; private set; }
+    public Guid Id { get; }
+    public Guid DepartmentId { get; }
+    public Guid LocationId { get; }
 
     public static Result<DepartmentLocation, Errors> Create(
         Guid departmentId,

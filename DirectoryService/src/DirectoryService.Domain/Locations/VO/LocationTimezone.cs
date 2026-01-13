@@ -5,13 +5,16 @@ namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationTimezone
 {
+    //ef core 
+    private LocationTimezone() { }
+
     private LocationTimezone(
     string value)
     {
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<LocationTimezone, Errors> Create(string value)
     {

@@ -7,6 +7,7 @@ public class DepartmentPosition
 {
     //ef core
     private DepartmentPosition() { }
+
     private DepartmentPosition(
     Guid departmentId,
     Guid positionId)
@@ -16,9 +17,9 @@ public class DepartmentPosition
         PositionId = positionId;
     }
 
-    public Guid Id { get; private set; }
-    public Guid DepartmentId { get; private set; }
-    public Guid PositionId { get; private set; }
+    public Guid Id { get; }
+    public Guid DepartmentId { get; }
+    public Guid PositionId { get; }
 
     public static Result<DepartmentPosition, Errors> Create(
         Guid departmentId,

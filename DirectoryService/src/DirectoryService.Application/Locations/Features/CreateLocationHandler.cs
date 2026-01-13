@@ -28,52 +28,52 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         CreateLocationCommand command, 
         CancellationToken cancellationToken)
     {
-        var comandValidationResult = await _validator.ValidateAsync(command, cancellationToken);
+        var commandValidationResult = await _validator.ValidateAsync(command, cancellationToken);
 
-        if (!comandValidationResult.IsValid)
+        if (!commandValidationResult.IsValid)
         {
-            _logger.LogError("Errors occured when validating locationDto");
-            return comandValidationResult.ToErrors();
+            _logger.LogError("Errors occurred when validating locationCommand");
+            return commandValidationResult.ToErrors();
         }
 
-        var locationName = LocationName.Create(command.createLocationDto.Name);
+        var locationName = LocationName.Create(command.CreateLocationDto.Name).Value;
 
         var locationAddress = LocationAddress.Create(
-            command.createLocationDto.Address.Country,
-            command.createLocationDto.Address.City,
-            command.createLocationDto.Address.Street,
-            command.createLocationDto.Address.Building,
-            command.createLocationDto.Address.Region,
-            command.createLocationDto.Address.District,
-            command.createLocationDto.Address.Apartment);
+            command.CreateLocationDto.Address.Country,
+            command.CreateLocationDto.Address.City,
+            command.CreateLocationDto.Address.Street,
+            command.CreateLocationDto.Address.Building,
+            command.CreateLocationDto.Address.Region,
+            command.CreateLocationDto.Address.District,
+            command.CreateLocationDto.Address.Apartment).Value;
 
-        var locationTimezone = LocationTimezone.Create(command.createLocationDto.Timezone);
+        var locationTimezone = LocationTimezone.Create(command.CreateLocationDto.Timezone).Value;
 
-        var location = Location.Create(
+        var locationResult = Location.Create(
             Guid.Empty,
-            locationName.Value,
-            locationAddress.Value,
-            locationTimezone.Value,
-            command.createLocationDto.IsActive);
+            locationName,
+            locationAddress,
+            locationTimezone,
+            command.CreateLocationDto.IsActive);
 
-        if (location.IsFailure)
+        if (locationResult.IsFailure)
         {
-            _logger.LogError("Errors occured when creating location");
-            return location.Error;
+            _logger.LogError("Errors occurred when creating location");
+            return locationResult.Error;
         }
 
         _logger.LogInformation("The location has been created");
 
-        var insertResult = await _locationsRepository.AddAsync(location.Value, cancellationToken);
+        var addLocationResult = await _locationsRepository.AddAsync(locationResult.Value, cancellationToken);
 
-        if (insertResult.IsFailure)
+        if (addLocationResult.IsFailure)
         {
             _logger.LogError("Failed to insert location into database");
-            return insertResult.Error.ToErrors();
+            return addLocationResult.Error.ToErrors();
         }
 
         _logger.LogInformation("The location has been inserted into database");
 
-        return location.Value.Id;
+        return locationResult.Value.Id;
     }
 }

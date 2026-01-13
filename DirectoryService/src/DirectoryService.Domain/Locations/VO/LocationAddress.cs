@@ -1,12 +1,16 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Departments;
 using SharedKernel;
+using System.Diagnostics.Metrics;
+using System.IO;
 using System.Text.Json.Serialization;
 
 namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationAddress
 {
-    public const string SEPARATOR = ", ";
+    //ef core
+    private LocationAddress() { }
 
     private LocationAddress(
         string country,
@@ -15,8 +19,7 @@ public record LocationAddress
         string building,
         string? region,
         string? district,
-        string? apartment,
-        string fullAddress)
+        string? apartment)
     {
         Country = country;
         City = city;
@@ -25,18 +28,18 @@ public record LocationAddress
         Region = region;
         District = district;
         Apartment = apartment;
-        FullAddress = fullAddress;
     }
 
-    public string Country { get; private set; }
-    public string City { get; private set; }
-    public string Street { get; private set; }
-    public string Building { get; private set; }
-    public string? Region { get; private set; }
-    public string? District { get; private set; }
-    public string? Apartment { get; private set; }
-    [JsonIgnore]
-    public string FullAddress { get; private set; }
+    public const string SEPARATOR = ", ";
+
+    public string Country { get; } = string.Empty;
+    public string City { get; } = string.Empty;
+    public string Street { get; } = string.Empty;
+    public string Building { get; } = string.Empty;
+    public string? Region { get; } = string.Empty;
+    public string? District { get; } = string.Empty;
+    public string? Apartment { get; } = string.Empty;
+    public string FullAddress => GetFullAddress(Country, City, Street, Building, Region, District, Apartment);
 
     public static Result<LocationAddress, Errors> Create(
         string country,
@@ -69,7 +72,7 @@ public record LocationAddress
         if (errors.Any())
             return Result.Failure<LocationAddress, Errors>(errors);
 
-        var address = new LocationAddress(country, city, street, building, region, district, apartment, fullAddress);
+        var address = new LocationAddress(country, city, street, building, region, district, apartment);
 
         return Result.Success<LocationAddress, Errors>(address);
     }

@@ -5,13 +5,16 @@ namespace DirectoryService.Domain.Departments.VO;
 
 public record DepartmentName
 {
+    //ef core 
+    private DepartmentName() { }
+
     private DepartmentName(
     string value)
     {
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<DepartmentName, Errors> Create(string value)
     {
@@ -21,7 +24,7 @@ public record DepartmentName
             return Result.Failure<DepartmentName, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Name"));
 
         if (value.Length > Constants.MAX_DEPARTMENT_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
-            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_DEPARTMENT_PATH_LENGTH, "Name", Constants.MIN_NAME_LENGTH));
+            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_DEPARTMENT_NAME_LENGTH, "Name", Constants.MIN_NAME_LENGTH));
 
         if (errors.Any())
             return Result.Failure<DepartmentName, Errors>(errors);

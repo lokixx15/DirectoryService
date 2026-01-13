@@ -2,6 +2,8 @@
 
 public static class Constants
 {
+    public const string IS_LATIN_PATTERN = @"^[A-Za-z]+$";
+
     public const int MIN_NAME_LENGTH = 3;
 
     public const int MAX_DEPARTMENT_IDENTIFIER_LENGTH = 150;

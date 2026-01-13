@@ -3,30 +3,33 @@ using SharedKernel;
 
 namespace DirectoryService.Domain.Positions.VO;
 
-public record PositonName
+public record PositionName
 {
-    private PositonName(
+    //ef core 
+    private PositionName() { }
+
+    private PositionName(
     string value)
     {
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
-    public static Result<PositonName, Errors> Create(string value)
+    public static Result<PositionName, Errors> Create(string value)
     {
         var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(value))
-            return Result.Failure<PositonName, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Name"));
+            return Result.Failure<PositionName, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Name"));
 
         if (value.Length > Constants.MAX_POSITION_NAME_LENGTH || value.Length < Constants.MIN_NAME_LENGTH)
             errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_POSITION_NAME_LENGTH, "Name", Constants.MIN_NAME_LENGTH));
 
         if (errors.Any())
-            return Result.Failure<PositonName, Errors>(errors);
+            return Result.Failure<PositionName, Errors>(errors);
 
-        return Result.Success<PositonName, Errors>(new PositonName(value));
+        return Result.Success<PositionName, Errors>(new PositionName(value));
     }
 }
 

@@ -5,13 +5,16 @@ namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationName
 {
+    //ef core 
+    private LocationName() { }  
+
     private LocationName(
     string value)
     {
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<LocationName, Errors> Create(string value)
     {
