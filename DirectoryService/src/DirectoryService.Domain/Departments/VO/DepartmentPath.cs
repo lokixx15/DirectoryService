@@ -15,7 +15,7 @@ public record DepartmentPath
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<DepartmentPath, Errors> Create(string value, string? parentPath = null)
     {

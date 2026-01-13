@@ -32,13 +32,13 @@ public record LocationAddress
 
     public const string SEPARATOR = ", ";
 
-    public string Country { get; private set; } = string.Empty;
-    public string City { get; private set; } = string.Empty;
-    public string Street { get; private set; } = string.Empty;
-    public string Building { get; private set; } = string.Empty;
-    public string? Region { get; private set; } = string.Empty;
-    public string? District { get; private set; } = string.Empty;
-    public string? Apartment { get; private set; } = string.Empty;
+    public string Country { get; } = string.Empty;
+    public string City { get; } = string.Empty;
+    public string Street { get; } = string.Empty;
+    public string Building { get; } = string.Empty;
+    public string? Region { get; } = string.Empty;
+    public string? District { get; } = string.Empty;
+    public string? Apartment { get; } = string.Empty;
     public string FullAddress => GetFullAddress(Country, City, Street, Building, Region, District, Apartment);
 
     public static Result<LocationAddress, Errors> Create(

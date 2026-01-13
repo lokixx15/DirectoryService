@@ -14,7 +14,7 @@ public record LocationName
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<LocationName, Errors> Create(string value)
     {

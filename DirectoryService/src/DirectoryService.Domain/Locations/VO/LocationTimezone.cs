@@ -14,7 +14,7 @@ public record LocationTimezone
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<LocationTimezone, Errors> Create(string value)
     {

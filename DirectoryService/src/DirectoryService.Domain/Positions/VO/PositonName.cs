@@ -14,7 +14,7 @@ public record PositionName
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<PositionName, Errors> Create(string value)
     {

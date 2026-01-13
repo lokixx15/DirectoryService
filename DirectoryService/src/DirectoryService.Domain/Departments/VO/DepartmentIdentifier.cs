@@ -15,7 +15,7 @@ public record DepartmentIdentifier
         Value = value;
     }
 
-    public string Value { get; private set; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<DepartmentIdentifier, Errors> Create(string value)
     {
