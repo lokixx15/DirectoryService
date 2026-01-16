@@ -30,4 +30,3 @@ public class DepartmentPosition
         return Result.Success<DepartmentPosition, Errors>(departmentPosition);
     }
 }
-

@@ -4,6 +4,32 @@ using SharedKernel;
 
 namespace DirectoryService.Presentation.EnpointResults;
 
+public sealed class EndpointResult : IResult
+{
+    private readonly IResult _result;
+
+    public EndpointResult(UnitResult<Error> result)
+    {
+        _result = result.IsSuccess
+            ? new SuccessResult()
+            : new ErrorsResult(result.Error);
+    }
+
+    public EndpointResult(UnitResult<Errors> result)
+    {
+        _result = result.IsSuccess
+            ? new SuccessResult()
+            : new ErrorsResult(result.Error);
+    }
+
+    public async Task ExecuteAsync(HttpContext httpContext) =>
+        await _result.ExecuteAsync(httpContext);
+
+    public static implicit operator EndpointResult(UnitResult<Error> result) => new(result);
+
+    public static implicit operator EndpointResult(UnitResult<Errors> result) => new(result);
+}
+
 public sealed class EndpointResult<TValue> : IResult
 {
     private readonly IResult _result;
@@ -25,5 +51,7 @@ public sealed class EndpointResult<TValue> : IResult
     public async Task ExecuteAsync(HttpContext httpContext) =>
         await _result.ExecuteAsync(httpContext);
 
-    public static implicit operator EndpointResult<TValue>(Result<TValue, Errors> result) => new(result); 
+    public static implicit operator EndpointResult<TValue>(Result<TValue, Error> result) => new(result);
+
+    public static implicit operator EndpointResult<TValue>(Result<TValue, Errors> result) => new(result);
 }

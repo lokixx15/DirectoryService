@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using SharedKernel;
-using System.Text.RegularExpressions;
 using DirectoryService.Domain.Departments.VO;
 using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.DepartmentPositions;

@@ -3,14 +3,14 @@ using DirectoryService.Domain.Locations.VO;
 using FluentValidation;
 using SharedKernel;
 
-namespace DirectoryService.Application.Locations.Features;
+namespace DirectoryService.Application.Locations.Features.CreateLocation;
 
 public class CreateLocationValidator : AbstractValidator<CreateLocationCommand>
 {
     public CreateLocationValidator()
     {
         RuleFor(command => command.CreateLocationDto)
-            .NotEmpty()
+            .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
         RuleFor(command => command.CreateLocationDto.Name)

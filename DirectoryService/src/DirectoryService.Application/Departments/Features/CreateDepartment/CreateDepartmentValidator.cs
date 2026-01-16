@@ -3,12 +3,16 @@ using FluentValidation;
 using DirectoryService.Domain.Departments.VO;
 using SharedKernel;
 
-namespace DirectoryService.Application.Departments.Features;
+namespace DirectoryService.Application.Departments.Features.CreateDepartment;
 
 public class CreateDepartmentValidator : AbstractValidator<CreateDepartmentCommand>
 {
     public CreateDepartmentValidator()
     {
+        RuleFor(command => command.CreateDepartmentDto)
+            .NotNull()
+                .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
+
         RuleFor(command => command.CreateDepartmentDto.Name)
             .MustBeValueObject(DepartmentName.Create);
 
@@ -16,9 +20,13 @@ public class CreateDepartmentValidator : AbstractValidator<CreateDepartmentComma
             .MustBeValueObject(DepartmentIdentifier.Create);
 
         RuleFor(command => command.CreateDepartmentDto.LocationIds)
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
+                .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"))
+            .NotEmpty()
+                .WithError(GeneralErrors.CollectionIsNullOrEmpty("LocationsIds"))
             .Must(dI => dI.Distinct().Count() == dI.Length)
                 .WithError(GeneralErrors.CollectionContainsDuplicates("LocationIds"))
-            .NotEmpty()
-                .WithError(GeneralErrors.CollectionIsNullOrEmpty("LocationsIds"));
+            .When(command => command.CreateDepartmentDto != null);
     }
 }

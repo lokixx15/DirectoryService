@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.DepartmentLocations;
@@ -9,23 +10,26 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
-namespace DirectoryService.Application.Departments.Features;
+namespace DirectoryService.Application.Departments.Features.CreateDepartment;
 
 public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ITransactionManager _transactionManager;
     private readonly IValidator<CreateDepartmentCommand> _validator;
     private readonly ILogger<CreateDepartmentHandler> _logger;
 
     public CreateDepartmentHandler(
         IDepartmentsRepository departmentsRepository,
         ILocationsRepository locationsRepository,
+        ITransactionManager transactionManager,
         IValidator<CreateDepartmentCommand> validator,
         ILogger<CreateDepartmentHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
+        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }
@@ -48,15 +52,27 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
 
         var departmentIdentifier = DepartmentIdentifier.Create(command.CreateDepartmentDto.Identifier).Value;
 
-        Guid[] locationIds = command.CreateDepartmentDto.LocationIds;
+        var locationIds = command.CreateDepartmentDto.LocationIds;
 
-        var locationsExistResult = await _locationsRepository.ExistsAsync(locationIds, cancellationToken);
+        var transactionScopeResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
 
-        if (locationsExistResult.IsFailure)
+        if (transactionScopeResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when beginning transaction");
+            return transactionScopeResult.Error.ToErrors();
+        }
+
+        var transactionScope = transactionScopeResult.Value;
+
+        var locationsExistenceResult = await _locationsRepository.ExistsAsync(locationIds, cancellationToken);
+
+        if (locationsExistenceResult.IsFailure)
         {
             _logger.LogError("Errors occurred when checking the existence of locations by ids: {Ids}",
                 string.Join(",", locationIds));
-            return locationsExistResult.Error.ToErrors();
+            transactionScope.Rollback();
+
+            return locationsExistenceResult.Error.ToErrors();
         }
 
         var departmentLocationList = locationIds.Select(id =>
@@ -72,6 +88,8 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         {
             _logger.LogError("Errors occurred when getting parent department by id {Id}",
                 command.CreateDepartmentDto.ParentId);
+            transactionScope.Rollback();
+
             return parentResult.Error.ToErrors();
         }
 
@@ -86,11 +104,29 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         if (addDepartmentResult.IsFailure)
         {
             _logger.LogError("Failed to insert department into database");
+            transactionScope.Rollback();
+
             return addDepartmentResult.Error.ToErrors();
+        }
+
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+
+        if (saveChangesResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when saving changes");
+            return saveChangesResult.Error.ToErrors();
+        }
+
+        var commitResult = transactionScope.Commit();
+
+        if (commitResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when committing transaction");
+            return saveChangesResult.Error.ToErrors();
         }
 
         _logger.LogInformation("The department has been inserted into database");
 
-        return departmentId;
+        return addDepartmentResult.Value;
     }
 }

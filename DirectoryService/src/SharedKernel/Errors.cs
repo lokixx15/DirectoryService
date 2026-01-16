@@ -11,6 +11,11 @@ public class Errors : IEnumerable<Error>
         _errors = [..errors];
     }
 
+    public Errors(IEnumerable<Errors> errors)
+    {
+        _errors = [.. errors.SelectMany(e => e)];
+    }
+
     public IEnumerator<Error> GetEnumerator() 
     { 
         return _errors.GetEnumerator(); 
@@ -18,7 +23,7 @@ public class Errors : IEnumerable<Error>
 
     IEnumerator IEnumerable.GetEnumerator() => _errors.GetEnumerator();
 
-    public static implicit operator Errors(List<Error> errors) => new Errors(errors);
-
     public static implicit operator Errors(Error error) => new Errors([error]);
+
+    public static implicit operator Errors(List<Error> errors) => new Errors(errors);
 }

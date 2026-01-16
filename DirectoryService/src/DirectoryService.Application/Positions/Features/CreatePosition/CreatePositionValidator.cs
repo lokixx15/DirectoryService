@@ -4,12 +4,16 @@ using DirectoryService.Domain.Positions.VO;
 using FluentValidation;
 using SharedKernel;
 
-namespace DirectoryService.Application.Positions.Features;
+namespace DirectoryService.Application.Positions.Features.CreatePosition;
 
 public class CreatePositionValidator : AbstractValidator<CreatePositionCommand>
 {
     public CreatePositionValidator()
     {
+        RuleFor(command => command.CreatePositionDto)
+            .NotNull()
+                .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
+
         RuleFor(command => command.CreatePositionDto.Name)
             .MustBeValueObject(PositionName.Create);
 
@@ -20,9 +24,12 @@ public class CreatePositionValidator : AbstractValidator<CreatePositionCommand>
                     "Description"));
 
         RuleFor(command => command.CreatePositionDto.DepartmentIds)
+            .NotNull()
+                .WithError(GeneralErrors.ValueIsNullOrWhitespace("DepartmentsIds"))
+            .NotEmpty()
+                .WithError(GeneralErrors.CollectionIsNullOrEmpty("DepartmentsIds"))
             .Must(dI => dI.Distinct().Count() == dI.Length)
                 .WithError(GeneralErrors.CollectionContainsDuplicates("LocationIds"))
-            .NotEmpty()
-                .WithError(GeneralErrors.CollectionIsNullOrEmpty("DepartmentsIds"));
+            .When(command => command.CreatePositionDto != null);
     }
 }

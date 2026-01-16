@@ -40,7 +40,6 @@ public class ErrorsResult : IResult
         var envelope = Envelope.Error(_errors);
 
         await httpContext.Response.WriteAsJsonAsync(envelope);
-
     }
 
     private int GetStatusCodeForErrorType(ErrorType errorType) =>

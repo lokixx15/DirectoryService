@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Departments;
+using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.Departments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using SharedKernel;
 
 namespace DirectoryService.Infrastructure.Departments;
@@ -46,7 +46,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error when reading department with id {Id}", id);
-            return GeneralErrors.DatabaseInsertFailed(ex.Message);
+            return GeneralErrors.DatabaseReadFailed(ex.Message);
         }
     }
 
@@ -83,33 +83,27 @@ public class DepartmentsRepository : IDepartmentsRepository
     public async Task<Result<Guid, Error>> AddAsync(Department department, CancellationToken cancellationToken = default)
     {
         await _dbContext.AddAsync(department, cancellationToken);
+        _logger.LogInformation("Department was addedd to the database");
 
-        try
-        {
-            await _dbContext.SaveChangesAsync();
+        return department.Id;
+    }
 
-            _logger.LogInformation("Department with name {Name} has been added to the database", department.Name);
+    public async Task<UnitResult<Error>> AddLocationsToDepartmentAsync(List<DepartmentLocation> locations, CancellationToken cancellationToken)
+    {
+        await _dbContext.DepartmentLocations.AddRangeAsync(locations, cancellationToken);
+        _logger.LogInformation("Locations were addedd to the database");
 
-            return department.Id;
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx)
-        {
-            if (pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
-                return GeneralErrors.ValueAlreadyExists("Department already exists");
+        return UnitResult.Success<Error>();
+    }
 
-            _logger.LogError(pgEx, "Database update error when creating department with name {Name}", department.Name.Value);
+    public async Task<UnitResult<Error>> DeleteLocationsByDepartmentIdAsync(Guid departmentId, CancellationToken cancellationToken)
+    {
+        await _dbContext.DepartmentLocations
+            .Where(d => d.DepartmentId == departmentId)
+            .ExecuteDeleteAsync(cancellationToken);
 
-            return GeneralErrors.DatabaseInsertFailed(pgEx.Message);
-        }
-        catch (OperationCanceledException ex)
-        {
-            _logger.LogError(ex, "Operation was cancelled when creating department with name {Name}", department.Name.Value);
-            return GeneralErrors.OperationCancelled();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error when creating department with name {Name}", department.Name.Value);
-            return GeneralErrors.DatabaseInsertFailed(ex.Message);
-        }
+        _logger.LogInformation("Locations were deleted from the database");
+
+        return UnitResult.Success<Error>();
     }
 }
