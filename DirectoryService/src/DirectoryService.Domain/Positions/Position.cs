@@ -57,4 +57,3 @@ public class Position
         return Result.Success<Position, Errors>(position);
     }
 }
-

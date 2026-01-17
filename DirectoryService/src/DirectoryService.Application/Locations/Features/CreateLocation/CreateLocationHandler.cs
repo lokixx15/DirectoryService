@@ -6,20 +6,25 @@ using Microsoft.Extensions.Logging;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Locations.VO;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 
-namespace DirectoryService.Application.Locations.Features;
+namespace DirectoryService.Application.Locations.Features.CreateLocation;
 
 public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ITransactionManager _transactionManager;
     private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILogger<CreateLocationHandler> _logger;
 
-    public CreateLocationHandler(ILocationsRepository locationsRepository,
+    public CreateLocationHandler(
+        ILocationsRepository locationsRepository,
+        ITransactionManager transactionManager,
         IValidator<CreateLocationCommand> validator,
         ILogger<CreateLocationHandler> logger)
     {
         _locationsRepository = locationsRepository;
+        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }
@@ -53,8 +58,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             Guid.Empty,
             locationName,
             locationAddress,
-            locationTimezone,
-            command.CreateLocationDto.IsActive);
+            locationTimezone);
 
         if (locationResult.IsFailure)
         {
@@ -72,8 +76,16 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             return addLocationResult.Error.ToErrors();
         }
 
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+
+        if (saveChangesResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when saving changes");
+            return saveChangesResult.Error.ToErrors();
+        }
+
         _logger.LogInformation("The location has been inserted into database");
 
-        return locationResult.Value.Id;
+        return addLocationResult.Value;
     }
 }

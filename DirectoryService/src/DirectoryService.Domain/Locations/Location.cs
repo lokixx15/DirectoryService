@@ -17,14 +17,13 @@ public class Location
         LocationName name,
         LocationAddress address,
         LocationTimezone timezone, 
-        bool isActive,
         IEnumerable<DepartmentLocation> departments)
     {
         Id = id ?? Guid.NewGuid();
         Name = name;
         Address = address;
         Timezone = timezone;
-        IsActive = isActive;
+        IsActive = true;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = CreatedAt;
         _departments = departments?.ToList() ?? new List<DepartmentLocation>();
@@ -44,12 +43,10 @@ public class Location
         LocationName name,
         LocationAddress address,
         LocationTimezone timezone,
-        bool isActive,
         IEnumerable<DepartmentLocation>? departments = null)
     {
-        var location = new Location(id, name, address, timezone, isActive, departments!);
+        var location = new Location(id, name, address, timezone, departments!);
 
         return Result.Success<Location, Errors>(location);
     }
 }
-

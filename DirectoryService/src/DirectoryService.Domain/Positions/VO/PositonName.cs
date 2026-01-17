@@ -32,4 +32,3 @@ public record PositionName
         return Result.Success<PositionName, Errors>(new PositionName(value));
     }
 }
-

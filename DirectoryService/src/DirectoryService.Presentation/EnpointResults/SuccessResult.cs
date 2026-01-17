@@ -2,6 +2,20 @@
 
 namespace DirectoryService.Presentation.EnpointResults;
 
+public class SuccessResult : IResult
+{
+    public async Task ExecuteAsync(HttpContext httpContext)
+    {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var envelope = Envelope.Ok();
+
+        httpContext.Response.StatusCode = (int)HttpStatusCode.OK;
+
+        await httpContext.Response.WriteAsJsonAsync(envelope);
+    }
+}
+
 public class SuccessResult<TValue> : IResult
 {
     private readonly TValue _value;
@@ -15,7 +29,7 @@ public class SuccessResult<TValue> : IResult
     {
         ArgumentNullException.ThrowIfNull(httpContext);
 
-        var envelope = Envelope.Ok(_value);
+        var envelope = Envelope<TValue>.Ok(_value);
 
         httpContext.Response.StatusCode = (int)HttpStatusCode.OK;
 

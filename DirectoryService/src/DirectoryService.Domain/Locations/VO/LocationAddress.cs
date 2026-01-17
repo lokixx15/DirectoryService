@@ -1,9 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Departments;
 using SharedKernel;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Text.Json.Serialization;
 
 namespace DirectoryService.Domain.Locations.VO;
 
@@ -32,13 +28,13 @@ public record LocationAddress
 
     public const string SEPARATOR = ", ";
 
-    public string Country { get; } = string.Empty;
-    public string City { get; } = string.Empty;
-    public string Street { get; } = string.Empty;
-    public string Building { get; } = string.Empty;
-    public string? Region { get; } = string.Empty;
-    public string? District { get; } = string.Empty;
-    public string? Apartment { get; } = string.Empty;
+    public string Country { get; init; } = string.Empty;
+    public string City { get; init; } = string.Empty;
+    public string Street { get; init; } = string.Empty;
+    public string Building { get; init; } = string.Empty;
+    public string? Region { get; init; } 
+    public string? District { get; init; } 
+    public string? Apartment { get; init; }
     public string FullAddress => GetFullAddress(Country, City, Street, Building, Region, District, Apartment);
 
     public static Result<LocationAddress, Errors> Create(

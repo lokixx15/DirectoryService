@@ -34,4 +34,3 @@ public record DepartmentName
         return Result.Success<DepartmentName, Errors>(name);
     }
 }
-
