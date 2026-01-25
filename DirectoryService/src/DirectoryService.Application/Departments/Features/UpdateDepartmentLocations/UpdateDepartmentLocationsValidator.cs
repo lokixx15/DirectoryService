@@ -4,15 +4,15 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 
-public class UpdateDepartmentLocationsValidator : AbstractValidator<UpdateDepartmentLocationsCommand>
+public class UpdateDepartmentLocationsCommandValidator : AbstractValidator<UpdateDepartmentLocationsCommand>
 {
-    public UpdateDepartmentLocationsValidator()
+    public UpdateDepartmentLocationsCommandValidator()
     {
-        RuleFor(command => command.updateDepartmentLocationsDto)
+        RuleFor(command => command)
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
-        RuleFor(command => command.updateDepartmentLocationsDto.LocationIds)
+        RuleFor(command => command.locationIds)
             .Cascade(CascadeMode.Stop)
             .NotNull()
                 .WithError(GeneralErrors.CollectionIsNullOrEmpty("LocationsIds"))
@@ -20,6 +20,6 @@ public class UpdateDepartmentLocationsValidator : AbstractValidator<UpdateDepart
                 .WithError(GeneralErrors.CollectionIsNullOrEmpty("LocationsIds"))
             .Must(lI => lI.Distinct().Count() == lI.Length)
                 .WithError(GeneralErrors.CollectionContainsDuplicates("LocationIds"))
-            .When(command => command.updateDepartmentLocationsDto != null);
+            .When(command => command != null);
     }
 }

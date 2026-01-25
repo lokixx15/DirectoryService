@@ -5,9 +5,9 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.CreateDepartment;
 
-public class CreateDepartmentValidator : AbstractValidator<CreateDepartmentCommand>
+public class CreateDepartmentCommandValidator : AbstractValidator<CreateDepartmentCommand>
 {
-    public CreateDepartmentValidator()
+    public CreateDepartmentCommandValidator()
     {
         RuleFor(command => command.CreateDepartmentDto)
             .NotNull()

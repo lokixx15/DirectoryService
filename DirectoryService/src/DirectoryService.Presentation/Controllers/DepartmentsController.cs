@@ -14,10 +14,10 @@ public class DepartmentsController : ControllerBase
     [HttpPost]
     public async Task<EndpointResult<Guid>> CreateDepartment(
         [FromServices] CreateDepartmentHandler handler,
-        [FromBody] CreateDepartmentDto request,
+        [FromBody] CreateDepartmentDto createDepartmentDto,
         CancellationToken cancellationToken)
     {
-        var command = new CreateDepartmentCommand(request);
+        var command = new CreateDepartmentCommand(createDepartmentDto);
 
         return await handler.Handle(command, cancellationToken);
     }
@@ -26,10 +26,10 @@ public class DepartmentsController : ControllerBase
     public async Task<EndpointResult> UpdateDepartmentLocations(
         [FromServices] UpdateDepartmentLocationsHadnler handler,
         [FromRoute] Guid departmentId,
-        [FromBody] UpdateDepartmentLocationsDto request,
+        [FromBody] Guid[] locationIds,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateDepartmentLocationsCommand(departmentId, request);
+        var command = new UpdateDepartmentLocationsCommand(departmentId, locationIds);
 
         return await handler.Handle(command, cancellationToken);
     }
@@ -38,10 +38,10 @@ public class DepartmentsController : ControllerBase
     public async Task<EndpointResult> UpdateDepartmentParent(
     [FromServices] UpdateDepartmentParentHandler handler,
     [FromRoute] Guid departmentId,
-    [FromBody] UpdateDepartmentParentDto request,
+    [FromBody] Guid? parentId,
     CancellationToken cancellationToken)
     {
-        var command = new UpdateDepartmentParentCommand(departmentId, request);
+        var command = new UpdateDepartmentParentCommand(departmentId, parentId);
 
         return await handler.Handle(command, cancellationToken);
     }

@@ -45,7 +45,7 @@ public class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDepartment
         }
 
         var departmentId = command.departmentId;
-        var locationIds = command.updateDepartmentLocationsDto.LocationIds;
+        var locationIds = command.locationIds;
 
         var transactionScopeResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
 

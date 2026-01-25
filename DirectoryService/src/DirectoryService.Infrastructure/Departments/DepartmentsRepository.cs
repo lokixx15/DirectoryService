@@ -60,16 +60,13 @@ public class DepartmentsRepository : IDepartmentsRepository
     {
         try
         {
-            await _dbContext.Database.ExecuteSqlRawAsync(@"
+            var department = await _dbContext.Departments.FromSqlInterpolated($"""
                 SELECT *
                 FROM departments 
-                WHERE id = {0}
-                FOR UPDATE NOWAIT;",
-                [id],
-                cancellationToken);
-
-            var department = await _dbContext.Departments
-                .FirstOrDefaultAsync(d => d.Id == id && d.IsActive, cancellationToken);
+                WHERE id = {id} AND is_active = true
+                FOR UPDATE
+                """)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (department == null)
             {
@@ -102,7 +99,7 @@ public class DepartmentsRepository : IDepartmentsRepository
                 SELECT path, depth
                 FROM departments 
                 WHERE path <@ {0}::ltree
-                FOR UPDATE NOWAIT", 
+                FOR UPDATE", 
                 [oldDepartmentPath.Value], 
                 cancellationToken);
 
@@ -176,9 +173,9 @@ public class DepartmentsRepository : IDepartmentsRepository
 
         var sql = """
                         UPDATE departments
-                        SET path = COALESCE(NULLIF(@updatedDepartmentPath, ''), '')::ltree
+                        SET path = @updatedDepartmentPath::ltree
                         || subpath(path, nlevel(@oldUpdatedDepartmentPath::ltree)),
-                            depth = nlevel(COALESCE(NULLIF(@updatedDepartmentPath, ''), '')::ltree
+                            depth = nlevel(@updatedDepartmentPath::ltree
                         || subpath(path, nlevel(@oldUpdatedDepartmentPath::ltree))) - 1
                         WHERE path <@ @oldUpdatedDepartmentPath::ltree
                         AND nlevel(path) != nlevel(@oldUpdatedDepartmentPath::ltree);

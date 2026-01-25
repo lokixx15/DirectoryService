@@ -6,9 +6,9 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Positions.Features.CreatePosition;
 
-public class CreatePositionValidator : AbstractValidator<CreatePositionCommand>
+public class CreateCommandPositionValidator : AbstractValidator<CreatePositionCommand>
 {
-    public CreatePositionValidator()
+    public CreateCommandPositionValidator()
     {
         RuleFor(command => command.CreatePositionDto)
             .NotNull()

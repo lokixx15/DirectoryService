@@ -41,7 +41,7 @@ public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentPar
         }
 
         var departmentId = command.departmentId;
-        var departmentParentId = command.updateDepartmentParentDto.parentId;
+        var departmentParentId = command.parentId;
 
         var transactionScopeResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
 
@@ -79,7 +79,7 @@ public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentPar
         if (newParentDepartmentResult.IsFailure)
         {
             _logger.LogError("Errors occurred when getting new parent department by id {Id}", departmentParentId);
-            return udpdatedDepartmentResult.Error.ToErrors();
+            return newParentDepartmentResult.Error.ToErrors();
         }
 
         var newParentDepartment = newParentDepartmentResult.Value;

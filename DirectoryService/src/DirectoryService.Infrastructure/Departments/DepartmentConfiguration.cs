@@ -21,7 +21,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnName("id");
 
         builder
-            .ComplexProperty(d => d.Name, bp =>
+            .OwnsOne(d => d.Name, bp =>
             {
                 bp.Property(d => d.Value)
                 .HasMaxLength(Constants.MAX_DEPARTMENT_NAME_LENGTH)
@@ -31,7 +31,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
 
         builder
-            .ComplexProperty(d => d.Identifier, bp =>
+            .OwnsOne(d => d.Identifier, bp =>
             {
                 bp.Property(d => d.Value)
                 .HasMaxLength(Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH)

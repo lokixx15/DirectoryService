@@ -4,16 +4,12 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 
-public class UpdateDepartmentParentValidator : AbstractValidator<UpdateDepartmentParentCommand>
+public class UpdateDepartmentParentCommandValidator : AbstractValidator<UpdateDepartmentParentCommand>
 {
-    public UpdateDepartmentParentValidator()
+    public UpdateDepartmentParentCommandValidator()
     {
-        RuleFor(command => command.updateDepartmentParentDto)
-            .NotNull()
-                .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
-
         RuleFor(command => command)
-            .Must(c => c.departmentId != c.updateDepartmentParentDto.parentId)
+            .Must(c => c.departmentId != c?.parentId)
                 .WithError(Error.Validation(null, "The department being updated cannot be the parent department.", null));
     }
 }

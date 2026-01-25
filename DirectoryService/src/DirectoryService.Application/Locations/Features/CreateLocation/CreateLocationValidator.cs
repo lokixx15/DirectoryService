@@ -5,9 +5,9 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Locations.Features.CreateLocation;
 
-public class CreateLocationValidator : AbstractValidator<CreateLocationCommand>
+public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCommand>
 {
-    public CreateLocationValidator()
+    public CreateLocationCommandValidator()
     {
         RuleFor(command => command.CreateLocationDto)
             .NotNull()

@@ -4,5 +4,5 @@ using DirectoryService.Contracts.Departments;
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 
 public record UpdateDepartmentParentCommand(
-    Guid departmentId, 
-    UpdateDepartmentParentDto updateDepartmentParentDto) : ICommand;
+    Guid departmentId,
+    Guid? parentId) : ICommand;
