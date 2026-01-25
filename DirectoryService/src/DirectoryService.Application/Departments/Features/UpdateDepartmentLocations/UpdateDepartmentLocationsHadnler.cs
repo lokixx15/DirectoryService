@@ -55,7 +55,7 @@ public class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDepartment
             return transactionScopeResult.Error.ToErrors();
         }
 
-        var transactionScope = transactionScopeResult.Value;
+        using var transactionScope = transactionScopeResult.Value;
 
         var departmentExistenceResult = await _departmentsRepository.ExistsAsync([departmentId], cancellationToken);
 

@@ -7,9 +7,9 @@ public static class AppExtensions
 {
     public static IApplicationBuilder Configure(this WebApplication app)
     {
-        app.UseMiddleware<ExceptionMiddleware>();
-
         app.UseSerilogRequestLogging();
+
+        app.UseMiddleware<ExceptionMiddleware>();
 
         if (app.Environment.IsDevelopment())
         {

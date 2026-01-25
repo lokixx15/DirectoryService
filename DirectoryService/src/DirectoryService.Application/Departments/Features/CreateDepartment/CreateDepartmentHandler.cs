@@ -62,7 +62,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
             return transactionScopeResult.Error.ToErrors();
         }
 
-        var transactionScope = transactionScopeResult.Value;
+        using var transactionScope = transactionScopeResult.Value;
 
         var locationsExistenceResult = await _locationsRepository.ExistsAsync(locationIds, cancellationToken);
 

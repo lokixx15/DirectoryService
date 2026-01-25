@@ -60,7 +60,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
             return transactionScopeResult.Error.ToErrors();
         }
 
-        var transactionScope = transactionScopeResult.Value;
+        using var transactionScope = transactionScopeResult.Value;
 
         var departmentsExistenceResult = await _departmentsRepository.ExistsAsync(departmentIds, cancellationToken);
 

@@ -1,7 +1,6 @@
 ﻿using DirectoryService.Application.Validation;
 using FluentValidation;
 using SharedKernel;
-using System.Text.Json;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 
