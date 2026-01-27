@@ -93,4 +93,23 @@ public class Department
 
         return department;
     }
+
+    public UnitResult<Errors> UpdateParent(Department? parent)
+    {
+        var parentPath = parent?.Path.Value;
+
+        if (parentPath != null && parentPath.StartsWith(Path.Value + "."))
+            return Error.Validation(null, "Parent department cannot be a child of the updated department", null).ToErrors(); 
+
+       var newPathResult = DepartmentPath.Create(Identifier.Value, parentPath);
+
+        if (newPathResult.IsFailure)
+            return newPathResult.Error;
+
+        ParentId = parent?.Id;
+        Path = newPathResult.Value;
+        Depth = (short)((parent?.Depth + 1) ?? 0);
+
+        return UnitResult.Success<Errors>();
+    }
 }

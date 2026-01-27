@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Departments;
 
-public record CreateDepartmentDto(
+public record CreateDepartmentRequest(
     string Name,
     string Identifier,
     Guid? ParentId,

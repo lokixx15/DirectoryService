@@ -4,5 +4,5 @@ using DirectoryService.Contracts.Departments;
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 
 public record UpdateDepartmentLocationsCommand(
-    Guid departmentId, 
-    UpdateDepartmentLocationsDto updateDepartmentLocationsDto) : ICommand;
+    Guid departmentId,
+    UpdateDepartmentLocationsRequest Request) : ICommand;

@@ -5,21 +5,21 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.CreateDepartment;
 
-public class CreateDepartmentValidator : AbstractValidator<CreateDepartmentCommand>
+public class CreateDepartmentCommandValidator : AbstractValidator<CreateDepartmentCommand>
 {
-    public CreateDepartmentValidator()
+    public CreateDepartmentCommandValidator()
     {
-        RuleFor(command => command.CreateDepartmentDto)
+        RuleFor(command => command.Request)
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
-        RuleFor(command => command.CreateDepartmentDto.Name)
+        RuleFor(command => command.Request.Name)
             .MustBeValueObject(DepartmentName.Create);
 
-        RuleFor(command => command.CreateDepartmentDto.Identifier)
+        RuleFor(command => command.Request.Identifier)
             .MustBeValueObject(DepartmentIdentifier.Create);
 
-        RuleFor(command => command.CreateDepartmentDto.LocationIds)
+        RuleFor(command => command.Request.LocationIds)
             .Cascade(CascadeMode.Stop)
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"))
@@ -27,6 +27,6 @@ public class CreateDepartmentValidator : AbstractValidator<CreateDepartmentComma
                 .WithError(GeneralErrors.CollectionIsNullOrEmpty("LocationsIds"))
             .Must(dI => dI.Distinct().Count() == dI.Length)
                 .WithError(GeneralErrors.CollectionContainsDuplicates("LocationIds"))
-            .When(command => command.CreateDepartmentDto != null);
+            .When(command => command.Request != null);
     }
 }

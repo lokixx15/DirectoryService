@@ -16,6 +16,10 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasName("pk_location_id");
 
         builder
+            .Property(l => l.Id)
+            .HasColumnName("id");
+
+        builder
             .ComplexProperty(l => l.Name, bp =>
             {
                 bp.Property(l => l.Value)          

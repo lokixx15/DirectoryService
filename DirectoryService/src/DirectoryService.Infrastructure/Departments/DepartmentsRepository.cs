@@ -2,8 +2,10 @@
 using DirectoryService.Application.Departments;
 using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Departments.VO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using SharedKernel;
 
 namespace DirectoryService.Infrastructure.Departments;
@@ -21,13 +23,15 @@ public class DepartmentsRepository : IDepartmentsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Department, Error>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result<Department, Error>> GetByIdAsync(
+        Guid id, 
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var department = await _dbContext.Departments
                 .AsNoTracking()
-                .FirstOrDefaultAsync(d => d.Id == id);
+                .FirstOrDefaultAsync(d => d.Id == id && d.IsActive, cancellationToken);
 
             if (department == null)
             {
@@ -50,7 +54,67 @@ public class DepartmentsRepository : IDepartmentsRepository
         }
     }
 
-    public async Task<UnitResult<Error>> ExistsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    public async Task<Result<Department, Error>> GetByIdWithLockAsync(
+        Guid id, 
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var department = await _dbContext.Departments.FromSqlInterpolated($"""
+                SELECT *
+                FROM departments 
+                WHERE id = {id} AND is_active = true
+                FOR UPDATE
+                """)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (department == null)
+            {
+                _logger.LogError("Department with id {Id} was not found in the database", id);
+                return GeneralErrors.EntityNotFound("Department");
+            }
+
+            _logger.LogInformation("Department with id {Id} was obtained from the database", id);
+            return department;
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled while reading department with id {Id}", id);
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error when reading department with id {Id}", id);
+            return GeneralErrors.DatabaseReadFailed(ex.Message);
+        }
+    }
+
+    public async Task<UnitResult<Error>> LockDescendants(
+        DepartmentPath oldDepartmentPath, 
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync(@"
+                SELECT path, depth
+                FROM departments 
+                WHERE path <@ {0}::ltree
+                FOR UPDATE", 
+                [oldDepartmentPath.Value], 
+                cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to lock descendants of {Path}", oldDepartmentPath);
+            return GeneralErrors.DataLockFailed(ex.Message);
+        }
+    }
+
+    public async Task<UnitResult<Error>> ExistsAsync(
+        IEnumerable<Guid> ids, 
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -80,7 +144,9 @@ public class DepartmentsRepository : IDepartmentsRepository
         }
     }
 
-    public async Task<Result<Guid, Error>> AddAsync(Department department, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid, Error>> AddAsync(
+        Department department, 
+        CancellationToken cancellationToken = default)
     {
         await _dbContext.AddAsync(department, cancellationToken);
         _logger.LogInformation("Department was addedd to the database");
@@ -88,7 +154,9 @@ public class DepartmentsRepository : IDepartmentsRepository
         return department.Id;
     }
 
-    public async Task<UnitResult<Error>> AddLocationsToDepartmentAsync(List<DepartmentLocation> locations, CancellationToken cancellationToken)
+    public async Task<UnitResult<Error>> AddLocationsToDepartmentAsync(
+        List<DepartmentLocation> locations, 
+        CancellationToken cancellationToken = default)
     {
         await _dbContext.DepartmentLocations.AddRangeAsync(locations, cancellationToken);
         _logger.LogInformation("Locations were addedd to the database");
@@ -96,7 +164,34 @@ public class DepartmentsRepository : IDepartmentsRepository
         return UnitResult.Success<Error>();
     }
 
-    public async Task<UnitResult<Error>> DeleteLocationsByDepartmentIdAsync(Guid departmentId, CancellationToken cancellationToken)
+    public async Task<UnitResult<Error>> UpdateDepartmentDescendantsParentAsync(
+        DepartmentPath? newUpdatedDepartmentPath,
+        DepartmentPath oldUpdatedDepartmentPath,
+        CancellationToken cancellationToken = default)
+    {
+        var newPath = newUpdatedDepartmentPath?.Value ?? "";
+
+        var sql = """
+                        UPDATE departments
+                        SET path = @updatedDepartmentPath::ltree
+                        || subpath(path, nlevel(@oldUpdatedDepartmentPath::ltree)),
+                            depth = nlevel(@updatedDepartmentPath::ltree
+                        || subpath(path, nlevel(@oldUpdatedDepartmentPath::ltree))) - 1
+                        WHERE path <@ @oldUpdatedDepartmentPath::ltree
+                        AND nlevel(path) != nlevel(@oldUpdatedDepartmentPath::ltree);
+                        """;
+
+        await _dbContext.Database.ExecuteSqlRawAsync(sql,
+            [new NpgsqlParameter("@updatedDepartmentPath", newPath),
+            new NpgsqlParameter("@oldUpdatedDepartmentPath", oldUpdatedDepartmentPath.Value)], 
+            cancellationToken);
+
+        return UnitResult.Success<Error>();
+    }
+
+    public async Task<UnitResult<Error>> DeleteLocationsByDepartmentIdAsync(
+        Guid departmentId,
+        CancellationToken cancellationToken = default)
     {
         await _dbContext.DepartmentLocations
             .Where(d => d.DepartmentId == departmentId)

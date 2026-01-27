@@ -12,7 +12,7 @@ public class PositionsController : ControllerBase
     [HttpPost]
     public async Task<EndpointResult<Guid>> CreatePosition(
         [FromServices] CreatePositionHandler handler,
-        [FromBody] CreatePositionDto request,
+        [FromBody] CreatePositionRequest request,
         CancellationToken cancellationToken)
     {
         var command = new CreatePositionCommand(request);

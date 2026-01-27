@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Domain;
 using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Departments.VO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,7 +17,11 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasName("pk_department_id");
 
         builder
-            .ComplexProperty(d => d.Name, bp =>
+            .Property(d => d.Id)
+            .HasColumnName("id");
+
+        builder
+            .OwnsOne(d => d.Name, bp =>
             {
                 bp.Property(d => d.Value)
                 .HasMaxLength(Constants.MAX_DEPARTMENT_NAME_LENGTH)
@@ -26,7 +31,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
 
         builder
-            .ComplexProperty(d => d.Identifier, bp =>
+            .OwnsOne(d => d.Identifier, bp =>
             {
                 bp.Property(d => d.Value)
                 .HasMaxLength(Constants.MAX_DEPARTMENT_IDENTIFIER_LENGTH)
@@ -38,14 +43,13 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .Property(d => d.ParentId)
             .HasColumnName("parent_id");
 
-        builder
-            .ComplexProperty(d => d.Path, bp =>
-            {
-                bp.Property(d => d.Value)
-                    .HasMaxLength(Constants.MAX_DEPARTMENT_PATH_LENGTH)
-                    .IsRequired()
-                    .HasColumnName("path");
-            });
+        builder.Property(d => d.Path)
+            .HasColumnName("path")
+            .HasColumnType("ltree")
+            .IsRequired()
+            .HasConversion(
+                value => value.Value,
+                value => DepartmentPath.Create(value, null).Value);
 
         builder
             .Property(d => d.Depth)

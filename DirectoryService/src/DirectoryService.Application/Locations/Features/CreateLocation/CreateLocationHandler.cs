@@ -41,18 +41,18 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             return commandValidationResult.ToErrors();
         }
 
-        var locationName = LocationName.Create(command.CreateLocationDto.Name).Value;
+        var locationName = LocationName.Create(command.Request.Name).Value;
 
         var locationAddress = LocationAddress.Create(
-            command.CreateLocationDto.Address.Country,
-            command.CreateLocationDto.Address.City,
-            command.CreateLocationDto.Address.Street,
-            command.CreateLocationDto.Address.Building,
-            command.CreateLocationDto.Address.Region,
-            command.CreateLocationDto.Address.District,
-            command.CreateLocationDto.Address.Apartment).Value;
+            command.Request.AddressRequest.Country,
+            command.Request.AddressRequest.City,
+            command.Request.AddressRequest.Street,
+            command.Request.AddressRequest.Building,
+            command.Request.AddressRequest.Region,
+            command.Request.AddressRequest.District,
+            command.Request.AddressRequest.Apartment).Value;
 
-        var locationTimezone = LocationTimezone.Create(command.CreateLocationDto.Timezone).Value;
+        var locationTimezone = LocationTimezone.Create(command.Request.Timezone).Value;
 
         var locationResult = Location.Create(
             Guid.Empty,
