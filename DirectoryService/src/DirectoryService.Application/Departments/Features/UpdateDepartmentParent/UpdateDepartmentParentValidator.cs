@@ -9,7 +9,7 @@ public class UpdateDepartmentParentCommandValidator : AbstractValidator<UpdateDe
     public UpdateDepartmentParentCommandValidator()
     {
         RuleFor(command => command)
-            .Must(c => c.departmentId != c?.parentId)
+            .Must(c => c.departmentId != c?.Request.parentId)
                 .WithError(Error.Validation(null, "The department being updated cannot be the parent department.", null));
     }
 }

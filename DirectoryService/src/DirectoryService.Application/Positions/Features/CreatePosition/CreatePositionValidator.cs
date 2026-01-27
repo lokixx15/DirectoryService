@@ -10,26 +10,26 @@ public class CreateCommandPositionValidator : AbstractValidator<CreatePositionCo
 {
     public CreateCommandPositionValidator()
     {
-        RuleFor(command => command.CreatePositionDto)
+        RuleFor(command => command.Request)
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
-        RuleFor(command => command.CreatePositionDto.Name)
+        RuleFor(command => command.Request.Name)
             .MustBeValueObject(PositionName.Create);
 
-        RuleFor(command => command.CreatePositionDto.Description)
+        RuleFor(command => command.Request.Description)
             .Must(d => d.Length <= Constants.MAX_POSITION_DESCRIPTION_LENGTH)
                 .WithError(GeneralErrors.ValueLengthIsNotValid(
                     Constants.MAX_POSITION_DESCRIPTION_LENGTH,
                     "Description"));
 
-        RuleFor(command => command.CreatePositionDto.DepartmentIds)
+        RuleFor(command => command.Request.DepartmentIds)
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("DepartmentsIds"))
             .NotEmpty()
                 .WithError(GeneralErrors.CollectionIsNullOrEmpty("DepartmentsIds"))
             .Must(dI => dI.Distinct().Count() == dI.Length)
                 .WithError(GeneralErrors.CollectionContainsDuplicates("LocationIds"))
-            .When(command => command.CreatePositionDto != null);
+            .When(command => command.Request != null);
     }
 }

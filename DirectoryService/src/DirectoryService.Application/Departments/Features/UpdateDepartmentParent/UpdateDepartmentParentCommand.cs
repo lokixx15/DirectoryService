@@ -5,4 +5,4 @@ namespace DirectoryService.Application.Departments.Features.UpdateDepartmentPare
 
 public record UpdateDepartmentParentCommand(
     Guid departmentId,
-    Guid? parentId) : ICommand;
+    UpdateDepartmentParentRequest Request) : ICommand;

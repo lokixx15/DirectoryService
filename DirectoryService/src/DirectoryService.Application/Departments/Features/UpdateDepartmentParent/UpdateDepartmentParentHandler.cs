@@ -41,7 +41,7 @@ public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentPar
         }
 
         var departmentId = command.departmentId;
-        var departmentParentId = command.parentId;
+        var departmentParentId = command.Request.parentId;
 
         var transactionScopeResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
 

@@ -5,4 +5,4 @@ namespace DirectoryService.Application.Departments.Features.UpdateDepartmentLoca
 
 public record UpdateDepartmentLocationsCommand(
     Guid departmentId,
-    Guid[] locationIds) : ICommand;
+    UpdateDepartmentLocationsRequest Request) : ICommand;

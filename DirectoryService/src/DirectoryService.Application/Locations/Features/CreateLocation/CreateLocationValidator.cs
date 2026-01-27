@@ -9,14 +9,14 @@ public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCo
 {
     public CreateLocationCommandValidator()
     {
-        RuleFor(command => command.CreateLocationDto)
+        RuleFor(command => command.Request)
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
-        RuleFor(command => command.CreateLocationDto.Name)
+        RuleFor(command => command.Request.Name)
             .MustBeValueObject(LocationName.Create);
 
-        RuleFor(command => command.CreateLocationDto.Address)
+        RuleFor(command => command.Request.AddressRequest)
             .MustBeValueObject((addressDto) => LocationAddress.Create(
                     addressDto.Country,
                     addressDto.City,
@@ -26,7 +26,7 @@ public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCo
                     addressDto.District,
                     addressDto.Apartment));
 
-        RuleFor(command => command.CreateLocationDto.Timezone)
+        RuleFor(command => command.Request.Timezone)
            .MustBeValueObject(LocationTimezone.Create);
     }
 }

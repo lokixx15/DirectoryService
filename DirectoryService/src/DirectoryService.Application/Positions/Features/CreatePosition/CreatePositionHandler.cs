@@ -48,9 +48,9 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
 
         var positionId = Guid.NewGuid();
 
-        var positionName = PositionName.Create(command.CreatePositionDto.Name).Value;
+        var positionName = PositionName.Create(command.Request.Name).Value;
 
-        var departmentIds = command.CreatePositionDto.DepartmentIds;
+        var departmentIds = command.Request.DepartmentIds;
 
         var transactionScopeResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
 
@@ -81,7 +81,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
         var positionResult = Position.Create(
             positionId,
             positionName,
-            command.CreatePositionDto.Description,
+            command.Request.Description,
             departmentPositionList);
 
         if (positionResult.IsFailure)

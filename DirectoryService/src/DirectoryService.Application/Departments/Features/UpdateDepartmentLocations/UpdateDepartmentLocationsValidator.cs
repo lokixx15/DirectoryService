@@ -12,7 +12,7 @@ public class UpdateDepartmentLocationsCommandValidator : AbstractValidator<Updat
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
-        RuleFor(command => command.locationIds)
+        RuleFor(command => command.Request.locationIds)
             .Cascade(CascadeMode.Stop)
             .NotNull()
                 .WithError(GeneralErrors.CollectionIsNullOrEmpty("LocationsIds"))

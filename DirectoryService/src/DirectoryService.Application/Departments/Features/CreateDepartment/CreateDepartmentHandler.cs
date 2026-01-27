@@ -48,11 +48,11 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
 
         var departmentId = Guid.NewGuid();
 
-        var departmentName = DepartmentName.Create(command.CreateDepartmentDto.Name).Value;
+        var departmentName = DepartmentName.Create(command.Request.Name).Value;
 
-        var departmentIdentifier = DepartmentIdentifier.Create(command.CreateDepartmentDto.Identifier).Value;
+        var departmentIdentifier = DepartmentIdentifier.Create(command.Request.Identifier).Value;
 
-        var locationIds = command.CreateDepartmentDto.LocationIds;
+        var locationIds = command.Request.LocationIds;
 
         var transactionScopeResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
 
@@ -80,14 +80,14 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
 
         _logger.LogInformation("The departmentLocation has been created");
 
-        var parentResult = command.CreateDepartmentDto.ParentId != null
-            ? await _departmentsRepository.GetByIdAsync(command.CreateDepartmentDto.ParentId.Value, cancellationToken)
+        var parentResult = command.Request.ParentId != null
+            ? await _departmentsRepository.GetByIdAsync(command.Request.ParentId.Value, cancellationToken)
             : Result.Success<Department, Error>(null!);
 
         if (parentResult.IsFailure)
         {
             _logger.LogError("Errors occurred when getting parent department by id {Id}",
-                command.CreateDepartmentDto.ParentId);
+                command.Request.ParentId);
             transactionScope.Rollback();
 
             return parentResult.Error.ToErrors();
