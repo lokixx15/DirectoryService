@@ -5,7 +5,7 @@ using System.Globalization;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
-    .CreateBootstrapLogger();
+    .CreateLogger();
 
 try
 {
@@ -17,7 +17,7 @@ try
 
     var app = builder.Build();
 
-    app.Configure();
+    await app.Configure(args);
 
     app.Run();
 }
@@ -28,4 +28,9 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
+}
+
+namespace DirectoryService.Presentation
+{
+    public partial class Program;
 }

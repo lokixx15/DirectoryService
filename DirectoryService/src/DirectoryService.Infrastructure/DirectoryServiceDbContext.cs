@@ -9,11 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure;
 
-public class DirectoryServiceDbContext(IConfiguration configuration) : DbContext
+public class DirectoryServiceDbContext : DbContext
 {
+    private readonly string _connectionString;
+
+    public DirectoryServiceDbContext(string connectionString)
+    {
+        _connectionString = connectionString;
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(configuration.GetConnectionString("DirectoryServiceDb"));
+        optionsBuilder.UseNpgsql(_connectionString);
         optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
     }
 
