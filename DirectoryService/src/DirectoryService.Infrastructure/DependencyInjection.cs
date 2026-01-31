@@ -6,15 +6,19 @@ using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Departments;
 using DirectoryService.Infrastructure.Locations;
 using DirectoryService.Infrastructure.Positions;
+using DirectoryService.Infrastructure.Seeding;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DirectoryService.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services) =>
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
         services
-            .AddScoped<DirectoryServiceDbContext>()
+            .AddScoped(_ => new DirectoryServiceDbContext(
+                configuration.GetConnectionString("DirectoryServiceDb")!))
+            .AddScoped<ISeeder, DirectoryServiceSeeder>()
             .AddScoped<ITransactionManager, TransactionManager>()
             .AddScoped<ILocationsRepository, LocationsRepository>()
             .AddScoped<IDepartmentsRepository, DepartmentsRepository>()

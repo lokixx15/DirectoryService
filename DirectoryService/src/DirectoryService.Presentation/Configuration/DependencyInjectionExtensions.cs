@@ -11,7 +11,7 @@ public static class DependencyInjectionExtensions
         services
             .AddSerilogLogging(configuration)
             .AddApplication()
-            .AddInfrastructure()
+            .AddInfrastructure(configuration)
             .AddWeb();
 
     private static IServiceCollection AddWeb(this IServiceCollection services)
