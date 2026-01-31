@@ -4,7 +4,9 @@ namespace DirectoryService.Infrastructure.Seeding;
 
 public static class SeederExtension
 {
-    public static async Task<IServiceProvider> RunSeeding(this IServiceProvider services)
+    public static async Task<IServiceProvider> RunSeeding(
+        this IServiceProvider services, 
+        CancellationToken cancellationToken = default)
     {
         using var scope = services.CreateScope();
 
@@ -12,7 +14,7 @@ public static class SeederExtension
 
         foreach (var seeder in seeders)
         {
-            await seeder.SeedAsync();
+            await seeder.SeedAsync(cancellationToken);
         }
 
         return services;

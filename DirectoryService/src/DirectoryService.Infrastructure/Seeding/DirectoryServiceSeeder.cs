@@ -8,6 +8,7 @@ using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Positions.VO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 
 namespace DirectoryService.Infrastructure.Seeding;
 
@@ -30,13 +31,13 @@ public class DirectoryServiceSeeder : ISeeder
         _logger = logger;
     }
 
-    public async Task SeedAsync()
+    public async Task SeedAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting seeding directory service data");
 
         try
         {
-            await SeedData();
+            await SeedData(cancellationToken);
 
             _logger.LogInformation("Finished seeding directory service data");
         }
@@ -46,37 +47,37 @@ public class DirectoryServiceSeeder : ISeeder
         }
     }
 
-    private async Task SeedData()
+    private async Task SeedData(CancellationToken cancellationToken)
     {
-        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
-            await ClearDatabase();
-            var locations = await SeedLocations();
-            var departments = await SeedDepartments(locations);
-            await SeedPositions(departments);
+            await ClearDatabase(cancellationToken);
+            var locations = await SeedLocations(cancellationToken);
+            var departments = await SeedDepartments(locations, cancellationToken);
+            await SeedPositions(departments, cancellationToken);
 
-            await transaction.CommitAsync();
+            await transaction.CommitAsync(cancellationToken);
             _logger.LogInformation("Seeding completed successfully");
         }
         catch (Exception)
         {
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync(cancellationToken);
             throw; 
         }
     }
 
-    private async Task ClearDatabase()
+    private async Task ClearDatabase(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Clearing database tables");
 
         await _dbContext.Database.ExecuteSqlRawAsync(@"
         TRUNCATE TABLE department_position, department_location, positions, locations, departments 
-        RESTART IDENTITY CASCADE");
+        RESTART IDENTITY CASCADE", cancellationToken);
     }
 
-    private async Task<List<Location>> SeedLocations()
+    private async Task<List<Location>> SeedLocations(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Seeding {Count} locations", LOCATIONS_COUNT);
 
@@ -102,16 +103,16 @@ public class DirectoryServiceSeeder : ISeeder
             var timezone = LocationTimezone.Create(timezones[i % timezones.Length]).Value;
 
             var location = Location.Create(Guid.NewGuid(), name, address, timezone).Value;
-            _dbContext.Locations.Add(location);
+            await _dbContext.Locations.AddAsync(location, cancellationToken);
             locations.Add(location);
         }
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Created {Count} UNIQUE locations", locations.Count);
         return locations;
     }
 
-    private async Task<List<Department>> SeedDepartments(List<Location> locations)
+    private async Task<List<Department>> SeedDepartments(List<Location> locations, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Seeding {Count} departments", DEPARTMENTS_COUNT);
         var departments = new List<Department>();
@@ -136,11 +137,12 @@ public class DirectoryServiceSeeder : ISeeder
                 [DepartmentLocation.Create(departmentId, locations[i].Id).Value]
             ).Value;
 
-            _dbContext.Departments.Add(department);
+            await _dbContext.Departments.AddAsync(department, cancellationToken);
             rootDepartments.Add(department);
             departments.Add(department);
         }
-        await _dbContext.SaveChangesAsync();
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         var childPrefixes = new[] { "dep", "unit", "team", "sect", "grp" };
         for (int i = 0; i < DEPARTMENTS_COUNT - 10; i++)
@@ -166,16 +168,16 @@ public class DirectoryServiceSeeder : ISeeder
                 [DepartmentLocation.Create(departmentId, locations[i + 10].Id).Value]
             ).Value;
 
-            _dbContext.Departments.Add(department);
+            await _dbContext.Departments.AddAsync(department, cancellationToken);
             departments.Add(department);
         }
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Created {Count} departments", departments.Count);
         return departments;
     }
 
-    private async Task SeedPositions(List<Department> departments)
+    private async Task SeedPositions(List<Department> departments, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Seeding {Count} positions", POSITIONS_COUNT);
 
@@ -207,10 +209,10 @@ public class DirectoryServiceSeeder : ISeeder
                 departments: [DepartmentPosition.Create(departments[i].Id,  positionId).Value]
             ).Value;
 
-            _dbContext.Positions.Add(position);
+            await _dbContext.Positions.AddAsync(position, cancellationToken);
         }
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Created {Count} UNIQUE positions", POSITIONS_COUNT);
     }
 }

@@ -2,5 +2,5 @@
 
 public interface ISeeder
 {
-    Task SeedAsync();
+    Task SeedAsync(CancellationToken cancellationToken);
 }

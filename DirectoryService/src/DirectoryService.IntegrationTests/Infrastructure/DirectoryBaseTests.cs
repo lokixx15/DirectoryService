@@ -18,12 +18,12 @@ public class DirectoryBaseTests : IClassFixture<DirectoryTestWebFactory>, IAsync
     public Task InitializeAsync() => Task.CompletedTask;
     public async Task DisposeAsync() => await _resetDatabase();
 
-    protected async Task SeedDataAsync()
+    protected async Task SeedDataAsync(CancellationToken cancellationToken = default)
     {
         await using var scope = Services.CreateAsyncScope();
         var seeder = scope.ServiceProvider.GetRequiredService<ISeeder>();
 
-        await seeder.SeedAsync();
+        await seeder.SeedAsync(cancellationToken);
     }
 
     protected async Task<T> ExecuteInDb<T>(Func<DirectoryServiceDbContext, Task<T>> action)
