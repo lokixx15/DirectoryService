@@ -4,7 +4,7 @@ using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DirectoryService.IntegrationTests.Departmentsp;
+namespace DirectoryService.IntegrationTests.Departments;
 
 public class UpdateDepartmentParentTests : DirectoryBaseTests
 {

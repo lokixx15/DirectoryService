@@ -19,6 +19,7 @@ public static class DependencyInjection
             .AddScoped(_ => new DirectoryServiceDbContext(
                 configuration.GetConnectionString("DirectoryServiceDb")!))
             .AddScoped<ISeeder, DirectoryServiceSeeder>()
+            .AddSingleton<IDbConnectionFactory, NpgsqlConnectionFactory>()
             .AddScoped<ITransactionManager, TransactionManager>()
             .AddScoped<ILocationsRepository, LocationsRepository>()
             .AddScoped<IDepartmentsRepository, DepartmentsRepository>()

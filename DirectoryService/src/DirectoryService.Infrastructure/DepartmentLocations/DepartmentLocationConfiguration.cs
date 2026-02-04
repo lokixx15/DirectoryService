@@ -22,22 +22,24 @@ public class DepartmentLocationConfiguration : IEntityTypeConfiguration<Departme
 
         builder
             .Property(d => d.DepartmentId)
-            .HasColumnName("fk_departmentlocation_department_id");
+            .HasColumnName("department_id");
 
         builder
             .Property(d => d.LocationId)
-            .HasColumnName("fk_departmentlocation_location_id");
+            .HasColumnName("location_id");
 
         builder
             .HasOne<Department>()
             .WithMany(d => d.Locations)
             .HasForeignKey(d => d.DepartmentId)
+            .HasConstraintName("fk_departmentlocation_department_id")
             .OnDelete(DeleteBehavior.NoAction);
 
         builder
             .HasOne<Location>()
             .WithMany(l => l.Departments)
             .HasForeignKey(d => d.LocationId)
+            .HasConstraintName("fk_departmentlocation_location_id")
             .OnDelete(DeleteBehavior.NoAction);
     }
 }
