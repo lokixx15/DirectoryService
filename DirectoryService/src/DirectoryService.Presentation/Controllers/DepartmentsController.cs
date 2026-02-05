@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application.Departments.Features.CreateDepartment;
+using DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 using DirectoryService.Contracts.Departments;
@@ -11,6 +12,13 @@ namespace DirectoryService.Presentation.Controllers;
 [Route("api/departments")]
 public class DepartmentsController : ControllerBase
 {
+    [HttpGet]
+    [Route("top-positions")]
+    public async Task<EndpointResult<IReadOnlyList<DepartmentDto>>> GetDepartmentsWithMostPositions(
+        [FromServices] GetDepartmentsWithMostPositionsHandler handler,
+        CancellationToken cancellationToken) =>
+        await handler.Handle(cancellationToken);
+
     [HttpPost]
     public async Task<EndpointResult<Guid>> CreateDepartment(
         [FromServices] CreateDepartmentHandler handler,
@@ -45,5 +53,4 @@ public class DepartmentsController : ControllerBase
 
         return await handler.Handle(command, cancellationToken);
     }
-
 }

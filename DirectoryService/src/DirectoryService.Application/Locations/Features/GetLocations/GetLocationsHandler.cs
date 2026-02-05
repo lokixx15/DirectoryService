@@ -30,9 +30,11 @@ public class GetLocationsHandler
         _logger = logger;
     }
 
-    public async Task<Result<LocationsResponse, Errors>> Handle(GetLocationsQuery query, CancellationToken cancellationToken)
+    public async Task<Result<LocationsResponse, Errors>> Handle(
+        GetLocationsQuery query, 
+        CancellationToken cancellationToken)
     {
-        var queryValidationResult = await _validator.ValidateAsync(query);
+        var queryValidationResult = await _validator.ValidateAsync(query, cancellationToken);
 
         if (!queryValidationResult.IsValid)
         {
@@ -90,7 +92,6 @@ public class GetLocationsHandler
         try
         {
             var locationResponseList = await connection.QueryAsync<LocationDto, string, long, LocationDto>(
-
                 $"""
                     SELECT l.id,
                            l.name,
