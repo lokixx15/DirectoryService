@@ -1,15 +1,16 @@
-﻿using DirectoryService.Domain.DepartmentLocations;
+﻿using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.DepartmentPositions;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace DirectoryService.Infrastructure;
 
-public class DirectoryServiceDbContext : DbContext
+public class DirectoryServiceDbContext : DbContext, IDbConnectionFactory
 {
     private readonly string _connectionString;
 
@@ -41,4 +42,6 @@ public class DirectoryServiceDbContext : DbContext
     public DbSet<DepartmentPosition> DepartmentPositions => Set<DepartmentPosition>();
     public DbSet<Location> Locations => Set<Location>();    
     public DbSet<Position> Positions => Set<Position>();
+    public IDbConnection GetDbConnection() =>
+        Database.GetDbConnection();
 }

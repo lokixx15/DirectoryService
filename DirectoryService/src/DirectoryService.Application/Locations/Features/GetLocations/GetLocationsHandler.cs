@@ -14,17 +14,18 @@ namespace DirectoryService.Application.Locations.Features.GetLocations;
 public class GetLocationsHandler
     : IQueryHandler<Result<LocationsResponse, Errors>, GetLocationsQuery>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDbConnectionFactory _dbConnection;
+
     private readonly IValidator<GetLocationsQuery> _validator;
     private readonly ILogger<GetLocationsHandler> _logger;
 
 
     public GetLocationsHandler(
-        IDbConnectionFactory connectionFactory,
+        IDbConnectionFactory dbConnection,
         IValidator<GetLocationsQuery> validator,
         ILogger<GetLocationsHandler> logger)
     {
-        _connectionFactory = connectionFactory;
+        _dbConnection = dbConnection;
         _validator = validator;
         _logger = logger;
     }
@@ -38,24 +39,26 @@ public class GetLocationsHandler
             _logger.LogError("Errors occurred when validating GetLocationsQuery");
             return queryValidationResult.ToErrors();
         }
-        using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+
+        using var connection = _dbConnection.GetDbConnection();
 
         var parameters = new DynamicParameters();
         var whereConditions = new List<string>();
-        string joinCondition = string.Empty;
 
         if (query.Request.DepartmentIds != null)
         {
             parameters.Add("department_ids", query.Request.DepartmentIds);
-            whereConditions.Add("d.id = ANY(@department_ids)");
-            joinCondition =
-                """
-                JOIN department_location AS dl ON dl.location_id = l.id
-                JOIN departments AS d ON dl.department_id = d.id
-                """;
+            whereConditions.Add("""
+                                EXISTS(
+                                SELECT 1
+                                FROM department_location AS dl
+                                WHERE dl.location_id = l.id AND 
+                                dl.department_id = ANY(@department_ids))
+                                """);
+                
         }
 
-        if (query.Request.Search !=  null)
+        if (!string.IsNullOrEmpty(query.Request.Search))
         {
             parameters.Add("search", query.Request.Search);
             whereConditions.Add("l.name ILIKE '%' || @search || '%'");
@@ -64,7 +67,7 @@ public class GetLocationsHandler
         if (query.Request.IsActive != null)
         {
             parameters.Add("is_active", query.Request.IsActive);
-            whereConditions.Add("is_active = @is_active");
+            whereConditions.Add("l.is_active = @is_active");
         }
 
         parameters.Add("page_size", query.Request.PageSize);
@@ -79,7 +82,6 @@ public class GetLocationsHandler
         };
         var orderDirection = query.Request.OrderDirection.ToUpper() == "ASC" ? "ASC" : "DESC";
 
-        var fromClause = $"FROM locations AS l";
         var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : "";
         var orderByClause = $"ORDER BY {orderBy} {orderDirection}";            
 
@@ -98,7 +100,6 @@ public class GetLocationsHandler
                            l.address,
                            COUNT(*) OVER() AS total_count
                     FROM locations AS l
-                    {joinCondition}
                     {whereClause}
                     {orderByClause}
                     LIMIT @page_size OFFSET @offset
