@@ -23,6 +23,5 @@ public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
                 .WithError(GeneralErrors.ValueIsNotValid("Page size must be greater than 0", "Page size"))
             .LessThanOrEqualTo(150)
                 .WithError(GeneralErrors.ValueIsNotValid("Page size cannot exceed 150", "Page size"));
-
     }
 }
