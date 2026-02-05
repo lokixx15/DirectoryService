@@ -8,6 +8,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
         var assembly = typeof(DependencyInjection).Assembly;
         services.AddValidatorsFromAssembly(assembly);
 
@@ -17,6 +19,12 @@ public static class DependencyInjection
         .AsSelfWithInterfaces()
         .WithScopedLifetime());
 
+        services.Scan(scan => scan.FromAssemblies(assembly)
+            .AddClasses(classes => classes
+            .AssignableToAny(typeof(IQueryHandler<,>)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
+            
         return services;
     }
 }
