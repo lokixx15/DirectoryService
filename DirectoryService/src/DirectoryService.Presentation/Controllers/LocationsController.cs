@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Locations.Features.CreateLocation;
 using DirectoryService.Application.Locations.Features.GetLocations;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Presentation.EnpointResults;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace DirectoryService.Presentation.Controllers;
 public class LocationsController : ControllerBase
 {
     [HttpGet]
-    public async Task<EndpointResult<LocationsResponse>> GetLocations(
+    public async Task<EndpointResult<PaginationResponse<LocationDto>>> GetLocations(
         [FromServices] GetLocationsHandler handler,
         [FromQuery] GetLocationsRequest request,
         CancellationToken cancellationToken)

@@ -3,6 +3,7 @@ using Dapper;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Validation;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -12,25 +13,25 @@ using System.Text.Json;
 namespace DirectoryService.Application.Locations.Features.GetLocations;
 
 public class GetLocationsHandler
-    : IQueryHandler<Result<LocationsResponse, Errors>, GetLocationsQuery>
+    : IQueryHandler<Result<PaginationResponse<LocationDto>, Errors>, GetLocationsQuery>
 {
-    private readonly IDbConnectionFactory _dbConnection;
+    private readonly IDbConnectionFactory _connectionFactory;
 
     private readonly IValidator<GetLocationsQuery> _validator;
     private readonly ILogger<GetLocationsHandler> _logger;
 
 
     public GetLocationsHandler(
-        IDbConnectionFactory dbConnection,
+        IDbConnectionFactory connectionFactory,
         IValidator<GetLocationsQuery> validator,
         ILogger<GetLocationsHandler> logger)
     {
-        _dbConnection = dbConnection;
+        _connectionFactory = connectionFactory;
         _validator = validator;
         _logger = logger;
     }
 
-    public async Task<Result<LocationsResponse, Errors>> Handle(
+    public async Task<Result<PaginationResponse<LocationDto>, Errors>> Handle(
         GetLocationsQuery query, 
         CancellationToken cancellationToken)
     {
@@ -42,7 +43,7 @@ public class GetLocationsHandler
             return queryValidationResult.ToErrors();
         }
 
-        using var connection = _dbConnection.GetDbConnection();
+        using var connection = _connectionFactory.GetDbConnection();
 
         var parameters = new DynamicParameters();
         var whereConditions = new List<string>();
@@ -72,8 +73,8 @@ public class GetLocationsHandler
             whereConditions.Add("l.is_active = @is_active");
         }
 
-        parameters.Add("page_size", query.Request.PageSize);
-        parameters.Add("offset", (query.Request.Page - 1) * query.Request.PageSize);
+        parameters.Add("page_size", query.Request.Pagination.Size);
+        parameters.Add("offset", (query.Request.Pagination.Page - 1) * query.Request.Pagination.Size);
 
         var orderBy = query.Request.OrderBy switch 
         {
@@ -91,7 +92,7 @@ public class GetLocationsHandler
 
         try
         {
-            var locationResponseList = await connection.QueryAsync<LocationDto, string, long, LocationDto>(
+            var locationDtos = await connection.QueryAsync<LocationDto, string, long, LocationDto>(
                 $"""
                     SELECT l.id,
                            l.name,
@@ -118,7 +119,7 @@ public class GetLocationsHandler
 
             _logger.LogInformation("Locations have been received");
 
-            return new LocationsResponse(locationResponseList.ToList(), totalCount);
+            return new PaginationResponse<LocationDto>(locationDtos.ToList(), totalCount ?? 0);
         }
         catch (Exception ex)
         {
