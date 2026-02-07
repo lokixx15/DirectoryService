@@ -90,41 +90,31 @@ public class GetLocationsHandler
 
         long? totalCount = null!;
 
-        try
-        {
-            var locationDtos = await connection.QueryAsync<LocationDto, string, long, LocationDto>(
-                $"""
-                    SELECT l.id,
-                           l.name,
-                           l.timezone,
-                           l.created_at,
-                           l.updated_at,
-                           l.address,
-                           COUNT(*) OVER() AS total_count
-                    FROM locations AS l
-                    {whereClause}
-                    {orderByClause}
-                    LIMIT @page_size OFFSET @offset
-                 """,
-                map: (lD, s, l) =>
-                {
-                    var address = JsonSerializer.Deserialize<LocationAddressDto>(s);
+        var locationDtos = await connection.QueryAsync<LocationDto, string, long, LocationDto>(
+            $"""
+                SELECT l.id,
+                       l.name,
+                       l.timezone,
+                       l.created_at,
+                       l.updated_at,
+                       l.address,
+                       COUNT(*) OVER() AS total_count
+                FROM locations AS l
+                {whereClause}
+                {orderByClause}
+                LIMIT @page_size OFFSET @offset
+             """,
+            map: (lD, s, l) =>
+            {
+                var address = JsonSerializer.Deserialize<LocationAddressDto>(s);
 
-                    totalCount ??= l;
+                totalCount ??= l;
 
-                    return lD with { Address = address! };
-                },
-                parameters,
-                splitOn: "address,total_count");
+                return lD with { Address = address! };
+            },
+            parameters,
+            splitOn: "address,total_count");
 
-            _logger.LogInformation("Locations have been received");
-
-            return new PaginationResponse<LocationDto>(locationDtos.ToList(), totalCount ?? 0);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error when getting locations");
-            return GeneralErrors.DatabaseReadFailed(ex.Message, "database.read.failed").ToErrors();
-        }
+        return new PaginationResponse<LocationDto>(locationDtos.ToList(), totalCount ?? 0);
     }
 }

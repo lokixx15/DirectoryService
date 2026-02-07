@@ -49,55 +49,45 @@ public class GetRootDepartmentsWithChildrenHandler
         parameters.Add("offset", (query.Request.Pagination.Page - 1) * query.Request.Pagination.Size);
         parameters.Add("children_limit", query.Request.Prefetch);
 
-        try
-        {
-            var departmentDtos = await connection.QueryAsync<DepartmentDto>(
-                $"""
-                 WITH roots AS (
-                 				SELECT d.id,
-                 					   d.name,
-                 					   d.identifier,
-                 					   d.parent_id,
-                 					   d.path,
-                 					   d.depth,
-                 					   d.is_active,
-                 					   d.created_at,
-                 					   d.updated_at
-                 			    FROM departments AS d
-                 				WHERE d.parent_id IS NULL AND d.is_active = true 
-                 				LIMIT @root_limit OFFSET @offset
-                 )
-                 SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = roots.id OFFSET @children_limit)) AS has_more_children
-                 FROM roots
+        var departmentDtos = await connection.QueryAsync<DepartmentDto>(
+            $"""
+             WITH roots AS (
+             				SELECT d.id,
+             					   d.name,
+             					   d.identifier,
+             					   d.parent_id,
+             					   d.path,
+             					   d.depth,
+             					   d.is_active,
+             					   d.created_at,
+             					   d.updated_at
+             			    FROM departments AS d
+             				WHERE d.parent_id IS NULL AND d.is_active = true 
+             				LIMIT @root_limit OFFSET @offset
+             )
+             SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = roots.id OFFSET @children_limit)) AS has_more_children
+             FROM roots
 
-                 UNION ALL 
+             UNION ALL 
 
-                 SELECT c.*, (EXISTS(SELECT 1 FROM departments WHERE parent_id = c.id)) AS has_more_children
-                 FROM roots AS r
-                 CROSS JOIN LATERAL (
-                 					SELECT d.id,
-                 						   d.name,
-                 					   	   d.identifier,
-                 					   	   d.parent_id,
-                 					   	   d.path,
-                 					   	   d.depth,
-                 					   	   d.is_active,
-                 						   d.created_at,
-                 					       d.updated_at	    
-                 					FROM departments AS d
-                 					WHERE r.id = d.parent_id
-                 					LIMIT @children_limit) AS c;
-                 """,
-                parameters);
+             SELECT c.*, (EXISTS(SELECT 1 FROM departments WHERE parent_id = c.id)) AS has_more_children
+             FROM roots AS r
+             CROSS JOIN LATERAL (
+             					SELECT d.id,
+             						   d.name,
+             					   	   d.identifier,
+             					   	   d.parent_id,
+             					   	   d.path,
+             					   	   d.depth,
+             					   	   d.is_active,
+             						   d.created_at,
+             					       d.updated_at	    
+             					FROM departments AS d
+             					WHERE r.id = d.parent_id
+             					LIMIT @children_limit) AS c;
+             """,
+            parameters);
 
-            _logger.LogInformation("Departments with children have been received");
-
-            return departmentDtos.ToList();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error when getting departments");
-            return GeneralErrors.DatabaseReadFailed(ex.Message, "database.read.failed").ToErrors();
-        }
+        return departmentDtos.ToList();
     }
 }

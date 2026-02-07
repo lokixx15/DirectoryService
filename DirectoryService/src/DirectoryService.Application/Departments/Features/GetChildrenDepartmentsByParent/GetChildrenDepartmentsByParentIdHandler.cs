@@ -51,45 +51,35 @@ public class GetChildrenDepartmentsByParentIdHandler
 
         long? totalCount = null!;
 
-        try
-        {
-            var locationResponseList = await connection.QueryAsync<DepartmentDto, long, DepartmentDto>(
-                $"""
-                 WITH children AS (
-                 				  SELECT d.id,
-                 				  	     d.name,
-                 				  	     d.identifier,
-                 				  	     d.parent_id,
-                 				  	     d.path,      
-                 				  	     d.depth,
-                 				  	     d.is_active,
-                 				  	     d.created_at,
-                 				  	     d.updated_at,
-                                         COUNT(*) OVER() AS total_count
-                 				  FROM departments AS d 
-                 				  WHERE d.parent_id = @parent_id
-                 				  LIMIT @children_limit OFFSET @offset
-                 )
-                 SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id))
-                 FROM children;
-                 """,
-                map: (dD, l) =>
-                {
-                    totalCount ??= l;
+        var locationResponseList = await connection.QueryAsync<DepartmentDto, long, DepartmentDto>(
+            $"""
+             WITH children AS (
+             				  SELECT d.id,
+             				  	     d.name,
+             				  	     d.identifier,
+             				  	     d.parent_id,
+             				  	     d.path,      
+             				  	     d.depth,
+             				  	     d.is_active,
+             				  	     d.created_at,
+             				  	     d.updated_at,
+                                     COUNT(*) OVER() AS total_count
+             				  FROM departments AS d 
+             				  WHERE d.parent_id = @parent_id
+             				  LIMIT @children_limit OFFSET @offset
+             )
+             SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id))
+             FROM children;
+             """,
+            map: (dD, l) =>
+            {
+                totalCount ??= l;
 
-                    return dD;
-                },
-                parameters,
-                splitOn: "total_count");
+                return dD;
+            },
+            parameters,
+            splitOn: "total_count");
 
-            _logger.LogInformation("Children departments have been received by parent id {id}", query.ParentId);
-
-            return new PaginationResponse<DepartmentDto>(locationResponseList.ToList(), totalCount ?? 0);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error when getting children departments by parent id {id}", query.ParentId);
-            return GeneralErrors.DatabaseReadFailed(ex.Message, "database.read.failed").ToErrors();
-        }
+        return new PaginationResponse<DepartmentDto>(locationResponseList.ToList(), totalCount ?? 0);
     }
 }
