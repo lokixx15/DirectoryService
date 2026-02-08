@@ -1,10 +1,11 @@
-﻿namespace DirectoryService.Contracts.Locations;
+﻿using DirectoryService.Presentation.Controllers;
+
+namespace DirectoryService.Contracts.Locations;
 
 public record GetLocationsRequest(
     Guid[]? DepartmentIds,
     string? Search,
     bool? IsActive,
-    int Page = 1,
-    int PageSize = 20,
+    PaginationRequest Pagination,
     string? OrderBy = "createdDate",
     string OrderDirection = "ASC");

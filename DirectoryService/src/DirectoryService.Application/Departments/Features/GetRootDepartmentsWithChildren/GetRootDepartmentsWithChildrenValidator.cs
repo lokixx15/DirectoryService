@@ -2,16 +2,12 @@
 using FluentValidation;
 using SharedKernel;
 
-namespace DirectoryService.Application.Locations.Features.GetLocations;
+namespace DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
 
-public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
+public class GetRootDepartmentsWithChildrenValidator : AbstractValidator<GetRootDepartmentsWithChildrenQuery>
 {
-    public GetLocationsQueryValidator()
+    public GetRootDepartmentsWithChildrenValidator()
     {
-        RuleFor(query => query.Request.Search)
-            .MaximumLength(1000)
-                .WithError(GeneralErrors.ValueLengthIsNotValid(1000, "Search"));
-
         RuleFor(query => query.Request.Pagination.Page)
             .GreaterThan(0)
                 .WithError(GeneralErrors.ValueIsNotValid("Page must be greater than 0", "Page"))
@@ -23,5 +19,11 @@ public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
                 .WithError(GeneralErrors.ValueIsNotValid("Page size must be greater than 0", "Page size"))
             .LessThanOrEqualTo(150)
                 .WithError(GeneralErrors.ValueIsNotValid("Page size cannot exceed 150", "Page size"));
+
+        RuleFor(query => query.Request.Prefetch)
+            .GreaterThan(0)
+                .WithError(GeneralErrors.ValueIsNotValid("Number of children received must be greater than 0", "Page size"))
+            .LessThanOrEqualTo(150)
+                .WithError(GeneralErrors.ValueIsNotValid("Number of children received cannot exceed 150", "Page size"));
     }
 }
