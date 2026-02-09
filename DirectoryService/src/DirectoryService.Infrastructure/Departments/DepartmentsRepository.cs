@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using SharedKernel;
+using System.Linq;
 
 namespace DirectoryService.Infrastructure.Departments;
 
@@ -30,7 +31,6 @@ public class DepartmentsRepository : IDepartmentsRepository
         try
         {
             var department = await _dbContext.Departments
-                .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.Id == id && d.IsActive, cancellationToken);
 
             if (department == null)
@@ -184,6 +184,26 @@ public class DepartmentsRepository : IDepartmentsRepository
         await _dbContext.Database.ExecuteSqlRawAsync(sql,
             [new NpgsqlParameter("@updatedDepartmentPath", newPath),
             new NpgsqlParameter("@oldUpdatedDepartmentPath", oldUpdatedDepartmentPath.Value)], 
+            cancellationToken);
+
+        return UnitResult.Success<Error>();
+    }
+
+    public async Task<UnitResult<Error>> UpdateDescendantsPathsAsync(
+    DepartmentPath newParentPath,
+    DepartmentPath oldParentPath,
+    CancellationToken cancellationToken = default)
+    {
+        var sql = """
+                        UPDATE departments
+                        SET path = @newParentPath::ltree || subpath(path, nlevel(@newParentPath::ltree))
+                        WHERE path <@ @oldParentPath::ltree
+                        AND nlevel(path) != nlevel(@oldParentPath::ltree);
+                        """;
+
+        await _dbContext.Database.ExecuteSqlRawAsync(sql,
+            [new NpgsqlParameter("@newParentPath", newParentPath.Value),
+            new NpgsqlParameter("@oldParentPath", oldParentPath.Value)],
             cancellationToken);
 
         return UnitResult.Success<Error>();
