@@ -45,6 +45,7 @@ public class Department
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
+    public DateTime? DeletedAt { get; private set; }
     public IReadOnlyList<Department> ChildrenDepartments => _childrenDepartments;
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
     public IReadOnlyList<DepartmentPosition> Positions => _positions;
@@ -109,6 +110,22 @@ public class Department
         ParentId = parent?.Id;
         Path = newPathResult.Value;
         Depth = (short)((parent?.Depth + 1) ?? 0);
+
+        return UnitResult.Success<Errors>();
+    }
+
+    public UnitResult<Errors> SoftDelete()
+    {
+        IsActive = false;
+
+        var newPath = DepartmentPath.MarkAsDeleted(Path.Value, Identifier.Value);
+
+        if (newPath.IsFailure)
+            return newPath.Error;
+
+        Path = newPath.Value;
+
+        DeletedAt = DateTime.UtcNow;
 
         return UnitResult.Success<Errors>();
     }

@@ -1,8 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Locations;
+using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using SharedKernel;
 
 namespace DirectoryService.Infrastructure.Locations;
@@ -56,5 +58,37 @@ public class LocationsRepository : ILocationsRepository
         _logger.LogInformation("Location was addedd to the database");
 
         return location.Id;
+    }
+
+    public async Task<UnitResult<Error>> SoftDeleteLocationsWithoutActiveDepartments(Guid departmentId, CancellationToken cancellationToken)
+    {
+        var sql = @"
+                    WITH department_locations AS (
+                    							  SELECT l.*
+                    							  FROM locations AS l
+                    							  JOIN department_location AS dl ON dl.location_id = l.id
+                    							  WHERE dl.department_id = @departmentId)								  
+                    UPDATE locations 
+                    SET is_active = false,
+                    	deleted_at = NOW() AT TIME ZONE 'UTC'
+                    WHERE id IN (
+                    	         SELECT dls.id
+                    	         FROM department_locations AS dls
+                    	         WHERE NOT EXISTS (
+                    	         				   SELECT 1
+                    	                           FROM department_location AS dl
+                    	                           JOIN departments AS d ON dl.department_id = d.id
+                    	                           WHERE dl.department_id != @departmentId
+                    	         					 AND dl.location_id = dls.id
+                    	         	                 AND d.is_active = true) 
+                          AND dls.is_active = true);
+                    ";           
+
+        await _dbContext.Database.ExecuteSqlRawAsync(
+            sql,
+            [new NpgsqlParameter("@departmentId", departmentId)],
+            cancellationToken);
+
+        return UnitResult.Success<Error>();
     }
 }

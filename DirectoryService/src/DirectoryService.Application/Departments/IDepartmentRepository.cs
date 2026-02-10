@@ -15,5 +15,6 @@ public interface IDepartmentsRepository
     Task<Result<Guid, Error>> AddAsync(Department department, CancellationToken cancellationToken);
     Task<UnitResult<Error>> AddLocationsToDepartmentAsync(List<DepartmentLocation> locations, CancellationToken cancellationToken);
     Task<UnitResult<Error>> UpdateDepartmentDescendantsParentAsync(DepartmentPath? newUpdatedDepartmentPath, DepartmentPath oldUpdatedDepartmentPath, CancellationToken cancellationToken);
+    Task<UnitResult<Error>> UpdateDescendantsPathsAsync(DepartmentPath newParentPath, DepartmentPath oldParentPath, CancellationToken cancellationToken = default);
     Task<UnitResult<Error>> DeleteLocationsByDepartmentIdAsync(Guid departmentId, CancellationToken cancellationToken);
 }

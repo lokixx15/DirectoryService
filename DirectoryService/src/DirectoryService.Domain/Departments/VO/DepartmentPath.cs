@@ -8,7 +8,7 @@ public record DepartmentPath
     //ef core 
     private DepartmentPath() { }
 
-    public const string SEPARATOR = ".";
+    public const char SEPARATOR = '.';
     private DepartmentPath(
         string value)
     {
@@ -32,5 +32,17 @@ public record DepartmentPath
         var path = new DepartmentPath($"{pathPrefix}{value}");
 
         return Result.Success<DepartmentPath, Errors>(path);
+    }
+
+    public static Result<DepartmentPath, Errors> MarkAsDeleted(string path, string identifier)
+    {
+        var pathWithDeletedMark = path.Replace(identifier, "deleted-" + identifier);
+
+        var newPathResult = Create(pathWithDeletedMark);
+
+        if (newPathResult.IsFailure)
+            return newPathResult.Error;
+
+        return Result.Success<DepartmentPath, Errors>(newPathResult.Value);
     }
 }

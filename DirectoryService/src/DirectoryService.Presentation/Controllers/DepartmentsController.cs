@@ -2,6 +2,7 @@
 using DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByRootId;
 using DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 using DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
+using DirectoryService.Application.Departments.Features.SoftDeleteDepartment;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 using DirectoryService.Contracts;
@@ -78,6 +79,18 @@ public class DepartmentsController : ControllerBase
     CancellationToken cancellationToken)
     {
         var command = new UpdateDepartmentParentCommand(departmentId, request);
+
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpDelete]
+    [Route("{departmentId:guid}")]
+    public async Task<EndpointResult> SoftDeleteDepartment(
+        [FromRoute] Guid departmentId,
+        [FromServices] SoftDeleteDepartmentHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new SoftDeleteDepartmentCommand(departmentId);
 
         return await handler.Handle(command, cancellationToken);
     }

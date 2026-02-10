@@ -9,7 +9,7 @@ public interface ICommandHandler<T, in TCommand>
     Task<Result<T, Errors>> Handle(TCommand command, CancellationToken cancellationToken);
 }
 
-public interface ICommandHandler<in TCommand>
+public interface  ICommandHandler<in TCommand>
     where TCommand : ICommand
 {
     Task<UnitResult<Errors>> Handle(TCommand command, CancellationToken cancellationToken);

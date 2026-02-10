@@ -74,6 +74,11 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnType("timestamp with time zone");
 
         builder
+            .Property(d => d.DeletedAt)
+            .HasColumnName("deleted_at")
+            .HasColumnType("timestamp with time zone");
+
+        builder
             .HasOne<Department>()
             .WithMany(d => d.ChildrenDepartments)
             .HasForeignKey(d => d.ParentId)

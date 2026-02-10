@@ -33,6 +33,7 @@ public class Position
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
+    public DateTime? DeletedAt { get; private set; }
     public IReadOnlyList<DepartmentPosition> Departments => _departments;
 
     public static Result<Position, Errors> Create(
