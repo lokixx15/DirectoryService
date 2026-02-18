@@ -41,6 +41,12 @@ public static class GeneralErrors
     public static Error DatabaseReadFailed(string message, string? code = null) =>
         Error.Failure(code ?? "database.read.failed", message);
 
+    public static Error DatabaseUpdateFailed(string message, string? code = null) =>
+        Error.Failure(code ?? "database.update.failed", message);
+
+    public static Error DatabaseDeleteFailed(string message, string? code = null) =>
+        Error.Failure(code ?? "database.delete.failed", message);
+
     public static Error DataLockFailed(string message, string? code = null) =>
     Error.Failure(code ?? "database.lock.failed", message);
 

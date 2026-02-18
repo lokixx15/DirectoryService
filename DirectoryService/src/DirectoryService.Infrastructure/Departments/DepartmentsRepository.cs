@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using SharedKernel;
-using System.Linq;
+using System.Linq.Expressions;
 
 namespace DirectoryService.Infrastructure.Departments;
 
@@ -24,32 +24,32 @@ public class DepartmentsRepository : IDepartmentsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Department, Error>> GetByIdAsync(
-        Guid id, 
+    public async Task<Result<Department, Error>> GetByAsync(
+        Expression<Func<Department, bool>> predicate, 
         CancellationToken cancellationToken = default)
     {
         try
         {
             var department = await _dbContext.Departments
-                .FirstOrDefaultAsync(d => d.Id == id && d.IsActive, cancellationToken);
+                .FirstOrDefaultAsync(predicate, cancellationToken);
 
             if (department == null)
             {
-                _logger.LogError("Department with id {Id} was not found in the database", id);
+                _logger.LogError("Department was not found in the database");
                 return GeneralErrors.EntityNotFound("Department");
             }
 
-            _logger.LogInformation("Department with id {Id} was obtained from the database", id);
+            _logger.LogInformation("Department was obtained from the database");
             return department;
         }
         catch (OperationCanceledException ex)
         {
-            _logger.LogError(ex, "Operation was cancelled while reading department with id {Id}", id);
+            _logger.LogError(ex, "Operation was cancelled while reading department");
             return GeneralErrors.OperationCancelled();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error when reading department with id {Id}", id);
+            _logger.LogError(ex, "Unexpected error when reading department");
             return GeneralErrors.DatabaseReadFailed(ex.Message);
         }
     }
@@ -105,6 +105,11 @@ public class DepartmentsRepository : IDepartmentsRepository
 
             return UnitResult.Success<Error>();
         }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when locking descendants");
+            return GeneralErrors.OperationCancelled();
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to lock descendants of {Path}", oldDepartmentPath);
@@ -134,7 +139,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         }
         catch (OperationCanceledException ex)
         {
-            _logger.LogError(ex, "Operation was cancelled checking the existence of departments with ids {Ids}", ids);
+            _logger.LogError(ex, "Operation was cancelled when checking the existence of departments with ids {Ids}", ids);
             return GeneralErrors.OperationCancelled();
         }
         catch (Exception ex)
@@ -164,35 +169,46 @@ public class DepartmentsRepository : IDepartmentsRepository
         return UnitResult.Success<Error>();
     }
 
-    public async Task<UnitResult<Error>> UpdateDepartmentDescendantsParentAsync(
-        DepartmentPath? newUpdatedDepartmentPath,
-        DepartmentPath oldUpdatedDepartmentPath,
+    public async Task<UnitResult<Error>> UpdateDescendantsParentAsync(
+        DepartmentPath? newParentPath,
+        DepartmentPath oldParentPath,
         CancellationToken cancellationToken = default)
     {
-        var newPath = newUpdatedDepartmentPath?.Value ?? "";
+        var newPath = newParentPath?.Value ?? "";
 
         var sql = """
                         UPDATE departments
-                        SET path = @updatedDepartmentPath::ltree
-                        || subpath(path, nlevel(@oldUpdatedDepartmentPath::ltree)),
-                            depth = nlevel(@updatedDepartmentPath::ltree
-                        || subpath(path, nlevel(@oldUpdatedDepartmentPath::ltree))) - 1
-                        WHERE path <@ @oldUpdatedDepartmentPath::ltree
-                        AND nlevel(path) != nlevel(@oldUpdatedDepartmentPath::ltree);
+                        SET path = @newParentPath::ltree || subpath(path, nlevel(@oldParentPath::ltree)),
+                            depth = nlevel(@newParentPath::ltree || subpath(path, nlevel(@oldParentPath::ltree))) - 1
+                        WHERE path <@ @oldParentPath::ltree
+                        AND nlevel(path) != nlevel(@oldParentPath::ltree);
                         """;
 
-        await _dbContext.Database.ExecuteSqlRawAsync(sql,
-            [new NpgsqlParameter("@updatedDepartmentPath", newPath),
-            new NpgsqlParameter("@oldUpdatedDepartmentPath", oldUpdatedDepartmentPath.Value)], 
-            cancellationToken);
+        try
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync(sql,
+                [new NpgsqlParameter("@newParentPath", newPath),
+                new NpgsqlParameter("@oldParentPath", oldParentPath.Value)],
+                cancellationToken);
 
-        return UnitResult.Success<Error>();
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when updating descendants parent");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update descendants parent");
+            return GeneralErrors.DatabaseUpdateFailed("Failed to update descendants parent");
+        }
     }
 
     public async Task<UnitResult<Error>> UpdateDescendantsPathsAsync(
-    DepartmentPath newParentPath,
-    DepartmentPath oldParentPath,
-    CancellationToken cancellationToken = default)
+        DepartmentPath newParentPath,
+        DepartmentPath oldParentPath,
+        CancellationToken cancellationToken = default)
     {
         var sql = """
                         UPDATE departments
@@ -201,17 +217,30 @@ public class DepartmentsRepository : IDepartmentsRepository
                         AND nlevel(path) != nlevel(@oldParentPath::ltree);
                         """;
 
-        await _dbContext.Database.ExecuteSqlRawAsync(sql,
-            [new NpgsqlParameter("@newParentPath", newParentPath.Value),
-            new NpgsqlParameter("@oldParentPath", oldParentPath.Value)],
-            cancellationToken);
+        try
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync(sql,
+                [new NpgsqlParameter("@newParentPath", newParentPath.Value),
+                new NpgsqlParameter("@oldParentPath", oldParentPath.Value)],
+                cancellationToken);
 
-        return UnitResult.Success<Error>();
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when updating descedants paths");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update descendant paths");
+            return GeneralErrors.DatabaseUpdateFailed("Failed to update descendant paths");
+        }
     }
 
     public async Task<UnitResult<Error>> DeleteLocationsByDepartmentIdAsync(
-        Guid departmentId,
-        CancellationToken cancellationToken = default)
+    Guid departmentId,
+    CancellationToken cancellationToken = default)
     {
         await _dbContext.DepartmentLocations
             .Where(d => d.DepartmentId == departmentId)

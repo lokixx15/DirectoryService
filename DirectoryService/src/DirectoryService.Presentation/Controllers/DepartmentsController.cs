@@ -1,5 +1,5 @@
 ﻿using DirectoryService.Application.Departments.Features.CreateDepartment;
-using DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByRootId;
+using DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 using DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 using DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
 using DirectoryService.Application.Departments.Features.SoftDeleteDepartment;

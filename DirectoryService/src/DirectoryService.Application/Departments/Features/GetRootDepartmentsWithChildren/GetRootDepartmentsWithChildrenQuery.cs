@@ -1,5 +1,5 @@
 ﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Presentation.Controllers;
+using DirectoryService.Contracts.Departments;
 
 namespace DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
 

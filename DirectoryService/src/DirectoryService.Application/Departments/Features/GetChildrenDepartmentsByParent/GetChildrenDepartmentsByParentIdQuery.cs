@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Presentation.Controllers;
+using DirectoryService.Contracts;
 
-namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByRootId;
+namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 
 public record GetChildrenDepartmentsByParentIdQuery(Guid ParentId, PaginationRequest Request)
     : IQuery;

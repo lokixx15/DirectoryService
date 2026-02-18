@@ -81,7 +81,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         _logger.LogInformation("The departmentLocation has been created");
 
         var parentResult = command.Request.ParentId != null
-            ? await _departmentsRepository.GetByIdAsync(command.Request.ParentId.Value, cancellationToken)
+            ? await _departmentsRepository.GetByAsync(d => d.Id == command.Request.ParentId.Value, cancellationToken)
             : Result.Success<Department, Error>(null!);
 
         if (parentResult.IsFailure)
