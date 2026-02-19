@@ -2,6 +2,7 @@
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
+using DirectoryService.Infrastructure.BackgroundTasks.ClearingInactiveDepartments;
 using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Departments;
 using DirectoryService.Infrastructure.Locations;
@@ -16,6 +17,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
         services
+            .Configure<ClearingInactiveDepartmentsOptions>(
+                configuration.GetSection("ClearingInactiveDepartmentsOptions"))
+            .AddHostedService<ClearingInactiveDepartmentsService>()
             .AddScoped(_ => new DirectoryServiceDbContext(
                 configuration.GetConnectionString("DirectoryServiceDb")!))
             .AddScoped<ISeeder, DirectoryServiceSeeder>()
@@ -24,5 +28,5 @@ public static class DependencyInjection
             .AddScoped<ITransactionManager, TransactionManager>()
             .AddScoped<ILocationsRepository, LocationsRepository>()
             .AddScoped<IDepartmentsRepository, DepartmentsRepository>()
-            .AddScoped<IPositionsRepository, PositionsRepository>();
+            .AddScoped<IPositionsRepository, PositionsRepository>(); 
 }

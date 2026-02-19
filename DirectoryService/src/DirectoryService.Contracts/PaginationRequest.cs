@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Presentation.Controllers;
+﻿namespace DirectoryService.Contracts;
 
 public record PaginationRequest(
     int Page = 1,

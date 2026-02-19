@@ -74,7 +74,7 @@ public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentPar
 
         var newParentDepartmentResult = departmentParentId is null
             ? Result.Success<Department, Error>(null!)
-            : await _departmentsRepository.GetByIdAsync(departmentParentId.Value, cancellationToken);
+            : await _departmentsRepository.GetByAsync(d => d.Id == departmentParentId.Value, cancellationToken);
 
         if (newParentDepartmentResult.IsFailure)
         {
@@ -94,7 +94,7 @@ public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentPar
             return updateDepartmentResult.Error;
         }
 
-        var updateDepartmentDescedantsParentResult = await _departmentsRepository.UpdateDepartmentDescendantsParentAsync(
+        var updateDepartmentDescedantsParentResult = await _departmentsRepository.UpdateDescendantsParentAsync(
             updatedDepartment.Path, oldDepartmentPath, cancellationToken);
 
         if (updateDepartmentDescedantsParentResult.IsFailure)

@@ -1,4 +1,6 @@
-﻿namespace DirectoryService.Presentation.Controllers;
+﻿using DirectoryService.Contracts;
+
+namespace DirectoryService.Contracts.Departments;
 
 public record GetRootDepartmentsWithChildrenRequest(
     PaginationRequest Pagination,

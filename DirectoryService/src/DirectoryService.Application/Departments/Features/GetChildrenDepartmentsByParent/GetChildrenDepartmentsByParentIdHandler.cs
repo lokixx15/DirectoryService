@@ -10,7 +10,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
-namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByRootId;
+namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 
 public class GetChildrenDepartmentsByParentIdHandler
     : IQueryHandler<Result<PaginationResponse<DepartmentDto>, Errors>, GetChildrenDepartmentsByParentIdQuery>

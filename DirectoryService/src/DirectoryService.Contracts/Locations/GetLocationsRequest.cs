@@ -1,6 +1,4 @@
-﻿using DirectoryService.Presentation.Controllers;
-
-namespace DirectoryService.Contracts.Locations;
+﻿namespace DirectoryService.Contracts.Locations;
 
 public record GetLocationsRequest(
     Guid[]? DepartmentIds,

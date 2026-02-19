@@ -2,7 +2,7 @@
 using FluentValidation;
 using SharedKernel;
 
-namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByRootId;
+namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 
 public class GetChildrenDepartmentsByParentIdValidator : AbstractValidator<GetChildrenDepartmentsByParentIdQuery>
 {
