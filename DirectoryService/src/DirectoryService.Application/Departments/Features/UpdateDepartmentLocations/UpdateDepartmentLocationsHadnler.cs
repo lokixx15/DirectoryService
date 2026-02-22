@@ -1,10 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.DepartmentLocations;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
@@ -16,6 +18,7 @@ public class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDepartment
     private readonly ILocationsRepository _locationsRepository;
     private readonly ITransactionManager _transactionManager;
     private readonly IValidator<UpdateDepartmentLocationsCommand> _validator;
+    private readonly HybridCache _cache;
     private readonly ILogger<UpdateDepartmentLocationsHadnler> _logger;
 
     public UpdateDepartmentLocationsHadnler(
@@ -23,12 +26,14 @@ public class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDepartment
         ILocationsRepository locationsRepository,
         ITransactionManager transactionManager,
         IValidator<UpdateDepartmentLocationsCommand> validator,
+        HybridCache cache,
         ILogger<UpdateDepartmentLocationsHadnler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
         _transactionManager = transactionManager;
         _validator = validator;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -123,6 +128,10 @@ public class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDepartment
             _logger.LogError("Errors occurred when committing transaction");
             return saveChangesResult.Error.ToErrors();
         }
+
+        await _cache.RemoveByTagAsync(CacheConstants.DEPARTMENTS_CACHE_TAG, cancellationToken);
+
+        _logger.LogInformation("Invalidated all departments cache using tag: {Tag}", CacheConstants.DEPARTMENTS_CACHE_TAG);
 
         return UnitResult.Success<Errors>();
     }

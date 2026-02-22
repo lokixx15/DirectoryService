@@ -2,7 +2,9 @@
 using Dapper;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Contracts.Departments;
+using Microsoft.Extensions.Caching.Hybrid;
 using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
@@ -10,21 +12,7 @@ namespace DirectoryService.Application.Departments.Features.GetDepartmentsWithMo
 public class GetDepartmentsWithMostPositionsHandler 
     : IQueryHandler<Result<IReadOnlyList<DepartmentDto>, Errors>>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
-
-    public GetDepartmentsWithMostPositionsHandler(
-        IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
-
-    public async Task<Result<IReadOnlyList<DepartmentDto>, Errors>> Handle(
-        CancellationToken cancellationToken)
-    {
-        using var connection = _connectionFactory.GetDbConnection();
-
-        var locations = await connection.QueryAsync<DepartmentDto>(
-        """
+    private const string sql = """
         SELECT d.id,
                d.name,
                d.identifier,
@@ -40,8 +28,41 @@ public class GetDepartmentsWithMostPositionsHandler
         GROUP BY d.id
         ORDER BY positions_count DESC
         LIMIT 5;
-        """, cancellationToken);
+        """;
 
-        return locations.ToList();
+    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly HybridCache _cache;
+
+    public GetDepartmentsWithMostPositionsHandler(
+        IDbConnectionFactory connectionFactory,
+        HybridCache cache)
+    {
+        _connectionFactory = connectionFactory;
+        _cache = cache;
+    }
+
+    public async Task<Result<IReadOnlyList<DepartmentDto>, Errors>> Handle(
+        CancellationToken cancellationToken)
+    {
+        using var connection = _connectionFactory.GetDbConnection();
+
+        var key = $"{CacheConstants.DEPARTMENTS_WITH_MOST_POSITIONS_CACHE_KEY}";
+
+        var departmentDtos = await _cache.GetOrCreateAsync(
+            key,
+            async _ =>
+            {
+                using var connection = _connectionFactory.GetDbConnection();
+
+                var departmentDtos = await connection.QueryAsync<DepartmentDto>(
+                    sql,
+                    cancellationToken);
+
+                return departmentDtos.ToList();
+            },
+            tags: [CacheConstants.DEPARTMENTS_CACHE_TAG],
+            cancellationToken: cancellationToken);
+
+        return departmentDtos;
     }
 }

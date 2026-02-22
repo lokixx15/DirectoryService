@@ -1,8 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
@@ -15,6 +17,7 @@ public class SoftDeleteDepartmentHandler
     private readonly ILocationsRepository _locationsRepository;
     private readonly IPositionsRepository _positionsRepository;
     private readonly ITransactionManager _transactionManager;
+    private readonly HybridCache _cache;
     private readonly ILogger<SoftDeleteDepartmentHandler> _logger;
     
     public SoftDeleteDepartmentHandler(
@@ -22,12 +25,14 @@ public class SoftDeleteDepartmentHandler
         ILocationsRepository locationsRepository,
         IPositionsRepository positionsRepository,
         ITransactionManager transactionManager,
+        HybridCache cache,
         ILogger<SoftDeleteDepartmentHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
         _positionsRepository = positionsRepository;
         _transactionManager = transactionManager;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -123,6 +128,10 @@ public class SoftDeleteDepartmentHandler
             _logger.LogError("Errors occurred when committing transaction");
             return commitResult.Error.ToErrors();
         }
+
+        await _cache.RemoveByTagAsync(CacheConstants.DEPARTMENTS_CACHE_TAG, cancellationToken);
+
+        _logger.LogInformation("Invalidated all departments cache using tag: {Tag}", CacheConstants.DEPARTMENTS_CACHE_TAG);
 
         return UnitResult.Success<Errors>();
     }
