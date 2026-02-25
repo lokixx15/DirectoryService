@@ -1,6 +1,4 @@
-﻿using DirectoryService.Contracts;
-
-namespace DirectoryService.Contracts.Departments;
+﻿namespace DirectoryService.Contracts.Departments;
 
 public record GetRootDepartmentsWithChildrenRequest(
     PaginationRequest Pagination,

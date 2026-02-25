@@ -216,4 +216,3 @@ public class DirectoryServiceSeeder : ISeeder
         _logger.LogInformation("Created {Count} UNIQUE positions", POSITIONS_COUNT);
     }
 }
-
