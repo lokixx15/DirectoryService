@@ -21,7 +21,9 @@ public sealed class LocationsRepository : ILocationsRepository
         _logger = logger;
     }
 
-    public async Task<UnitResult<Error>> ExistsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    public async Task<UnitResult<Error>> ExistsAsync(
+        IEnumerable<Guid> ids, 
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -51,15 +53,32 @@ public sealed class LocationsRepository : ILocationsRepository
         }
     }
 
-    public async Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Error>> AddAsync(
+        Location location, 
+        CancellationToken cancellationToken = default)
     {
-        await _dbContext.Locations.AddAsync(location, cancellationToken);
-        _logger.LogInformation("Location was addedd to the database");
+        try
+        {
+            await _dbContext.Locations.AddAsync(location, cancellationToken);
+            _logger.LogInformation("Location was added to the database");
 
-        return location.Id;
+            return location.Id;
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when adding location {LocationId}", location.Id);
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add location {LocationId}", location.Id);
+            return GeneralErrors.DatabaseAddFailed("Failed to add location");
+        }
     }
 
-    public async Task<UnitResult<Error>> SoftDeleteLocationsWithoutActiveDepartments(Guid departmentId, CancellationToken cancellationToken)
+    public async Task<UnitResult<Error>> SoftDeleteLocationsWithoutActiveDepartments(
+        Guid departmentId, 
+        CancellationToken cancellationToken = default)
     {
         var sql = @"
                     WITH department_locations AS (
@@ -83,11 +102,24 @@ public sealed class LocationsRepository : ILocationsRepository
                           AND dls.is_active = true);
                     ";           
 
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            sql,
-            [new NpgsqlParameter("@departmentId", departmentId)],
-            cancellationToken);
+        try
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync(
+                sql,
+                [new NpgsqlParameter("@departmentId", departmentId)],
+                cancellationToken);
 
-        return UnitResult.Success<Error>();
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when deleting locations without active departments");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete locations without active departments");
+            return GeneralErrors.DatabaseDeleteFailed("Failed to delete locations without active departments");
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Positions;
+using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,16 +22,32 @@ public sealed class PositionsRepository : IPositionsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Error>> AddAsync(Position position, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid, Error>> AddAsync(
+        Position position, 
+        CancellationToken cancellationToken = default)
     {
-        await _dbContext.AddAsync(position, cancellationToken);
+        try
+        {
+            await _dbContext.AddAsync(position, cancellationToken);
+            _logger.LogInformation("Position was added to the database");
 
-        _logger.LogInformation("Position was addedd to the database");
-
-        return position.Id;
+            return position.Id;
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when adding position {positionId}", position.Id);
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add position {positionId}", position.Id);
+            return GeneralErrors.DatabaseAddFailed("Failed to add position");
+        }
     }
 
-    public async Task<UnitResult<Error>> SoftDeletePositionsWithoutActiveDepartments(Guid departmentId, CancellationToken cancellationToken)
+    public async Task<UnitResult<Error>> SoftDeletePositionsWithoutActiveDepartments(
+        Guid departmentId, 
+        CancellationToken cancellationToken = default)
     {
         var sql = @"
                     WITH department_positions AS (
@@ -52,13 +69,26 @@ public sealed class PositionsRepository : IPositionsRepository
                     	         					 AND dp.position_id = dps.id
                     	         	                 AND d.is_active = true) 
                           AND dps.is_active = true);
-                    ";           
+                    ";
 
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            sql,
-            [new NpgsqlParameter("@departmentId", departmentId)],
-            cancellationToken);
+        try
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync(
+                sql,
+                [new NpgsqlParameter("@departmentId", departmentId)],
+                cancellationToken);
 
-        return UnitResult.Success<Error>();
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when deleting positions without active departments");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete positions without active departments");
+            return GeneralErrors.DatabaseDeleteFailed("Failed to delete positions without active departments");
+        }
     }
 }

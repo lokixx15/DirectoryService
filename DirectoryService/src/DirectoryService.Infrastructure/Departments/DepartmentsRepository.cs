@@ -113,7 +113,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to lock descendants of {Path}", oldDepartmentPath);
-            return GeneralErrors.DataLockFailed(ex.Message);
+            return GeneralErrors.DatabaseLockFailed(ex.Message);
         }
     }
 
@@ -154,7 +154,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         CancellationToken cancellationToken = default)
     {
         await _dbContext.AddAsync(department, cancellationToken);
-        _logger.LogInformation("Department was addedd to the database");
+        _logger.LogInformation("Department was added to the database");
 
         return department.Id;
     }
@@ -228,12 +228,12 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         }
         catch (OperationCanceledException ex)
         {
-            _logger.LogError(ex, "Operation was cancelled when updating descedants paths");
+            _logger.LogError(ex, "Operation was cancelled when updating descendants paths");
             return GeneralErrors.OperationCancelled();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to update descendant paths");
+            _logger.LogError(ex, "Failed to update descendants paths");
             return GeneralErrors.DatabaseUpdateFailed("Failed to update descendant paths");
         }
     }
@@ -242,12 +242,25 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     Guid departmentId,
     CancellationToken cancellationToken = default)
     {
-        await _dbContext.DepartmentLocations
-            .Where(d => d.DepartmentId == departmentId)
-            .ExecuteDeleteAsync(cancellationToken);
+        try
+        {
+            await _dbContext.DepartmentLocations
+                .Where(d => d.DepartmentId == departmentId)
+                .ExecuteDeleteAsync(cancellationToken);
 
-        _logger.LogInformation("Locations were deleted from the database");
+            _logger.LogInformation("Locations were deleted from the database");
 
-        return UnitResult.Success<Error>();
+            return UnitResult.Success<Error>();
+        }
+        catch(OperationCanceledException ex) 
+        {
+            _logger.LogError(ex, "Operation was cancelled when deleting locations by department id");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete locations by department id");
+            return GeneralErrors.DatabaseDeleteFailed("Failed to delete locations by department id");
+        }
     }
 }
