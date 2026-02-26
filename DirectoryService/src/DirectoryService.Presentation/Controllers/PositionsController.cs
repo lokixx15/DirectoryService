@@ -7,7 +7,7 @@ namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]
 [Route("api/positions")]
-public class PositionsController : ControllerBase
+public sealed class PositionsController : ControllerBase
 {
     [HttpPost]
     public async Task<EndpointResult<Guid>> CreatePosition(

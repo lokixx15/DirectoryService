@@ -12,7 +12,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 
-public class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDepartmentLocationsCommand>
+public sealed class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDepartmentLocationsCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;

@@ -8,7 +8,7 @@ using SharedKernel;
 
 namespace DirectoryService.Infrastructure.Database;
 
-public class TransactionManager : ITransactionManager
+public sealed class TransactionManager : ITransactionManager
 {
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<TransactionManager> _logger;

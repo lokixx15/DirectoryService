@@ -14,7 +14,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.CreateDepartment;
 
-public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
+public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;

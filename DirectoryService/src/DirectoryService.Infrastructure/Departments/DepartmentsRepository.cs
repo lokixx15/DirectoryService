@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace DirectoryService.Infrastructure.Departments;
 
-public class DepartmentsRepository : IDepartmentsRepository
+public sealed class DepartmentsRepository : IDepartmentsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<DepartmentsRepository> _logger;

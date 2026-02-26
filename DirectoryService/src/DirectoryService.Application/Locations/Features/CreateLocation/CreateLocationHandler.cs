@@ -10,7 +10,7 @@ using DirectoryService.Application.Abstractions.Database;
 
 namespace DirectoryService.Application.Locations.Features.CreateLocation;
 
-public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
+public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
     private readonly ITransactionManager _transactionManager;

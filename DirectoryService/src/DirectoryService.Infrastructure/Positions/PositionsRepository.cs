@@ -8,7 +8,7 @@ using SharedKernel;
 
 namespace DirectoryService.Infrastructure.Positions;
 
-public class PositionsRepository : IPositionsRepository
+public sealed class PositionsRepository : IPositionsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<PositionsRepository> _logger;

@@ -12,7 +12,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
 
-public class GetRootDepartmentsWithChildrenHandler
+public sealed class GetRootDepartmentsWithChildrenHandler
     : IQueryHandler<Result<IReadOnlyList<DepartmentDto>, Errors>, GetRootDepartmentsWithChildrenQuery>
 {
     private const string sql = """

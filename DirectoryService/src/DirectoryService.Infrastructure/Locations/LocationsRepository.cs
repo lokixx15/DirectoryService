@@ -8,7 +8,7 @@ using SharedKernel;
 
 namespace DirectoryService.Infrastructure.Locations;
 
-public class LocationsRepository : ILocationsRepository
+public sealed class LocationsRepository : ILocationsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<LocationsRepository> _logger;

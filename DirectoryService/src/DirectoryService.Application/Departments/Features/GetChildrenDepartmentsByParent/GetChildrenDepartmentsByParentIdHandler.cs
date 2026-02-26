@@ -13,7 +13,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 
-public class GetChildrenDepartmentsByParentIdHandler
+public sealed class GetChildrenDepartmentsByParentIdHandler
     : IQueryHandler<Result<PaginationResponse<DepartmentDto>, Errors>, GetChildrenDepartmentsByParentIdQuery>
 {
     private const string sql = """

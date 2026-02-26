@@ -14,7 +14,7 @@ namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]
 [Route("api/departments")]
-public class DepartmentsController : ControllerBase
+public sealed class DepartmentsController : ControllerBase
 {
     [HttpGet]
     [Route("top-positions")]

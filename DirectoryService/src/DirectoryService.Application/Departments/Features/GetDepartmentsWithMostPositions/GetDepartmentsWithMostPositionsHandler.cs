@@ -9,7 +9,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 
-public class GetDepartmentsWithMostPositionsHandler 
+public sealed class GetDepartmentsWithMostPositionsHandler 
     : IQueryHandler<Result<IReadOnlyList<DepartmentDto>, Errors>>
 {
     private const string sql = """

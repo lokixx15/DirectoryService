@@ -10,7 +10,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.SoftDeleteDepartment;
 
-public class SoftDeleteDepartmentHandler 
+public sealed class SoftDeleteDepartmentHandler 
     : ICommandHandler<SoftDeleteDepartmentCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;

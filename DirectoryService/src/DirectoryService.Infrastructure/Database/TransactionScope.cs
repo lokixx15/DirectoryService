@@ -6,7 +6,7 @@ using System.Data;
 
 namespace DirectoryService.Infrastructure.Database;
 
-public class TransactionScope : ITransactionScope
+public sealed class TransactionScope : ITransactionScope
 {
     private readonly IDbTransaction _dbTransaction;
     private readonly ILogger<TransactionScope> _logger;

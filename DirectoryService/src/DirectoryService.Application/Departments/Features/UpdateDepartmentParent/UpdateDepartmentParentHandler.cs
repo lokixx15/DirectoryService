@@ -11,7 +11,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 
-public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentParentCommand>
+public sealed class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentParentCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ITransactionManager _transactionManager;
