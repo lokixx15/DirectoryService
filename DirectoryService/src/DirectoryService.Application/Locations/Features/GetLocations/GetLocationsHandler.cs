@@ -12,8 +12,7 @@ using System.Text.Json;
 
 namespace DirectoryService.Application.Locations.Features.GetLocations;
 
-public class GetLocationsHandler
-    : IQueryHandler<Result<PaginationResponse<LocationDto>, Errors>, GetLocationsQuery>
+public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationResponse<LocationDto>, Errors>, GetLocationsQuery>
 {
     private readonly IDbConnectionFactory _connectionFactory;
 

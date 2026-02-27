@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Presentation.EnpointResults;
 
-public class SuccessResult : IResult
+public sealed class SuccessResult : IResult
 {
     public async Task ExecuteAsync(HttpContext httpContext)
     {

@@ -2,7 +2,7 @@
 
 namespace SharedKernel;
 
-public class Error
+public sealed class Error
 {
     public const string SEPARATOR = "||";
     public string Code { get; } = string.Empty;

@@ -10,7 +10,7 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddProgramDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddSerilogLogging(configuration)
-            .AddApplication()
+            .AddApplication(configuration)
             .AddInfrastructure(configuration)
             .AddWeb();
 

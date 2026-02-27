@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace DirectoryService.Infrastructure.Seeding;
 
-public class DirectoryServiceSeeder : ISeeder
+public sealed class DirectoryServiceSeeder : ISeeder
 {
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<DirectoryServiceSeeder> _logger;
@@ -216,4 +216,3 @@ public class DirectoryServiceSeeder : ISeeder
         _logger.LogInformation("Created {Count} UNIQUE positions", POSITIONS_COUNT);
     }
 }
-

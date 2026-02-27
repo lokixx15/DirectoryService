@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions.Database;
-using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,7 @@ using SharedKernel;
 
 namespace DirectoryService.Infrastructure.Database;
 
-public class TransactionManager : ITransactionManager
+public sealed class TransactionManager : ITransactionManager
 {
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<TransactionManager> _logger;

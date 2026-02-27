@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace DirectoryService.Infrastructure.BackgroundTasks.ClearingInactiveDepartments;
 
-public class ClearingInactiveDepartmentsService : BackgroundService
+public sealed class ClearingInactiveDepartmentsService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IOptions<ClearingInactiveDepartmentsOptions> _options;

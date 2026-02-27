@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Presentation.EnpointResults;
 
-public class ErrorsResult : IResult
+public sealed class ErrorsResult : IResult
 {
     private readonly Errors _errors;
 

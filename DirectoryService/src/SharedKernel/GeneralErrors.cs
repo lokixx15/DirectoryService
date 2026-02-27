@@ -21,10 +21,9 @@ public static class GeneralErrors
         Error.Conflict("value.already.exists", message);
 
     public static Error EntityNotFound(string? name = null, string? message = null) =>
-        Error.Validation(
+        Error.NotFound(
             "entity.not.found",
-            message ?? $"{name ?? "Entity"} was not found in the database.",
-            name ?? "Entity");
+            message ?? $"{name ?? "Entity"} was not found in the database.");
 
     public static Error CollectionIsNullOrEmpty(string? name = null) =>
         Error.Validation(
@@ -33,13 +32,16 @@ public static class GeneralErrors
             $"Collection {name ?? ""}");
 
     public static Error CollectionContainsDuplicates(string? name = null) =>
-    Error.Validation(
-        "collection.duplicates",
-        $"Collection {name ?? ""} cannot contains duplicates",
-        $"Collection {name ?? ""}");
+        Error.Validation(
+            "collection.duplicates",
+            $"Collection {name ?? ""} cannot contains duplicates",
+            $"Collection {name ?? ""}");
 
     public static Error DatabaseReadFailed(string message, string? code = null) =>
         Error.Failure(code ?? "database.read.failed", message);
+
+    public static Error DatabaseAddFailed(string message, string? code = null) =>
+        Error.Failure(code ?? "database.add.failed", message);
 
     public static Error DatabaseUpdateFailed(string message, string? code = null) =>
         Error.Failure(code ?? "database.update.failed", message);
@@ -47,7 +49,7 @@ public static class GeneralErrors
     public static Error DatabaseDeleteFailed(string message, string? code = null) =>
         Error.Failure(code ?? "database.delete.failed", message);
 
-    public static Error DataLockFailed(string message, string? code = null) =>
+    public static Error DatabaseLockFailed(string message, string? code = null) =>
     Error.Failure(code ?? "database.lock.failed", message);
 
     public static Error OperationCancelled() =>

@@ -12,7 +12,7 @@ using SharedKernel;
 
 namespace DirectoryService.Application.Positions.Features.CreatePosition;
 
-public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand>
+public sealed class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand>
 {
     private readonly IPositionsRepository _positionsRepository;
     private readonly IDepartmentsRepository _departmentsRepository;

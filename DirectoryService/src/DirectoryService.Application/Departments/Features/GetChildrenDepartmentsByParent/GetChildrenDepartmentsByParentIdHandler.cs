@@ -2,30 +2,54 @@
 using Dapper;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
-using DirectoryService.Contracts.Locations;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 
-public class GetChildrenDepartmentsByParentIdHandler
+public sealed class GetChildrenDepartmentsByParentIdHandler
     : IQueryHandler<Result<PaginationResponse<DepartmentDto>, Errors>, GetChildrenDepartmentsByParentIdQuery>
 {
+    private const string sql = """
+             WITH children AS (
+             				   SELECT d.id,
+             				   	      d.name,
+             				   	      d.identifier,
+             				   	      d.parent_id,
+             				   	      d.path,      
+             				   	      d.depth,
+             				   	      d.is_active,
+             				   	      d.created_at,
+             				   	      d.updated_at,
+                                      COUNT(*) OVER() AS total_count
+             				   FROM departments AS d 
+             				   WHERE d.parent_id = @parent_id
+             				   LIMIT @children_limit OFFSET @offset
+             )
+             SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id))
+             FROM children;
+             """;
+
     private readonly IDbConnectionFactory _connectionFactory;
     private readonly IValidator<GetChildrenDepartmentsByParentIdQuery> _validator;
+    private readonly HybridCache _cache;
     private readonly ILogger<GetChildrenDepartmentsByParentIdHandler> _logger;
 
     public GetChildrenDepartmentsByParentIdHandler(
         IDbConnectionFactory connectionFactory,
         IValidator<GetChildrenDepartmentsByParentIdQuery> validator,
+        HybridCache cache,
         ILogger<GetChildrenDepartmentsByParentIdHandler> logger)
     {
         _connectionFactory = connectionFactory;
         _validator = validator;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -51,35 +75,30 @@ public class GetChildrenDepartmentsByParentIdHandler
 
         long? totalCount = null!;
 
-        var locationResponseList = await connection.QueryAsync<DepartmentDto, long, DepartmentDto>(
-            $"""
-             WITH children AS (
-             				  SELECT d.id,
-             				  	     d.name,
-             				  	     d.identifier,
-             				  	     d.parent_id,
-             				  	     d.path,      
-             				  	     d.depth,
-             				  	     d.is_active,
-             				  	     d.created_at,
-             				  	     d.updated_at,
-                                     COUNT(*) OVER() AS total_count
-             				  FROM departments AS d 
-             				  WHERE d.parent_id = @parent_id
-             				  LIMIT @children_limit OFFSET @offset
-             )
-             SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id))
-             FROM children;
-             """,
-            map: (dD, l) =>
+        var key = $"{CacheConstants.CHILDREN_DEPARTMENTS_CACHE_KEY}_parentid_{query.ParentId}_page_{query.Request.Page}_pagesize_{query.Request.Size}";
+
+        var departmentDtos = await _cache.GetOrCreateAsync(
+            key,
+            async _ =>
             {
-                totalCount ??= l;
+                using var connection = _connectionFactory.GetDbConnection();
 
-                return dD;
+                var departmentDtos = await connection.QueryAsync<DepartmentDto, long, DepartmentDto>(
+                    sql,
+                    map: (dD, l) =>
+                    {
+                        totalCount ??= l;
+
+                        return dD;
+                    },
+                    parameters,
+                    splitOn: "total_count");
+
+                return departmentDtos.ToList();
             },
-            parameters,
-            splitOn: "total_count");
+            tags:[CacheConstants.DEPARTMENTS_CACHE_TAG],
+            cancellationToken: cancellationToken);
 
-        return new PaginationResponse<DepartmentDto>(locationResponseList.ToList(), totalCount ?? 0);
+        return new PaginationResponse<DepartmentDto>(departmentDtos.ToList(), totalCount ?? 0);
     }
 }

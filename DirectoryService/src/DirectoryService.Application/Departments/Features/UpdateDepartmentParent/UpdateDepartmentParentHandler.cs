@@ -1,30 +1,35 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Departments;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 
-public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentParentCommand>
+public sealed class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentParentCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ITransactionManager _transactionManager;
     private readonly IValidator<UpdateDepartmentParentCommand> _validator;
+    private readonly HybridCache _cache;
     private readonly ILogger<UpdateDepartmentParentHandler> _logger;
 
     public UpdateDepartmentParentHandler(
         IDepartmentsRepository departmentsRepository,
         ITransactionManager transactionManager,
         IValidator<UpdateDepartmentParentCommand> validator, 
+        HybridCache cache,
         ILogger<UpdateDepartmentParentHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _transactionManager = transactionManager;
         _validator = validator;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -122,6 +127,10 @@ public class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepartmentPar
             _logger.LogError("Errors occurred when committing transaction");
             return saveChangesResult.Error.ToErrors();
         }
+
+        await _cache.RemoveByTagAsync(CacheConstants.DEPARTMENTS_CACHE_TAG, cancellationToken);
+
+        _logger.LogInformation("Invalidated all departments cache using tag: {Tag}", CacheConstants.DEPARTMENTS_CACHE_TAG);
 
         return UnitResult.Success<Errors>();
     }

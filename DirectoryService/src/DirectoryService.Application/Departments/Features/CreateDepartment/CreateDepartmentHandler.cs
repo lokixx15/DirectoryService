@@ -1,23 +1,26 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Departments.VO;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.CreateDepartment;
 
-public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
+public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;
     private readonly ITransactionManager _transactionManager;
     private readonly IValidator<CreateDepartmentCommand> _validator;
+    private readonly HybridCache _cache;
     private readonly ILogger<CreateDepartmentHandler> _logger;
 
     public CreateDepartmentHandler(
@@ -25,12 +28,14 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         ILocationsRepository locationsRepository,
         ITransactionManager transactionManager,
         IValidator<CreateDepartmentCommand> validator,
+        HybridCache cache,
         ILogger<CreateDepartmentHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
         _transactionManager = transactionManager;
         _validator = validator;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -126,6 +131,10 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         }
 
         _logger.LogInformation("The department has been inserted into database");
+
+        await _cache.RemoveByTagAsync(CacheConstants.DEPARTMENTS_CACHE_TAG, cancellationToken);
+
+        _logger.LogInformation("Invalidated all departments cache using tag: {Tag}", CacheConstants.DEPARTMENTS_CACHE_TAG);
 
         return addDepartmentResult.Value;
     }
