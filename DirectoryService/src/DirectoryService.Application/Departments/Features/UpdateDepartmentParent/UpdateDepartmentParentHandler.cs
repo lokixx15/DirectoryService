@@ -1,13 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Caching;
-using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Departments;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Validation;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 
@@ -22,7 +22,7 @@ public sealed class UpdateDepartmentParentHandler : ICommandHandler<UpdateDepart
     public UpdateDepartmentParentHandler(
         IDepartmentsRepository departmentsRepository,
         ITransactionManager transactionManager,
-        IValidator<UpdateDepartmentParentCommand> validator, 
+        IValidator<UpdateDepartmentParentCommand> validator,
         HybridCache cache,
         ILogger<UpdateDepartmentParentHandler> logger)
     {

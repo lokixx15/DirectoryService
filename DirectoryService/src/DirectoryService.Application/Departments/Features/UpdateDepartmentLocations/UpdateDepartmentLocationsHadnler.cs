@@ -1,14 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Caching;
 using DirectoryService.Application.Locations;
-using DirectoryService.Application.Validation;
 using DirectoryService.Domain.DepartmentLocations;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Validation;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 
@@ -66,8 +66,7 @@ public sealed class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDep
 
         if (departmentExistenceResult.IsFailure)
         {
-            _logger.LogError("Errors occurred when checking the existence of department by id {Id}",
-                departmentId);
+            _logger.LogError("Errors occurred when checking the existence of department by id {Id}", departmentId);
             transactionScope.Rollback();
 
             return departmentExistenceResult.Error.ToErrors();
@@ -77,8 +76,7 @@ public sealed class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDep
 
         if (locationsExistenceResult.IsFailure)
         {
-            _logger.LogError("Errors occurred when checking the existence of locations by ids {Ids}",
-               string.Join(", ", locationIds));
+            _logger.LogError("Errors occurred when checking the existence of locations by ids {Ids}", string.Join(", ", locationIds));
             transactionScope.Rollback();
 
             return locationsExistenceResult.Error.ToErrors();
@@ -88,14 +86,13 @@ public sealed class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDep
 
         if (deleteLocationsResult.IsFailure)
         {
-            _logger.LogError("Errors occurred during deletion locations from the department with id {Id}",
-                departmentId);
+            _logger.LogError("Errors occurred during deletion locations from the department with id {Id}", departmentId);
             transactionScope.Rollback();
 
             return deleteLocationsResult.Error.ToErrors();
         }
 
-        var departmentLocationListResult = locationIds.Select(lI => 
+        var departmentLocationListResult = locationIds.Select(lI =>
             DepartmentLocation.Create(departmentId, lI)).ToList();
 
         var departmentLocationList = departmentLocationListResult.Select(d => d.Value).ToList();

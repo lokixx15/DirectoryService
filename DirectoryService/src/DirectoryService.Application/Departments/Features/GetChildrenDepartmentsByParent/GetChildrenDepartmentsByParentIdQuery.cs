@@ -1,5 +1,5 @@
-﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Contracts;
+﻿using DirectoryService.Contracts;
+using SharedService.Core.Abstractions;
 
 namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 

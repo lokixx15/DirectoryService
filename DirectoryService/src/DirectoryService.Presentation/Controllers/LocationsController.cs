@@ -2,8 +2,8 @@
 using DirectoryService.Application.Locations.Features.GetLocations;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
-using DirectoryService.Presentation.EnpointResults;
 using Microsoft.AspNetCore.Mvc;
+using SharedService.Framework.Endpoints;
 
 namespace DirectoryService.Presentation.Controllers;
 

@@ -29,7 +29,6 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
                 .HasColumnName("name");
             });
 
-
         builder
             .OwnsOne(d => d.Identifier, bp =>
             {

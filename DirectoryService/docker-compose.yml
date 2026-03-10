@@ -1,18 +1,22 @@
 ﻿services:
-
   directory-service:
     container_name: directory-service
     build: 
       context: ./
       dockerfile: Dockerfile
+      args:
+        NUGET_USERNAME: ${NUGET_USERNAME}
+        NUGET_PASSWORD: ${NUGET_PASSWORD}
+    env_file:
+      - .env
     ports:
     - "9001:9001"
     environment:
     - ASPNETCORE_ENVIRONMENT=Docker
     - ASPNETCORE_URLS=http://s+:9001
-    restart: always
     depends_on:
       - postgres
+    restart: always
 
   postgres:
     container_name: postgres

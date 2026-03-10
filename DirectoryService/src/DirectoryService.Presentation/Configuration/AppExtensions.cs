@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Infrastructure.Seeding;
-using DirectoryService.Presentation.Middlewares;
 using Serilog;
+using SharedService.Framework.Middlewares;
 
 namespace DirectoryService.Presentation.Configuration;
 

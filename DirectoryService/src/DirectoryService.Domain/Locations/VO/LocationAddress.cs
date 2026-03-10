@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationAddress
 {
-    //ef core
+    // ef core
     private LocationAddress() { }
 
     private LocationAddress(
@@ -32,8 +32,8 @@ public record LocationAddress
     public string City { get; init; } = string.Empty;
     public string Street { get; init; } = string.Empty;
     public string Building { get; init; } = string.Empty;
-    public string? Region { get; init; } 
-    public string? District { get; init; } 
+    public string? Region { get; init; }
+    public string? District { get; init; }
     public string? Apartment { get; init; }
     public string FullAddress => GetFullAddress(Country, City, Street, Building, Region, District, Apartment);
 

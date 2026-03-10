@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Application;
 using DirectoryService.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
+using SharedService.Framework.Logging;
 
 namespace DirectoryService.Presentation.Configuration;
 
@@ -22,16 +22,6 @@ public static class DependencyInjectionExtensions
         options.SuppressModelStateInvalidFilter = true);
 
         services.AddOpenApi();
-
-        return services;
-    }
-
-    private static IServiceCollection AddSerilogLogging(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddSerilog((services, lc) => lc
-        .ReadFrom.Configuration(configuration)
-        .ReadFrom.Services(services)
-        .Enrich.WithProperty("ServiceName", "DirectoryService"));
 
         return services;
     }

@@ -1,12 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationName
 {
-    //ef core 
-    private LocationName() { }  
+    // ef core
+    private LocationName() { }
 
     private LocationName(
     string value)

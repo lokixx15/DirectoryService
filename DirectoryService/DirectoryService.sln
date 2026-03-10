@@ -11,7 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
-		directory.service.env = directory.service.env
+		Directory.Build.props = Directory.Build.props
+		.env = .env
+		Directory.Packages.props = Directory.Packages.props
 		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
 	EndProjectSection
@@ -23,8 +25,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Infrastructure", "src\DirectoryService.Infrastructure\DirectoryService.Infrastructure.csproj", "{3D7CC7DB-F4A6-4FCE-909D-D0977A082D8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Presentation", "src\DirectoryService.Presentation\DirectoryService.Presentation.csproj", "{8AC528AE-F254-4C16-A453-8F6B3180B856}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel", "src\SharedKernel\SharedKernel.csproj", "{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D8A414F0-AAFF-46CE-BEF4-4158627DCF39}"
 EndProject
@@ -100,18 +100,6 @@ Global
 		{8AC528AE-F254-4C16-A453-8F6B3180B856}.Release|x64.Build.0 = Release|Any CPU
 		{8AC528AE-F254-4C16-A453-8F6B3180B856}.Release|x86.ActiveCfg = Release|Any CPU
 		{8AC528AE-F254-4C16-A453-8F6B3180B856}.Release|x86.Build.0 = Release|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Debug|x64.Build.0 = Debug|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Debug|x86.Build.0 = Debug|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Release|x64.ActiveCfg = Release|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Release|x64.Build.0 = Release|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Release|x86.ActiveCfg = Release|Any CPU
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4}.Release|x86.Build.0 = Release|Any CPU
 		{A66CAE64-ACB3-D524-9486-206D9A441CD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A66CAE64-ACB3-D524-9486-206D9A441CD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A66CAE64-ACB3-D524-9486-206D9A441CD0}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -134,7 +122,6 @@ Global
 		{F02CAFF9-F769-4328-B02A-DA83EA73F26C} = {8F0A7B6E-C71E-467A-9F3F-AE556B7D273F}
 		{3D7CC7DB-F4A6-4FCE-909D-D0977A082D8D} = {8F0A7B6E-C71E-467A-9F3F-AE556B7D273F}
 		{8AC528AE-F254-4C16-A453-8F6B3180B856} = {8F0A7B6E-C71E-467A-9F3F-AE556B7D273F}
-		{4E2F1959-7E02-4013-B8B0-92E5DF7471A4} = {8F0A7B6E-C71E-467A-9F3F-AE556B7D273F}
 		{A66CAE64-ACB3-D524-9486-206D9A441CD0} = {D8A414F0-AAFF-46CE-BEF4-4158627DCF39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

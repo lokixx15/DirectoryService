@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Departments;
 using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.Departments;
@@ -6,8 +7,7 @@ using DirectoryService.Domain.Departments.VO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using SharedKernel;
-using System.Linq.Expressions;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Infrastructure.Departments;
 
@@ -17,7 +17,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     private readonly ILogger<DepartmentsRepository> _logger;
 
     public DepartmentsRepository(
-        DirectoryServiceDbContext dbContext, 
+        DirectoryServiceDbContext dbContext,
         ILogger<DepartmentsRepository> logger)
     {
         _dbContext = dbContext;
@@ -25,7 +25,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     }
 
     public async Task<Result<Department, Error>> GetByAsync(
-        Expression<Func<Department, bool>> predicate, 
+        Expression<Func<Department, bool>> predicate,
         CancellationToken cancellationToken = default)
     {
         try
@@ -55,7 +55,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     }
 
     public async Task<Result<Department, Error>> GetByIdWithLockAsync(
-        Guid id, 
+        Guid id,
         CancellationToken cancellationToken = default)
     {
         try
@@ -90,7 +90,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     }
 
     public async Task<UnitResult<Error>> LockDescendants(
-        DepartmentPath oldDepartmentPath, 
+        DepartmentPath oldDepartmentPath,
         CancellationToken cancellationToken = default)
     {
         try
@@ -99,8 +99,8 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
                 SELECT path, depth
                 FROM departments 
                 WHERE path <@ {0}::ltree
-                FOR UPDATE", 
-                [oldDepartmentPath.Value], 
+                FOR UPDATE",
+                [oldDepartmentPath.Value],
                 cancellationToken);
 
             return UnitResult.Success<Error>();
@@ -118,7 +118,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     }
 
     public async Task<UnitResult<Error>> ExistsAsync(
-        IEnumerable<Guid> ids, 
+        IEnumerable<Guid> ids,
         CancellationToken cancellationToken = default)
     {
         try
@@ -150,7 +150,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     }
 
     public async Task<Result<Guid, Error>> AddAsync(
-        Department department, 
+        Department department,
         CancellationToken cancellationToken = default)
     {
         await _dbContext.AddAsync(department, cancellationToken);
@@ -160,7 +160,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     }
 
     public async Task<UnitResult<Error>> AddLocationsToDepartmentAsync(
-        List<DepartmentLocation> locations, 
+        List<DepartmentLocation> locations,
         CancellationToken cancellationToken = default)
     {
         await _dbContext.DepartmentLocations.AddRangeAsync(locations, cancellationToken);
@@ -174,7 +174,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         DepartmentPath oldParentPath,
         CancellationToken cancellationToken = default)
     {
-        var newPath = newParentPath?.Value ?? "";
+        var newPath = newParentPath?.Value ?? string.Empty;
 
         var sql = """
                         UPDATE departments
@@ -252,7 +252,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
 
             return UnitResult.Success<Error>();
         }
-        catch(OperationCanceledException ex) 
+        catch(OperationCanceledException ex)
         {
             _logger.LogError(ex, "Operation was cancelled when deleting locations by department id");
             return GeneralErrors.OperationCancelled();

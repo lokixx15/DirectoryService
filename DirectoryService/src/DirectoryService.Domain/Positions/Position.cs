@@ -1,39 +1,46 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.DepartmentPositions;
 using DirectoryService.Domain.Positions.VO;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Positions;
 
 public class Position
 {
-    //ef core
+    // ef core
     private Position() { }
 
     private readonly List<DepartmentPosition> _departments = [];
 
     private Position(
         Guid? id,
-        PositionName name, 
-        string description, 
+        PositionName name,
+        string description,
         IEnumerable<DepartmentPosition> departments)
     {
         Id = id ?? Guid.NewGuid();
         Name = name;
         Description = description;
         IsActive = true;
-        CreatedAt = DateTime.UtcNow;    
+        CreatedAt = DateTime.UtcNow;
         UpdatedAt = CreatedAt;
         _departments = departments.ToList();
     }
-                    
+
     public Guid Id { get; private set; }
+
     public PositionName Name { get; private set; } = null!;
+
     public string Description { get; private set; } = string.Empty;
+
     public bool IsActive { get; private set; }
+
     public DateTime CreatedAt { get; private set; }
+
     public DateTime UpdatedAt { get; private set; }
+
     public DateTime? DeletedAt { get; private set; }
+
     public IReadOnlyList<DepartmentPosition> Departments => _departments;
 
     public static Result<Position, Errors> Create(
@@ -42,7 +49,7 @@ public class Position
         string description,
         IEnumerable<DepartmentPosition> departments)
     {
-        var errors = new List<Error>(); 
+        var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(description))
             return Result.Failure<Position, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Description"));

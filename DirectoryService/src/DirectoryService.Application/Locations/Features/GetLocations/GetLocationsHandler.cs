@@ -1,14 +1,14 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text.Json;
+using CSharpFunctionalExtensions;
 using Dapper;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
-using System.Text.Json;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Validation;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Locations.Features.GetLocations;
 
@@ -18,7 +18,6 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
 
     private readonly IValidator<GetLocationsQuery> _validator;
     private readonly ILogger<GetLocationsHandler> _logger;
-
 
     public GetLocationsHandler(
         IDbConnectionFactory connectionFactory,
@@ -31,7 +30,7 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
     }
 
     public async Task<Result<PaginationResponse<LocationDto>, Errors>> Handle(
-        GetLocationsQuery query, 
+        GetLocationsQuery query,
         CancellationToken cancellationToken)
     {
         var queryValidationResult = await _validator.ValidateAsync(query, cancellationToken);
@@ -57,7 +56,7 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
                                 WHERE dl.location_id = l.id AND 
                                 dl.department_id = ANY(@department_ids))
                                 """);
-                
+
         }
 
         if (!string.IsNullOrEmpty(query.Request.Search))
@@ -75,7 +74,7 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
         parameters.Add("page_size", query.Request.Pagination.Size);
         parameters.Add("offset", (query.Request.Pagination.Page - 1) * query.Request.Pagination.Size);
 
-        var orderBy = query.Request.OrderBy switch 
+        var orderBy = query.Request.OrderBy switch
         {
             "name" => "l.name",
             "createdDate" => "l.created_at",
@@ -84,8 +83,8 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
         };
         var orderDirection = query.Request.OrderDirection.ToUpper() == "ASC" ? "ASC" : "DESC";
 
-        var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : "";
-        var orderByClause = $"ORDER BY {orderBy} {orderDirection}";            
+        var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
+        var orderByClause = $"ORDER BY {orderBy} {orderDirection}";
 
         long? totalCount = null!;
 

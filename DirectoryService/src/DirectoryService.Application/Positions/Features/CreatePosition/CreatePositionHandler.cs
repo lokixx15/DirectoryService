@@ -2,13 +2,14 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Departments;
-using DirectoryService.Application.Validation;
 using DirectoryService.Domain.DepartmentPositions;
 using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Positions.VO;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Validation;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Positions.Features.CreatePosition;
 
@@ -66,8 +67,7 @@ public sealed class CreatePositionHandler : ICommandHandler<Guid, CreatePosition
 
         if (departmentsExistenceResult.IsFailure)
         {
-            _logger.LogError("Errors occurred when checking the existence of departments by ids {Ids}",
-                string.Join(",", departmentIds));
+            _logger.LogError("Errors occurred when checking the existence of departments by ids {Ids}", string.Join(",", departmentIds));
             transactionScope.Rollback();
 
             return departmentsExistenceResult.Error.ToErrors();
@@ -99,7 +99,6 @@ public sealed class CreatePositionHandler : ICommandHandler<Guid, CreatePosition
 
             return addPositionResult.Error.ToErrors();
         }
-
 
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
 

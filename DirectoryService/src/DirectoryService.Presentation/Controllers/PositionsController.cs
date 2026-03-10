@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Application.Positions.Features.CreatePosition;
 using DirectoryService.Contracts.Positions;
-using DirectoryService.Presentation.EnpointResults;
 using Microsoft.AspNetCore.Mvc;
+using SharedService.Framework.Endpoints;
 
 namespace DirectoryService.Presentation.Controllers;
 

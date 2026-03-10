@@ -1,12 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
-using FluentValidation;
-using DirectoryService.Application.Validation;
-using Microsoft.Extensions.Logging;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Locations.VO;
-using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Abstractions.Database;
+using FluentValidation;
+using Microsoft.Extensions.Logging;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Validation;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Locations.Features.CreateLocation;
 
@@ -30,7 +30,7 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
     }
 
     public async Task<Result<Guid, Errors>> Handle(
-        CreateLocationCommand command, 
+        CreateLocationCommand command,
         CancellationToken cancellationToken)
     {
         var commandValidationResult = await _validator.ValidateAsync(command, cancellationToken);

@@ -8,20 +8,19 @@ using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Positions.VO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Threading;
 
 namespace DirectoryService.Infrastructure.Seeding;
 
 public sealed class DirectoryServiceSeeder : ISeeder
 {
+    private const int DEPARTMENTS_COUNT = 100;
+    private const int LOCATIONS_COUNT = 100;
+    private const int POSITIONS_COUNT = 100;
+
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<DirectoryServiceSeeder> _logger;
 
     private readonly Random _random = new();
-
-    private const int DEPARTMENTS_COUNT = 100;
-    private readonly int LOCATIONS_COUNT = 100;
-    private readonly int POSITIONS_COUNT = 100;
 
     public DirectoryServiceSeeder(
         DirectoryServiceDbContext dbContext,
@@ -64,7 +63,7 @@ public sealed class DirectoryServiceSeeder : ISeeder
         catch (Exception)
         {
             await transaction.RollbackAsync(cancellationToken);
-            throw; 
+            throw;
         }
     }
 
@@ -89,15 +88,14 @@ public sealed class DirectoryServiceSeeder : ISeeder
         for (int i = 0; i < LOCATIONS_COUNT; i++)
         {
             var cityIdx = i % cities.Length;
-            var streetIdx = i % streets.Length;  
+            var streetIdx = i % streets.Length;
 
             var address = LocationAddress.Create(
                 country: "Russia",
-                city: $"{cities[cityIdx]}-{i:D2}",           
-                street: $"{streets[streetIdx]} St",         
-                building: $"{i + 1:D3}",                   
-                region: $"RU-{i % 4 + 1}"                    
-            ).Value;
+                city: $"{cities[cityIdx]}-{i:D2}",
+                street: $"{streets[streetIdx]} St",
+                building: $"{i + 1:D3}",
+                region: $"RU-{(i % 4) + 1}").Value;
 
             var name = LocationName.Create($"Office-{i:D3}-{cities[cityIdx]}").Value;
             var timezone = LocationTimezone.Create(timezones[i % timezones.Length]).Value;
@@ -124,18 +122,17 @@ public sealed class DirectoryServiceSeeder : ISeeder
         {
             var departmentId = Guid.NewGuid();
 
-            var identifierValue = $"{latinLetters[i]}div";  
+            var identifierValue = $"{latinLetters[i]}div";
             var nameValue = $"Division {i + 1}";
 
             var identifier = DepartmentIdentifier.Create(identifierValue).Value;
             var name = DepartmentName.Create(nameValue).Value;
 
             var department = Department.CreateParent(
-                departmentId, 
-                name, 
-                identifier, 
-                [DepartmentLocation.Create(departmentId, locations[i].Id).Value]
-            ).Value;
+                departmentId,
+                name,
+                identifier,
+                [DepartmentLocation.Create(departmentId, locations[i].Id).Value]).Value;
 
             await _dbContext.Departments.AddAsync(department, cancellationToken);
             rootDepartments.Add(department);
@@ -154,7 +151,7 @@ public sealed class DirectoryServiceSeeder : ISeeder
             var letter1 = latinLetters[i % latinLetters.Length];
             var letter2 = latinLetters[(i / 10) % latinLetters.Length];
 
-            var identifierValue = $"{prefix}{letter1}{letter2}";  
+            var identifierValue = $"{prefix}{letter1}{letter2}";
             var nameValue = $"Department {i + 1}";
 
             var identifier = DepartmentIdentifier.Create(identifierValue).Value;
@@ -162,11 +159,10 @@ public sealed class DirectoryServiceSeeder : ISeeder
 
             var department = Department.CreateChild(
                 departmentId,
-                name, 
+                name,
                 identifier,
                 parent,
-                [DepartmentLocation.Create(departmentId, locations[i + 10].Id).Value]
-            ).Value;
+                [DepartmentLocation.Create(departmentId, locations[i + 10].Id).Value]).Value;
 
             await _dbContext.Departments.AddAsync(department, cancellationToken);
             departments.Add(department);
@@ -206,8 +202,7 @@ public sealed class DirectoryServiceSeeder : ISeeder
                 id: positionId,
                 name: positionName,
                 description: description,
-                departments: [DepartmentPosition.Create(departments[i].Id,  positionId).Value]
-            ).Value;
+                departments: [DepartmentPosition.Create(departments[i].Id,  positionId).Value]).Value;
 
             await _dbContext.Positions.AddAsync(position, cancellationToken);
         }

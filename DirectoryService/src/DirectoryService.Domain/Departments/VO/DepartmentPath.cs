@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Departments.VO;
 
 public record DepartmentPath
 {
-    //ef core 
+    // ef core
     private DepartmentPath() { }
 
     public const char SEPARATOR = '.';
@@ -21,13 +21,16 @@ public record DepartmentPath
     {
         var errors = new List<Error>();
 
+        if (string.IsNullOrWhiteSpace(value))
+            errors.Add(GeneralErrors.ValueIsNullOrWhitespace("Path"));
+
         if (value.Length > Constants.MAX_DEPARTMENT_PATH_LENGTH)
             errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_DEPARTMENT_PATH_LENGTH, "Path"));
 
         if (errors.Any())
             return Result.Failure<DepartmentPath, Errors>(errors);
 
-        var pathPrefix = parentPath != null ? $"{parentPath}{SEPARATOR}" : "";
+        var pathPrefix = parentPath != null ? $"{parentPath}{SEPARATOR}" : string.Empty;
 
         var path = new DepartmentPath($"{pathPrefix}{value}");
 

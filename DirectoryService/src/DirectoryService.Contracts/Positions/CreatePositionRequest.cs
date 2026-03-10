@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Positions;
 
 public record CreatePositionRequest(
-    string Name, 
+    string Name,
     string Description,
     Guid[] DepartmentIds);

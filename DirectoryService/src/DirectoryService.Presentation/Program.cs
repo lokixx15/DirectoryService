@@ -1,6 +1,6 @@
-﻿using DirectoryService.Presentation.Configuration;
+﻿using System.Globalization;
+using DirectoryService.Presentation.Configuration;
 using Serilog;
-using System.Globalization;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

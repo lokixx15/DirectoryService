@@ -6,12 +6,23 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG NUGET_USERNAME
+ARG NUGET_PASSWORD
 WORKDIR /src
+
+COPY ["Directory.Packages.props", "."]
+COPY ["Directory.Build.props", "."]
+
+RUN dotnet nuget add source https://nuget.pkg.github.com/lokixx15/index.json \
+    -n github \
+    --username $NUGET_USERNAME \
+    --password $NUGET_PASSWORD \
+    --store-password-in-clear-text
+
 COPY ["src/DirectoryService.Presentation/DirectoryService.Presentation.csproj", "src/DirectoryService.Presentation/"]
 COPY ["src/DirectoryService.Application/DirectoryService.Application.csproj", "src/DirectoryService.Application/"]
 COPY ["src/DirectoryService.Contracts/DirectoryService.Contracts.csproj", "src/DirectoryService.Contracts/"]
 COPY ["src/DirectoryService.Domain/DirectoryService.Domain.csproj", "src/DirectoryService.Domain/"]
-COPY ["src/SharedKernel/SharedKernel.csproj", "src/SharedKernel/"]
 COPY ["src/DirectoryService.Infrastructure/DirectoryService.Infrastructure.csproj", "src/DirectoryService.Infrastructure/"]
 RUN dotnet restore "./src/DirectoryService.Presentation/DirectoryService.Presentation.csproj"
 COPY . .

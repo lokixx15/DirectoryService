@@ -4,7 +4,7 @@ using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Infrastructure.Locations;
 
@@ -14,7 +14,7 @@ public sealed class LocationsRepository : ILocationsRepository
     private readonly ILogger<LocationsRepository> _logger;
 
     public LocationsRepository(
-        DirectoryServiceDbContext dbContext, 
+        DirectoryServiceDbContext dbContext,
         ILogger<LocationsRepository> logger)
     {
         _dbContext = dbContext;
@@ -22,7 +22,7 @@ public sealed class LocationsRepository : ILocationsRepository
     }
 
     public async Task<UnitResult<Error>> ExistsAsync(
-        IEnumerable<Guid> ids, 
+        IEnumerable<Guid> ids,
         CancellationToken cancellationToken = default)
     {
         try
@@ -54,7 +54,7 @@ public sealed class LocationsRepository : ILocationsRepository
     }
 
     public async Task<Result<Guid, Error>> AddAsync(
-        Location location, 
+        Location location,
         CancellationToken cancellationToken = default)
     {
         try
@@ -77,7 +77,7 @@ public sealed class LocationsRepository : ILocationsRepository
     }
 
     public async Task<UnitResult<Error>> SoftDeleteLocationsWithoutActiveDepartments(
-        Guid departmentId, 
+        Guid departmentId,
         CancellationToken cancellationToken = default)
     {
         var sql = @"
@@ -100,7 +100,7 @@ public sealed class LocationsRepository : ILocationsRepository
                     	         					 AND dl.location_id = dls.id
                     	         	                 AND d.is_active = true) 
                           AND dls.is_active = true);
-                    ";           
+                    ";
 
         try
         {

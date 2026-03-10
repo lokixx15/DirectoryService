@@ -1,14 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
-using DirectoryService.Domain.Departments.VO;
 using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.DepartmentPositions;
+using DirectoryService.Domain.Departments.VO;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Departments;
 
 public class Department
 {
-    //ef core
+    // ef core
     private Department() { }
 
     private readonly List<Department> _childrenDepartments = [];
@@ -22,7 +22,7 @@ public class Department
         Guid? parentId,
         DepartmentPath path,
         short depth,
-        IEnumerable<DepartmentLocation> locations) 
+        IEnumerable<DepartmentLocation> locations)
     {
         Id = id ?? Guid.NewGuid();
         Name = name;
@@ -37,17 +37,29 @@ public class Department
     }
 
     public Guid Id { get; private set; }
+
     public DepartmentName Name { get; private set; } = null!;
+
     public DepartmentIdentifier Identifier { get; private set; } = null!;
+
     public Guid? ParentId { get; private set; }
+
     public DepartmentPath Path { get; private set; } = null!;
+
     public short Depth { get; private set; }
+
     public bool IsActive { get; private set; }
+
     public DateTime CreatedAt { get; private set; }
+
     public DateTime UpdatedAt { get; private set; }
+
     public DateTime? DeletedAt { get; private set; }
+
     public IReadOnlyList<Department> ChildrenDepartments => _childrenDepartments;
+
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
+
     public IReadOnlyList<DepartmentPosition> Positions => _positions;
 
     public static Result<Department, Errors> CreateParent(
@@ -100,9 +112,9 @@ public class Department
         var parentPath = parent?.Path.Value;
 
         if (parentPath != null && parentPath.StartsWith(Path.Value + "."))
-            return Error.Validation(null, "Parent department cannot be a child of the updated department", null).ToErrors(); 
+            return Error.Validation(null, "Parent department cannot be a child of the updated department", null).ToErrors();
 
-       var newPathResult = DepartmentPath.Create(Identifier.Value, parentPath);
+        var newPathResult = DepartmentPath.Create(Identifier.Value, parentPath);
 
         if (newPathResult.IsFailure)
             return newPathResult.Error;

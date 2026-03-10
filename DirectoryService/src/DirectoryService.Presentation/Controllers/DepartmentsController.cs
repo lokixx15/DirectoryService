@@ -7,8 +7,8 @@ using DirectoryService.Application.Departments.Features.UpdateDepartmentLocation
 using DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
-using DirectoryService.Presentation.EnpointResults;
 using Microsoft.AspNetCore.Mvc;
+using SharedService.Framework.Endpoints;
 
 namespace DirectoryService.Presentation.Controllers;
 

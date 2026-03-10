@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.DepartmentPositions;
 
 public class DepartmentPosition
 {
-    //ef core
+    // ef core
     private DepartmentPosition() { }
 
     private DepartmentPosition(
@@ -18,7 +18,9 @@ public class DepartmentPosition
     }
 
     public Guid Id { get; }
+
     public Guid DepartmentId { get; }
+
     public Guid PositionId { get; }
 
     public static Result<DepartmentPosition, Errors> Create(

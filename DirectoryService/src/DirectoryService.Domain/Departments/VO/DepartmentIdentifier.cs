@@ -1,12 +1,12 @@
-﻿using CSharpFunctionalExtensions;
-using SharedKernel;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using CSharpFunctionalExtensions;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Departments.VO;
 
 public record DepartmentIdentifier
 {
-    //ef core 
+    // ef core
     private DepartmentIdentifier() { }
 
     private DepartmentIdentifier(

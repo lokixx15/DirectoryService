@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Locations.VO;
 
 public record LocationTimezone
 {
-    //ef core 
+    // ef core
     private LocationTimezone() { }
 
     private LocationTimezone(
@@ -20,7 +20,7 @@ public record LocationTimezone
     {
         var errors = new List<Error>();
 
-         if (string.IsNullOrWhiteSpace(value))
+        if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<LocationTimezone, Errors>(GeneralErrors.ValueIsNullOrWhitespace("Timezone"));
 
         if (value.Length > Constants.MAX_LOCATION_TIMEZONE_LENGTH)
