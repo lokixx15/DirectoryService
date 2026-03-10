@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Infrastructure.Database;
 
@@ -15,8 +15,8 @@ public sealed class TransactionManager : ITransactionManager
     private readonly ILoggerFactory _loggerFactory;
 
     public TransactionManager(
-        DirectoryServiceDbContext dbContext, 
-        ILogger<TransactionManager> logger, 
+        DirectoryServiceDbContext dbContext,
+        ILogger<TransactionManager> logger,
         ILoggerFactory loggerFactory)
     {
         _dbContext = dbContext;
@@ -51,7 +51,7 @@ public sealed class TransactionManager : ITransactionManager
     {
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Changes were saved in the database");
 
             return UnitResult.Success<Error>();

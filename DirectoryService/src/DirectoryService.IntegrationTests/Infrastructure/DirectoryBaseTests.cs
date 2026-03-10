@@ -6,9 +6,9 @@ namespace DirectoryService.IntegrationTests.Infrastructure;
 
 public class DirectoryBaseTests : IClassFixture<DirectoryTestWebFactory>, IAsyncLifetime
 {
-    private readonly Func<Task> _resetDatabase;
     protected readonly IServiceProvider Services;
-    
+    private readonly Func<Task> _resetDatabase;
+
     public DirectoryBaseTests(DirectoryTestWebFactory factory)
     {
         Services = factory.Services;
@@ -16,6 +16,7 @@ public class DirectoryBaseTests : IClassFixture<DirectoryTestWebFactory>, IAsync
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
+
     public async Task DisposeAsync() => await _resetDatabase();
 
     protected async Task SeedDataAsync(CancellationToken cancellationToken = default)

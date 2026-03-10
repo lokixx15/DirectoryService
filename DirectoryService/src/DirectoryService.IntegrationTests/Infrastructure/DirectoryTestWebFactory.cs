@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using DirectoryService.Presentation;
-using Testcontainers.PostgreSql;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using System.Data.Common;
 using DirectoryService.Infrastructure;
+using DirectoryService.Presentation;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Respawn;
-using System.Data.Common;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
+using Respawn;
+using Testcontainers.PostgreSql;
 
 namespace DirectoryService.IntegrationTests.Infrastructure;
 
@@ -22,17 +22,6 @@ public class DirectoryTestWebFactory : WebApplicationFactory<Program>, IAsyncLif
 
     private Respawner _respawner = null!;
     private DbConnection _dbConnection = null!;
-
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        builder.ConfigureTestServices(services =>
-        {
-            services.RemoveAll<DirectoryServiceDbContext>();
-
-            services.TryAddScoped(_ =>
-                new DirectoryServiceDbContext(_dbContainer.GetConnectionString()));
-        });
-    }
 
     public async Task InitializeAsync()
     {
@@ -62,6 +51,17 @@ public class DirectoryTestWebFactory : WebApplicationFactory<Program>, IAsyncLif
     public async Task ResetDatabaseAsync()
     {
         await _respawner.ResetAsync(_dbConnection);
+    }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<DirectoryServiceDbContext>();
+
+            services.TryAddScoped(_ =>
+                new DirectoryServiceDbContext(_dbContainer.GetConnectionString()));
+        });
     }
 
     private async Task InitializeRespawner()

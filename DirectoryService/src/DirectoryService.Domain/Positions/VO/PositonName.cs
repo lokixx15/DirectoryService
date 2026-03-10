@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Positions.VO;
 
 public record PositionName
 {
-    //ef core 
+    // ef core
     private PositionName() { }
 
     private PositionName(

@@ -1,8 +1,8 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Data;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions.Database;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
-using System.Data;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Infrastructure.Database;
 
@@ -12,7 +12,7 @@ public sealed class TransactionScope : ITransactionScope
     private readonly ILogger<TransactionScope> _logger;
 
     public TransactionScope(
-        IDbTransaction dbTransaction, 
+        IDbTransaction dbTransaction,
         ILogger<TransactionScope> logger)
     {
         _dbTransaction = dbTransaction;
@@ -52,7 +52,7 @@ public sealed class TransactionScope : ITransactionScope
     }
 
     public void Dispose()
-    { 
+    {
         _dbTransaction.Dispose();
     }
 }

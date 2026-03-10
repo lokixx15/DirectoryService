@@ -28,5 +28,5 @@ public static class DependencyInjection
             .AddScoped<ITransactionManager, TransactionManager>()
             .AddScoped<ILocationsRepository, LocationsRepository>()
             .AddScoped<IDepartmentsRepository, DepartmentsRepository>()
-            .AddScoped<IPositionsRepository, PositionsRepository>(); 
+            .AddScoped<IPositionsRepository, PositionsRepository>();
 }

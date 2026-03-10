@@ -1,8 +1,8 @@
-﻿using DirectoryService.Application.Abstractions;
-using FluentValidation;
-using Microsoft.Extensions.Caching.Hybrid;
+﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Caching;
 
 namespace DirectoryService.Application;
 
@@ -15,31 +15,9 @@ public static class DependencyInjection
         var assembly = typeof(DependencyInjection).Assembly;
         services.AddValidatorsFromAssembly(assembly);
 
-        services.Scan(scan => scan.FromAssemblies(assembly)
-        .AddClasses(classes => classes
-        .AssignableToAny(typeof(ICommandHandler<,>), typeof(ICommandHandler<>)))
-        .AsSelfWithInterfaces()
-        .WithScopedLifetime());
+        services.AddHandlers([assembly]);
 
-        services.Scan(scan => scan.FromAssemblies(assembly)
-            .AddClasses(classes => classes
-            .AssignableToAny(typeof(IQueryHandler<,>), typeof(IQueryHandler<>)))
-            .AsSelfWithInterfaces()
-            .WithScopedLifetime());
-
-        services.AddStackExchangeRedisCache(setup =>
-        {
-            setup.Configuration = configuration.GetConnectionString("Redis");
-        });
-
-        services.AddHybridCache(options =>
-        {
-            options.DefaultEntryOptions = new HybridCacheEntryOptions()
-            {
-                LocalCacheExpiration = configuration.GetValue<TimeSpan>("HybridCache:LocalCacheExpiration"),
-                Expiration = configuration.GetValue<TimeSpan>("HybridCache:Expiration")
-            };
-        });
+        services.AddCaching(configuration);
 
         return services;
     }

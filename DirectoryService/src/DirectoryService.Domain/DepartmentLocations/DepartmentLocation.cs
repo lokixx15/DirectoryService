@@ -1,15 +1,15 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.DepartmentLocations;
 
 public class DepartmentLocation
 {
-    //ef core
+    // ef core
     private DepartmentLocation() { }
 
     private DepartmentLocation(
-        Guid departmentId, 
+        Guid departmentId,
         Guid locationId)
     {
         Id = Guid.NewGuid();
@@ -18,7 +18,9 @@ public class DepartmentLocation
     }
 
     public Guid Id { get; }
+
     public Guid DepartmentId { get; }
+
     public Guid LocationId { get; }
 
     public static Result<DepartmentLocation, Errors> Create(

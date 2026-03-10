@@ -5,14 +5,15 @@ using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Caching;
 using DirectoryService.Contracts.Departments;
 using Microsoft.Extensions.Caching.Hybrid;
-using SharedKernel;
+using SharedService.Core.Abstractions;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 
-public sealed class GetDepartmentsWithMostPositionsHandler 
+public sealed class GetDepartmentsWithMostPositionsHandler
     : IQueryHandler<Result<IReadOnlyList<DepartmentDto>, Errors>>
 {
-    private const string sql = """
+    private const string SQL = """
         SELECT d.id,
                d.name,
                d.identifier,
@@ -55,7 +56,7 @@ public sealed class GetDepartmentsWithMostPositionsHandler
                 using var connection = _connectionFactory.GetDbConnection();
 
                 var departmentDtos = await connection.QueryAsync<DepartmentDto>(
-                    sql,
+                    SQL,
                     cancellationToken);
 
                 return departmentDtos.ToList();

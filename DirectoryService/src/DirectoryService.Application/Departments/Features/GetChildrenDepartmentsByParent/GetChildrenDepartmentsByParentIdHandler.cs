@@ -1,22 +1,22 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Caching;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Validation;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 
 public sealed class GetChildrenDepartmentsByParentIdHandler
     : IQueryHandler<Result<PaginationResponse<DepartmentDto>, Errors>, GetChildrenDepartmentsByParentIdQuery>
 {
-    private const string sql = """
+    private const string SQL = """
              WITH children AS (
              				   SELECT d.id,
              				   	      d.name,
@@ -84,7 +84,7 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
                 using var connection = _connectionFactory.GetDbConnection();
 
                 var departmentDtos = await connection.QueryAsync<DepartmentDto, long, DepartmentDto>(
-                    sql,
+                    SQL,
                     map: (dD, l) =>
                     {
                         totalCount ??= l;
@@ -96,7 +96,7 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
 
                 return departmentDtos.ToList();
             },
-            tags:[CacheConstants.DEPARTMENTS_CACHE_TAG],
+            tags: [CacheConstants.DEPARTMENTS_CACHE_TAG],
             cancellationToken: cancellationToken);
 
         return new PaginationResponse<DepartmentDto>(departmentDtos.ToList(), totalCount ?? 0);

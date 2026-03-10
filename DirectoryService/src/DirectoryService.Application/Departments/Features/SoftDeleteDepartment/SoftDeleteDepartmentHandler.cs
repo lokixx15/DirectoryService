@@ -6,11 +6,12 @@ using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
+using SharedService.Core.Abstractions;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.SoftDeleteDepartment;
 
-public sealed class SoftDeleteDepartmentHandler 
+public sealed class SoftDeleteDepartmentHandler
     : ICommandHandler<SoftDeleteDepartmentCommand>
 {
     private readonly IDepartmentsRepository _departmentsRepository;
@@ -19,7 +20,7 @@ public sealed class SoftDeleteDepartmentHandler
     private readonly ITransactionManager _transactionManager;
     private readonly HybridCache _cache;
     private readonly ILogger<SoftDeleteDepartmentHandler> _logger;
-    
+
     public SoftDeleteDepartmentHandler(
         IDepartmentsRepository departmentsRepository,
         ILocationsRepository locationsRepository,

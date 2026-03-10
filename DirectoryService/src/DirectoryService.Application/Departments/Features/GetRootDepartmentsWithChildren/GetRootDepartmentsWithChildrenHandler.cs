@@ -1,21 +1,21 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Caching;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using SharedKernel;
+using SharedService.Core.Abstractions;
+using SharedService.Core.Validation;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
 
 public sealed class GetRootDepartmentsWithChildrenHandler
     : IQueryHandler<Result<IReadOnlyList<DepartmentDto>, Errors>, GetRootDepartmentsWithChildrenQuery>
 {
-    private const string sql = """
+    private const string SQL = """
                  WITH roots AS (
                  				SELECT d.id,
                  					   d.name,
@@ -58,7 +58,7 @@ public sealed class GetRootDepartmentsWithChildrenHandler
     private readonly ILogger<GetRootDepartmentsWithChildrenHandler> _logger;
 
     public GetRootDepartmentsWithChildrenHandler(
-        IDbConnectionFactory connectionFactory, 
+        IDbConnectionFactory connectionFactory,
         IValidator<GetRootDepartmentsWithChildrenQuery> validator,
         HybridCache cache,
         ILogger<GetRootDepartmentsWithChildrenHandler> logger)
@@ -96,7 +96,7 @@ public sealed class GetRootDepartmentsWithChildrenHandler
                 using var connection = _connectionFactory.GetDbConnection();
 
                 var departmentDtos = await connection.QueryAsync<DepartmentDto>(
-                    sql,
+                    SQL,
                     parameters);
 
                 return departmentDtos.ToList();

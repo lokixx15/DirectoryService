@@ -1,8 +1,8 @@
 ﻿using DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
+using DirectoryService.Contracts.Departments;
 using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using DirectoryService.Contracts.Departments;
 
 namespace DirectoryService.IntegrationTests.Departments;
 

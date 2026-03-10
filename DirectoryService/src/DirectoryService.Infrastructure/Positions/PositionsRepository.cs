@@ -5,7 +5,7 @@ using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Infrastructure.Positions;
 
@@ -15,7 +15,7 @@ public sealed class PositionsRepository : IPositionsRepository
     private readonly ILogger<PositionsRepository> _logger;
 
     public PositionsRepository(
-        DirectoryServiceDbContext dbContext, 
+        DirectoryServiceDbContext dbContext,
         ILogger<PositionsRepository> logger)
     {
         _dbContext = dbContext;
@@ -23,7 +23,7 @@ public sealed class PositionsRepository : IPositionsRepository
     }
 
     public async Task<Result<Guid, Error>> AddAsync(
-        Position position, 
+        Position position,
         CancellationToken cancellationToken = default)
     {
         try
@@ -35,18 +35,18 @@ public sealed class PositionsRepository : IPositionsRepository
         }
         catch (OperationCanceledException ex)
         {
-            _logger.LogError(ex, "Operation was cancelled when adding position {positionId}", position.Id);
+            _logger.LogError(ex, "Operation was cancelled when adding position {PositionId}", position.Id);
             return GeneralErrors.OperationCancelled();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to add position {positionId}", position.Id);
+            _logger.LogError(ex, "Failed to add position {PositionId}", position.Id);
             return GeneralErrors.DatabaseAddFailed("Failed to add position");
         }
     }
 
     public async Task<UnitResult<Error>> SoftDeletePositionsWithoutActiveDepartments(
-        Guid departmentId, 
+        Guid departmentId,
         CancellationToken cancellationToken = default)
     {
         var sql = @"

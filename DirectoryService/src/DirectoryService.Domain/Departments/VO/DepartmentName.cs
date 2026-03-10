@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
-using SharedKernel;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.Domain.Departments.VO;
 
 public record DepartmentName
 {
-    //ef core 
+    // ef core
     private DepartmentName() { }
 
     private DepartmentName(
