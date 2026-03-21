@@ -5,6 +5,9 @@ namespace FileService.Domain.Assets;
 
 public class VideoAsset : MediaAsset
 {
+    // ef core
+    private VideoAsset() { }
+
     public const long MAX_SIZE = 5_368_709_120;
     public const string BUCKET = "videos";
     public const string RAW_PREFIX = "raw";

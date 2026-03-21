@@ -5,9 +5,12 @@ namespace FileService.Domain;
 
 public sealed record MediaData
 {
-    public FileName FileName { get; }
+    // ef core
+    private MediaData() { }
 
-    public ContentType ContentType { get; }
+    public FileName FileName { get; } = null!;
+
+    public ContentType ContentType { get; } = null!;
 
     public long Size { get; }
 

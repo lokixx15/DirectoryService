@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using DirectoryService.Presentation.Configuration;
 using FileService.Web.Configuration;
 using Serilog;
 
@@ -19,6 +18,7 @@ try
     var app = builder.Build();
 
     app.Configure();
+    await app.ApplyMigrationsAsync();
 
     app.Run();
 }

@@ -5,9 +5,12 @@ namespace FileService.Domain;
 
 public sealed record FileName
 {
-    public string Value { get; }
+    // ef core
+    private FileName() { }
 
-    public string Extension { get; }
+    public string Value { get; } = string.Empty;
+
+    public string Extension { get; } = string.Empty;
 
     private FileName(
         string value,

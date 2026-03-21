@@ -5,6 +5,9 @@ namespace FileService.Domain;
 
 public sealed record MediaOwner
 {
+    // ef core
+    private MediaOwner() { }
+
     private static readonly HashSet<string> AllowedContexts =
     [
         "lesson",
@@ -13,7 +16,7 @@ public sealed record MediaOwner
         "department"
     ];
 
-    public string Context { get; }
+    public string Context { get; } = string.Empty;
 
     public Guid EntityId { get; }
 

@@ -6,15 +6,18 @@ namespace FileService.Domain;
 
 public sealed record StorageKey
 {
-    public string Bucket { get; }
+    // ef core
+    private StorageKey() { }
 
-    public string Prefix { get; }
+    public string Bucket { get; } = string.Empty;
 
-    public string Key { get; }
+    public string Prefix { get; } = string.Empty;
 
-    public string Value { get; }
+    public string Key { get; } = string.Empty;
 
-    public string FullPath { get; }
+    public string Value { get; } = string.Empty;
+
+    public string FullPath { get; } = string.Empty;
 
     public static StorageKey None => new("raw", null!, string.Empty);
 

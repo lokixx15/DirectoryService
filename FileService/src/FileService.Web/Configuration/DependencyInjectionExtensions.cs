@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FileService.Infrastructure.Postgres;
+using Microsoft.AspNetCore.Mvc;
 using SharedService.Framework.Logging;
 
-namespace DirectoryService.Presentation.Configuration;
+namespace FileService.Web.Configuration;
 
 public static class DependencyInjectionExtensions
 {
     public static IServiceCollection AddProgramDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services
+            .AddPostgresInfrastructure(configuration)
             .AddSerilogLogging(configuration)
             .AddWeb();
 

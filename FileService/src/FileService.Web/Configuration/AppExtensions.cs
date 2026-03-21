@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using FileService.Infrastructure.Postgres;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 using SharedService.Framework.Middlewares;
 
 namespace FileService.Web.Configuration;
@@ -18,5 +20,15 @@ public static class AppExtensions
         }
 
         return app;
+    }
+
+    public static async Task ApplyMigrationsAsync(this WebApplication app)
+    {
+        if (!app.Environment.IsDevelopment())
+            return;
+
+        await using var scope = app.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<FileServiceDbContext>();
+        await dbContext.Database.MigrateAsync();
     }
 }

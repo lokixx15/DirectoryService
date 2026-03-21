@@ -5,7 +5,10 @@ namespace FileService.Domain;
 
 public sealed record ContentType
 {
-    public string Value { get; }
+    // ef core
+    private ContentType() { }
+
+    public string Value { get; } = string.Empty;
 
     public MediaType Category { get; }
 
