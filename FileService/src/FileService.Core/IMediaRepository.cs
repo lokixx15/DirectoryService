@@ -11,7 +11,5 @@ public interface IMediaRepository
 
     Task<Result<Guid, Error>> AddAsync(MediaAsset mediaAsset, CancellationToken cancellationToken);
 
-    Task<UnitResult<Error>> UpdateAsync(MediaAsset mediaAsset, CancellationToken cancellationToken);
-
     Task<UnitResult<Error>> DeleteById(Guid mediaAssetId, CancellationToken cancellationToken);
 }
