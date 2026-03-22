@@ -5,6 +5,9 @@ namespace FileService.Domain.Assets;
 
 public class PreviewAsset : MediaAsset
 {
+    // ef core
+    private PreviewAsset() { }
+
     public const long MAX_SIZE = 10_485_760;
     public const string BUCKET = "preview";
     public const string RAW_PREFIX = "raw";
