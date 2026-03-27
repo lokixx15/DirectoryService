@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="DirectoryService.Core" />
     <PackageReference Include="DirectoryService.Framework" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 
   <ItemGroup>

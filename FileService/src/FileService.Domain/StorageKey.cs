@@ -1,6 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SharedService.SharedKernel;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace FileService.Domain;
 
@@ -21,6 +22,7 @@ public sealed record StorageKey
 
     public static StorageKey None => new("raw", null!, string.Empty);
 
+    [JsonConstructor]
     private StorageKey(
         string bucket,
         string prefix,

@@ -35,6 +35,7 @@
     - ASPNETCORE_URLS=http://s+:9001
     depends_on:
       - postgres
+      - minio
     restart: always
 
   postgres:
@@ -68,6 +69,18 @@
       - "6379:6379"
     volumes: 
       - redis_data:/data
+    restart: always
+
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9003:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server --console-address ":9001" /data
     restart: always
 
 volumes:

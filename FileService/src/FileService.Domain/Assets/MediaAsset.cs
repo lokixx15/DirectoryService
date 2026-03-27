@@ -43,7 +43,9 @@ public abstract class MediaAsset
         MediaOwner = mediaOwner;
     }
 
-    protected UnitResult<Error> MarkUploaded(DateTime uploadedAt)
+    public abstract UnitResult<Error> CompleteProcessing(DateTime timestamp);
+
+    public UnitResult<Error> MarkUploaded(DateTime uploadedAt)
     {
         if (MediaStatus == MediaStatus.UPLOADED)
             return UnitResult.Success<Error>();
@@ -57,7 +59,7 @@ public abstract class MediaAsset
         return UnitResult.Success<Error>();
     }
 
-    protected UnitResult<Error> MarkReady(StorageKey finalKey, DateTime readyAt)
+    public UnitResult<Error> MarkReady(StorageKey finalKey, DateTime readyAt)
     {
         if (MediaStatus == MediaStatus.READY)
             return UnitResult.Success<Error>();
@@ -72,7 +74,7 @@ public abstract class MediaAsset
         return UnitResult.Success<Error>();
     }
 
-    protected UnitResult<Error> MarkFailed(DateTime failedAt)
+    public UnitResult<Error> MarkFailed(DateTime failedAt)
     {
         if (MediaStatus != MediaStatus.UPLOADING && MediaStatus != MediaStatus.UPLOADED)
             return Error.Validation("file.state.transition.is.invalid", "Invalid state transition", nameof(MediaStatus));
@@ -83,7 +85,7 @@ public abstract class MediaAsset
         return UnitResult.Success<Error>();
     }
 
-    protected UnitResult<Error> MarkDeleted(DateTime deletedAt)
+    public UnitResult<Error> MarkDeleted(DateTime deletedAt)
     {
         if (MediaStatus == MediaStatus.DELETED)
             return UnitResult.Success<Error>();

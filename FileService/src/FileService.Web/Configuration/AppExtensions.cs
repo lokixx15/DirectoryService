@@ -1,6 +1,7 @@
 ﻿using FileService.Infrastructure.Postgres;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using SharedService.Framework.Endpoints;
 using SharedService.Framework.Middlewares;
 
 namespace FileService.Web.Configuration;
@@ -18,6 +19,9 @@ public static class AppExtensions
             app.MapOpenApi();
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "DirectoryService"));
         }
+
+        var filesApiGroup = app.MapGroup("api/files");
+        app.UseEndpoints(filesApiGroup);
 
         return app;
     }
