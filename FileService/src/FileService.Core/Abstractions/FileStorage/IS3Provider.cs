@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using FileService.Contracts;
 using FileService.Domain;
 using SharedService.SharedKernel;
 
@@ -30,5 +31,37 @@ public interface IS3Provider
         StorageKey storageKey);
 
     Task<Result<IReadOnlyList<string>, Error>> GenerateDownloadUrlsAsync(
-        IEnumerable<StorageKey> storageKeys);
+        IEnumerable<StorageKey> storageKeys,
+        CancellationToken cancellationToken);
+
+    Task<Result<string, Error>> StartMultipartUpload(
+        StorageKey storageKey,
+        MediaData mediaData,
+        CancellationToken cancellationToken);
+
+    Task<Result<ChunkUploadUrl, Error>> GenerateChunckUploadUrl(
+        StorageKey storageKey,
+        string uploadId,
+        int partNumber);
+
+    Task<Result<IReadOnlyList<ChunkUploadUrl>, Error>> GenerateAllChunkUploadUrls(
+        StorageKey storageKey,
+        string uploadId,
+        int totalChunks,
+        CancellationToken cancellationToken);
+
+    Task<Result<CompleteMultipartUploadDto, Error>> CompleteMultipartUpload(
+        StorageKey storageKey,
+        string uploadId,
+        List<PartETagDto> partETags,
+        CancellationToken cancellationToken);
+
+    Task<UnitResult<Error>> AbortMultipartUploadAsync(
+        StorageKey storageKey,
+        string uploadId,
+        CancellationToken cancellationToken);
+
+    Task<Result<IReadOnlyList<MultipartUploadDto>, Error>> ListMultipartUploadAsync(
+        string bucketName,
+        CancellationToken cancellationToken);
 }
