@@ -1,10 +1,11 @@
-﻿using FileService.Domain.Assets;
+﻿using FileService.Core.Abstractions.Database;
+using FileService.Domain.Assets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FileService.Infrastructure.Postgres;
 
-public class FileServiceDbContext : DbContext
+public class FileServiceDbContext : DbContext, IReadFileServiceDbContext
 {
     private readonly string _connectionString;
 
@@ -32,6 +33,8 @@ public class FileServiceDbContext : DbContext
     public DbSet<VideoAsset> VideoAssets => Set<VideoAsset>();
 
     public DbSet<PreviewAsset> PreviewAssets => Set<PreviewAsset>();
+
+    public IQueryable<MediaAsset> ReadMediaAssets => Set<MediaAsset>().AsNoTracking().AsQueryable();
 
     private ILoggerFactory CreateLoggerFactory() =>
         LoggerFactory.Create(builder =>

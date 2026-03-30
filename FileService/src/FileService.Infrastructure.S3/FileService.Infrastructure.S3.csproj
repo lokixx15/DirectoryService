@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
+    <PackageReference Include="AWSSDK.S3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FileService.Core\FileService.Core.csproj" />
   </ItemGroup>
 

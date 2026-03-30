@@ -36,7 +36,7 @@ public class PreviewAsset : MediaAsset
         return UnitResult.Success<Error>();
     }
 
-    public UnitResult<Error> CompleteUpload(DateTime timestamp)
+    public override UnitResult<Error> CompleteProcessing(DateTime timestamp)
     {
         var markUploadedResult = MarkUploaded(timestamp);
         if (markUploadedResult.IsFailure)

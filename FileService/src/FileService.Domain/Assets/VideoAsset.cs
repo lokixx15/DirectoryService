@@ -44,7 +44,7 @@ public class VideoAsset : MediaAsset
         return UnitResult.Success<Error>();
     }
 
-    public UnitResult<Error> CompleteProcessing(DateTime timestamp)
+    public override UnitResult<Error> CompleteProcessing(DateTime timestamp)
     {
         var appendSegmentResult = HslRootKey.AppendSegment(MASTER_PLAYLIST_NAME);
         if (appendSegmentResult.IsFailure)

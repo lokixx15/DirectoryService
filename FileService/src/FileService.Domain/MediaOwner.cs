@@ -28,9 +28,9 @@ public sealed record MediaOwner
         EntityId = entityId;
     }
 
-    public static Result<MediaOwner, Error> Create(string context, Guid entityId)
+    public static Result<MediaOwner, Error> Create(Guid entityId, string context)
     {
-        if (!string.IsNullOrWhiteSpace(context) || context.Length > 50)
+        if (string.IsNullOrWhiteSpace(context) || context.Length > 50)
             return GeneralErrors.ValueLengthIsNotValid(50, nameof(context));
 
         if (entityId == Guid.Empty)
@@ -43,11 +43,11 @@ public sealed record MediaOwner
         return new MediaOwner(normalizedContext, entityId);
     }
 
-    public static Result<MediaOwner, Error> ForLesson(Guid entityId) => Create("lesson", entityId);
+    public static Result<MediaOwner, Error> ForLesson(Guid entityId) => Create(entityId, "lesson");
 
-    public static Result<MediaOwner, Error> ForCourse(Guid entityId) => Create("course", entityId);
+    public static Result<MediaOwner, Error> ForCourse(Guid entityId) => Create(entityId, "course");
 
-    public static Result<MediaOwner, Error> ForUser(Guid entityId) => Create("user", entityId);
+    public static Result<MediaOwner, Error> ForUser(Guid entityId) => Create(entityId, "user");
 
-    public static Result<MediaOwner, Error> ForDepartment(Guid entityId) => Create("department", entityId);
+    public static Result<MediaOwner, Error> ForDepartment(Guid entityId) => Create(entityId, "department");
 }
