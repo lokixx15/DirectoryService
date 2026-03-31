@@ -134,11 +134,19 @@ public class UploadFileHandler : ICommandHandler<UploadFileCommand>
 
         var transactionScope = beginTransactionResult.Value;
 
-        await _mediaRepository.AddAsync(mediaAsset, cancellationToken);
+        var addingResult = await _mediaRepository.AddAsync(mediaAsset, cancellationToken);
+        if (addingResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when adding media asset");
+            return addingResult.Error.ToErrors();
+        }
 
         var completeUploadResult = mediaAsset.CompleteProcessing(DateTime.UtcNow);
         if (completeUploadResult.IsFailure)
+        {
+            transactionScope.Rollback();
             return completeUploadResult.Error.ToErrors();
+        }
 
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)

@@ -34,23 +34,23 @@ public interface IS3Provider
         IEnumerable<StorageKey> storageKeys,
         CancellationToken cancellationToken);
 
-    Task<Result<string, Error>> StartMultipartUpload(
+    Task<Result<string, Error>> StartMultipartUploadAsync(
         StorageKey storageKey,
         MediaData mediaData,
         CancellationToken cancellationToken);
 
-    Task<Result<ChunkUploadUrl, Error>> GenerateChunckUploadUrl(
+    Task<Result<ChunkUploadUrl, Error>> GenerateChunkUploadUrlAsync(
         StorageKey storageKey,
         string uploadId,
         int partNumber);
 
-    Task<Result<IReadOnlyList<ChunkUploadUrl>, Error>> GenerateAllChunkUploadUrls(
+    Task<Result<IReadOnlyList<ChunkUploadUrl>, Error>> GenerateAllChunkUploadUrlsAsync(
         StorageKey storageKey,
         string uploadId,
         int totalChunks,
         CancellationToken cancellationToken);
 
-    Task<Result<CompleteMultipartUploadDto, Error>> CompleteMultipartUpload(
+    Task<Result<CompleteMultipartUploadDto, Error>> CompleteMultipartUploadAsync(
         StorageKey storageKey,
         string uploadId,
         List<PartETagDto> partETags,

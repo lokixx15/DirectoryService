@@ -209,7 +209,7 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<string, Error>> StartMultipartUpload(
+    public async Task<Result<string, Error>> StartMultipartUploadAsync(
         StorageKey storageKey,
         MediaData mediaData,
         CancellationToken cancellationToken)
@@ -234,7 +234,7 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<ChunkUploadUrl, Error>> GenerateChunckUploadUrl(
+    public async Task<Result<ChunkUploadUrl, Error>> GenerateChunkUploadUrlAsync(
         StorageKey storageKey,
         string uploadId,
         int partNumber)
@@ -257,12 +257,12 @@ public class S3Provider : IS3Provider
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to generate chunck upload url by uploadId {Id}", uploadId);
+            _logger.LogError("Failed to generate chunk upload url by uploadId {Id}", uploadId);
             return S3ErrorMapper.ToError(ex);
         }
     }
 
-    public async Task<Result<IReadOnlyList<ChunkUploadUrl>, Error>> GenerateAllChunkUploadUrls(
+    public async Task<Result<IReadOnlyList<ChunkUploadUrl>, Error>> GenerateAllChunkUploadUrlsAsync(
         StorageKey storageKey,
         string uploadId,
         int totalChunks,
@@ -272,7 +272,7 @@ public class S3Provider : IS3Provider
 
         try
         {
-            var tasks = Enumerable.Range(0, totalChunks).Select(async partNumber =>
+            var tasks = Enumerable.Range(1, totalChunks).Select(async partNumber =>
             {
                 await _semaphore.WaitAsync(cancellationToken);
 
@@ -304,12 +304,12 @@ public class S3Provider : IS3Provider
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to generate all chunck upload urls by uploadId {Id}", uploadId);
+            _logger.LogError("Failed to generate all chunk upload urls by uploadId {Id}", uploadId);
             return S3ErrorMapper.ToError(ex);
         }
     }
 
-    public async Task<Result<CompleteMultipartUploadDto, Error>> CompleteMultipartUpload(
+    public async Task<Result<CompleteMultipartUploadDto, Error>> CompleteMultipartUploadAsync(
         StorageKey storageKey,
         string uploadId,
         List<PartETagDto> partETags,
