@@ -10,14 +10,17 @@ public sealed record FileName
 
     public string Value { get; } = string.Empty;
 
+    public string Name { get; } = string.Empty;
+
     public string Extension { get; } = string.Empty;
 
     private FileName(
-        string value,
+        string name,
         string extension)
     {
-        Value = value;
+        Name = name;
         Extension = extension;
+        Value = name + "." + extension;
     }
 
     public static Result<FileName, Error> Create(string value)

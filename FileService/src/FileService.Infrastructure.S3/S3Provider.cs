@@ -1,8 +1,9 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
-using FileService.Contracts;
+using FileService.Contracts.Dtos;
 using FileService.Core.Abstractions.FileStorage;
+using FileService.Core.Models;
 using FileService.Domain;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -167,7 +168,7 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<IReadOnlyList<string>, Error>> GenerateDownloadUrlsAsync(
+    public async Task<Result<IReadOnlyList<MediaUrl>, Error>> GenerateDownloadUrlsAsync(
         IEnumerable<StorageKey> storageKeys,
         CancellationToken cancellationToken)
     {
@@ -191,7 +192,7 @@ public class S3Provider : IS3Provider
                     };
 
                     var url = await _amazonS3.GetPreSignedURLAsync(request);
-                    return url;
+                    return new MediaUrl(sK, url);
                 }
                 finally
                 {
@@ -234,7 +235,7 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<ChunkUploadUrl, Error>> GenerateChunkUploadUrlAsync(
+    public async Task<Result<ChunkUploadUrlDto, Error>> GenerateChunkUploadUrlAsync(
         StorageKey storageKey,
         string uploadId,
         int partNumber)
@@ -253,7 +254,7 @@ public class S3Provider : IS3Provider
 
             var url = await _amazonS3.GetPreSignedURLAsync(request);
 
-            return new ChunkUploadUrl(partNumber, url);
+            return new ChunkUploadUrlDto(partNumber, url);
         }
         catch (Exception ex)
         {
@@ -262,7 +263,7 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<IReadOnlyList<ChunkUploadUrl>, Error>> GenerateAllChunkUploadUrlsAsync(
+    public async Task<Result<IReadOnlyList<ChunkUploadUrlDto>, Error>> GenerateAllChunkUploadUrlsAsync(
         StorageKey storageKey,
         string uploadId,
         int totalChunks,
@@ -283,6 +284,7 @@ public class S3Provider : IS3Provider
                         BucketName = storageKey.Bucket,
                         Key = storageKey.Key,
                         Verb = HttpVerb.PUT,
+                        Protocol = Protocol.HTTP,
                         PartNumber = partNumber,
                         UploadId = uploadId,
                         Expires = expirationTime
@@ -290,7 +292,7 @@ public class S3Provider : IS3Provider
 
                     var url = await _amazonS3.GetPreSignedURLAsync(request);
 
-                    return new ChunkUploadUrl(partNumber, url);
+                    return new ChunkUploadUrlDto(partNumber, url);
                 }
                 finally
                 {

@@ -1,4 +1,4 @@
-﻿namespace FileService.Core.Features;
+﻿namespace FileService.Contracts.Requests;
 
 public record AbortMultipartUploadRequest(
     Guid MediaAssetId,

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace FileService.Contracts;
+namespace FileService.Contracts.Requests;
 
 public record UploadFileRequest(
     IFormFile FormFile,

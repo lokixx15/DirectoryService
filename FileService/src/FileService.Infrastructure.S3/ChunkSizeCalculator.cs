@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Core.Abstractions.FileStorage;
+using Microsoft.Extensions.Options;
 using SharedService.SharedKernel;
 
 namespace FileService.Infrastructure.S3;
@@ -8,36 +9,29 @@ public class ChunkSizeCalculator : IChunkSizeCalculator
 {
     private readonly S3Options _options;
 
-    public ChunkSizeCalculator(S3Options options)
+    public ChunkSizeCalculator(IOptions<S3Options> options)
     {
-        _options = options;
+        _options = options.Value;
     }
 
-    public Result<(long ChunkSize, int TotalChunks), Error> Calculate(long fileSize)
+    public Result<(int ChunkSize, int TotalChunks), Error> Calculate(long fileSize)
     {
-        if (fileSize == 0)
-            return GeneralErrors.ValueIsNotValid("File size cannot be zero", "File size");
+        if (_options.RecommendedChunkSizeBytes <= 0)
+            return GeneralErrors.ValueIsNotValid("Recommended chunk size cannot be equal or less than 0 bytes", "Recommended chunk size");
 
-        int recommendedChunkSize = _options.RecommendedChunkSizeBytes;
-        int maxChunks = _options.MaxChuncks;
+        if (_options.MaxChunks <= 0)
+            return GeneralErrors.ValueIsNotValid("Max chunks cannot be equal or less than 0", "Max chunks");
 
-        if (fileSize <= recommendedChunkSize)
-            return (fileSize, 1);
+        if (fileSize <= 0)
+            return GeneralErrors.ValueIsNotValid("File size cannot be equal or less than 0", "File size");
 
-        int totalChunks = (int)Math.Ceiling((double)(fileSize + recommendedChunkSize + 1) / recommendedChunkSize);
+        if (fileSize <= _options.RecommendedChunkSizeBytes)
+            return ((int)fileSize, 1);
 
-        long chunkSize;
+        int totalChunks = Math.Min((int)Math.Ceiling((double)fileSize / _options.RecommendedChunkSizeBytes), _options.MaxChunks);
 
-        if (totalChunks > maxChunks)
-        {
-            totalChunks = maxChunks;
-            chunkSize = (long)Math.Ceiling((double)fileSize / totalChunks);
-        }
-        else
-        {
-            chunkSize = recommendedChunkSize;
-        }
+        long chunkSize = (fileSize + totalChunks - 1) / totalChunks;
 
-        return (chunkSize, totalChunks);
+        return ((int)chunkSize, totalChunks);
     }
 }

@@ -4,6 +4,7 @@ using Amazon.S3;
 using FileService.Core.Abstractions.FileStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FileService.Infrastructure.S3;
 
@@ -19,25 +20,29 @@ public static class DependencyInjectionS3
             throw new ConfigurationException("S3Options section does not exist in configuration");
         }
 
-        var s3Options = configuration.GetSection("S3Options").Get<S3Options>()
-            ?? throw new ConfigurationException("Missing s3 configuration section: S3Options");
+        services.Configure<S3Options>(configuration.GetSection("S3Options"));
 
-        var s3Config = new AmazonS3Config()
+        services.AddSingleton<IAmazonS3>(sp =>
         {
-            ServiceURL = s3Options.Endpoint,
-            ForcePathStyle = true,
-            UseHttp = !s3Options.WithSsl,
-        };
+            var s3Options = sp.GetRequiredService<IOptions<S3Options>>().Value;
 
-        var credentials = new BasicAWSCredentials(s3Options.AccessKey, s3Options.SecretKey);
+            var s3Config = new AmazonS3Config()
+            {
+                ServiceURL = s3Options.Endpoint,
+                ForcePathStyle = true,
+                UseHttp = !s3Options.WithSsl,
+            };
 
-        services.AddSingleton<IAmazonS3>(new AmazonS3Client(credentials, s3Config));
+            var credentials = new BasicAWSCredentials(s3Options.AccessKey, s3Options.SecretKey);
+
+            return new AmazonS3Client(credentials, s3Config);
+        });
 
         services.AddHostedService<S3BucketInitializer>();
 
-        services.Configure<S3Options>(configuration.GetSection("S3Options"));
-
         services.AddScoped<IS3Provider, S3Provider>();
+
+        services.AddTransient<IChunkSizeCalculator, ChunkSizeCalculator>();
 
         return services;
     }

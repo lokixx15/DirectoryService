@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using FileService.Contracts.Requests;
 using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
 using FluentValidation;
@@ -24,14 +25,8 @@ public class AbortMultipartUploadValidator : AbstractValidator<AbortMultipartUpl
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
         RuleFor(command => command.AbortMultipartUploadRequest.UploadId)
-            .Must(uI =>
-            {
-                if (string.IsNullOrEmpty(uI))
-                    return false;
-
-                return Guid.TryParse(uI, out _);
-            })
-                .WithError(GeneralErrors.ValueIsNotValid("Upload id must be a guid"));
+            .NotEmpty()
+                .WithError(GeneralErrors.ValueIsNotValid("Upload id cannot be empty"));
     }
 }
 
@@ -39,7 +34,7 @@ public class AbortMultipartUploadEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("multipart/abort", async Task<EndpointResult<AbortMultipartUploadResponse>>(
+        app.MapPost("multipart/abort", async Task<EndpointResult>(
             [FromBody] AbortMultipartUploadRequest request,
             [FromServices] AbortMultipartUploadHandler handler,
             CancellationToken cancellationToken) =>
@@ -47,7 +42,7 @@ public class AbortMultipartUploadEndpoint : IEndpoint
     }
 }
 
-public class AbortMultipartUploadHandler : ICommandHandler<AbortMultipartUploadResponse, AbortMultipartUploadCommand>
+public class AbortMultipartUploadHandler : ICommandHandler<AbortMultipartUploadCommand>
 {
     private readonly IS3Provider _s3Provider;
     private readonly ITransactionManager _transactionManager;
@@ -69,7 +64,7 @@ public class AbortMultipartUploadHandler : ICommandHandler<AbortMultipartUploadR
         _logger = logger;
     }
 
-    public async Task<Result<AbortMultipartUploadResponse, Errors>> Handle(
+    public async Task<UnitResult<Errors>> Handle(
         AbortMultipartUploadCommand command,
         CancellationToken cancellationToken)
     {
@@ -112,6 +107,6 @@ public class AbortMultipartUploadHandler : ICommandHandler<AbortMultipartUploadR
             return saveChangesResult.Error.ToErrors();
         }
 
-        return new AbortMultipartUploadResponse(true);
+        return UnitResult.Success<Errors>();
     }
 }

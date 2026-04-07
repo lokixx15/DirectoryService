@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
-using FileService.Contracts;
+using FileService.Contracts.Dtos;
+using FileService.Contracts.Requests;
 using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
 using FluentValidation;
@@ -25,14 +26,8 @@ public class GetChunkUploadUrlValidator : AbstractValidator<GetChunkUploadUrlQue
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
         RuleFor(command => command.GetChunkUploadUrlRequest.UploadId)
-            .Must(uI =>
-            {
-                if (string.IsNullOrEmpty(uI))
-                    return false;
-
-                return Guid.TryParse(uI, out _);
-            })
-                .WithError(GeneralErrors.ValueIsNotValid("Upload id must be a guid"));
+           .NotEmpty()
+               .WithError(GeneralErrors.ValueIsNotValid("Upload id cannot be empty"));
 
         RuleFor(command => command.GetChunkUploadUrlRequest.PartNumber)
             .GreaterThan(0)
@@ -44,7 +39,7 @@ public class GetChunkUploadUrlEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("multipart/url", async Task<EndpointResult<ChunkUploadUrl>>(
+        app.MapPost("multipart/url", async Task<EndpointResult<ChunkUploadUrlDto>>(
             [FromBody] GetChunkUploadUrlRequest request,
             [FromServices] GetChunkUploadUrlHandler handler,
             CancellationToken cancellationToken) =>
@@ -52,7 +47,7 @@ public class GetChunkUploadUrlEndpoint : IEndpoint
     }
 }
 
-public class GetChunkUploadUrlHandler : IQueryHandler<Result<ChunkUploadUrl, Errors>, GetChunkUploadUrlQuery>
+public class GetChunkUploadUrlHandler : IQueryHandler<Result<ChunkUploadUrlDto, Errors>, GetChunkUploadUrlQuery>
 {
     private readonly IS3Provider _s3Provider;
     private readonly ITransactionManager _transactionManager;
@@ -74,7 +69,7 @@ public class GetChunkUploadUrlHandler : IQueryHandler<Result<ChunkUploadUrl, Err
         _logger = logger;
     }
 
-    public async Task<Result<ChunkUploadUrl, Errors>> Handle(
+    public async Task<Result<ChunkUploadUrlDto, Errors>> Handle(
         GetChunkUploadUrlQuery query,
         CancellationToken cancellationToken)
     {

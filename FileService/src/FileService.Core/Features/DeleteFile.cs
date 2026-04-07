@@ -1,14 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
-using FluentValidation;
+using FileService.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SharedService.Core.Abstractions;
-using SharedService.Core.Validation;
 using SharedService.Framework.Endpoints;
 using SharedService.SharedKernel;
 
@@ -54,21 +52,24 @@ public class DeleteFileHandler : ICommandHandler<string, DeleteFileQuery>
         if (query.MediaAssetId == Guid.Empty)
             return GeneralErrors.ValueIsNotValid("Guid cannot be empty", nameof(query.MediaAssetId)).ToErrors();
 
-        var mediaAssetResult = await _mediadRepository.GetByAsync(ma => ma.Id == query.MediaAssetId, cancellationToken);
-
+        var mediaAssetResult = await _mediadRepository.GetByAsync(
+            ma => ma.Id == query.MediaAssetId
+            && ma.MediaStatus != MediaStatus.DELETED, cancellationToken);
         if (mediaAssetResult.IsFailure)
             return mediaAssetResult.Error.ToErrors();
 
         var mediaAsset = mediaAssetResult.Value;
 
-        var downloadResult = await _s3Provider.DeleteFileAsync(mediaAsset.FinalKey, cancellationToken);
+        var downloadResult = await _s3Provider.DeleteFileAsync(mediaAsset.RawKey, cancellationToken);
         if (downloadResult.IsFailure)
         {
             _logger.LogError("Errors occurred when deleting file with id {Id}", query.MediaAssetId);
             return downloadResult.Error.ToErrors();
         }
 
-        mediaAsset.MarkDeleted(DateTime.UtcNow);
+        var markDeletedResult = mediaAsset.MarkDeleted(DateTime.UtcNow);
+        if (markDeletedResult.IsFailure)
+            return markDeletedResult.Error.ToErrors();
 
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)

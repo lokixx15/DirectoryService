@@ -1,7 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using SharedService.SharedKernel;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using CSharpFunctionalExtensions;
+using SharedService.SharedKernel;
 
 namespace FileService.Domain;
 

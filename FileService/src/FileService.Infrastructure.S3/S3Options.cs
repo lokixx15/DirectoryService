@@ -20,5 +20,5 @@ public class S3Options
 
     public int RecommendedChunkSizeBytes { get; set; }
 
-    public int MaxChuncks { get; set; }
+    public int MaxChunks { get; set; }
 }

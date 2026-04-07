@@ -1,6 +1,6 @@
-﻿using FileService.Contracts;
+﻿using FileService.Contracts.Dtos;
 
-namespace FileService.Core.Features;
+namespace FileService.Contracts.Requests;
 
 public record CompleteMultipartUploadRequest(
     Guid MediaAssetId,

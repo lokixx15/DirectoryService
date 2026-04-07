@@ -1,9 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using FileService.Contracts;
+using FileService.Contracts.Requests;
 using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
 using FileService.Domain;
-using FileService.Domain.Assets;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +54,7 @@ public class UploadFileEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/files/upload-file", async Task<EndpointResult>(
+        app.MapPost("/", async Task<EndpointResult>(
             [FromForm] UploadFileRequest request,
             [FromServices] UploadFileHandler handler,
             CancellationToken cancellationToken) =>
@@ -127,6 +126,10 @@ public class UploadFileHandler : ICommandHandler<UploadFileCommand>
 
         if (uploadResult.IsFailure)
             return uploadResult.Error.ToErrors();
+
+        var markUploadedResult = mediaAsset.MarkUploaded(DateTime.UtcNow);
+        if (markUploadedResult.IsFailure)
+            return markUploadedResult.Error.ToErrors();
 
         var beginTransactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
         if(beginTransactionResult.IsFailure)

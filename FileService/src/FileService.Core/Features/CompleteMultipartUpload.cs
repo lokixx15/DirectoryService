@@ -1,4 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using FileService.Contracts.Requests;
+using FileService.Contracts.Responses;
 using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
 using FluentValidation;
@@ -24,14 +26,8 @@ public class CompleteMultipartUploadValidator : AbstractValidator<CompleteMultip
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
 
         RuleFor(command => command.CompleteMultipartUploadRequest.UploadId)
-            .Must(uI =>
-            {
-                if (string.IsNullOrEmpty(uI))
-                    return false;
-
-                return Guid.TryParse(uI, out _);
-            })
-                .WithError(GeneralErrors.ValueIsNotValid("Upload id must be a guid"));
+           .NotEmpty()
+               .WithError(GeneralErrors.ValueIsNotValid("Upload id cannot be empty"));
 
         RuleFor(command => command.CompleteMultipartUploadRequest.PartETags)
             .NotNull()
