@@ -3,4 +3,4 @@
 public record FileInfoDto(
     string FileName,
     string ContentType,
-    long size);
+    long Size);

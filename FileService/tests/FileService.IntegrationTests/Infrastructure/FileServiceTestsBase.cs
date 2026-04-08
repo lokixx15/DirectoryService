@@ -1,19 +1,16 @@
-﻿using Amazon.S3;
+﻿using System.Net.Http.Json;
+using Amazon.S3;
 using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
 using FileService.Contracts.Requests;
 using FileService.Contracts.Responses;
-using FileService.Core;
 using FileService.Domain;
 using FileService.Domain.Assets;
 using FileService.Infrastructure.Postgres;
 using FileService.IntegrationTests.Features;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SharedService.SharedKernel;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 
 namespace FileService.IntegrationTests.Infrastructure;
 

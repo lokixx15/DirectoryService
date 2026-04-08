@@ -19,7 +19,7 @@ public class GetMediaAssetInfoTests : FileServiceTestsBase
 
         var result = await response.HandleResponseAsync<GetMediaAssetInfoResponse>(cancellationToken);
 
-        var mediaAsset = result.Value.mediaAsset;
+        var mediaAsset = result.Value.MediaAsset;
         var fileInfo = mediaAsset.FileInfo;
 
         Assert.Equal(imageId, mediaAsset.Id);
@@ -29,7 +29,7 @@ public class GetMediaAssetInfoTests : FileServiceTestsBase
         Assert.True(mediaAsset.UpdatedAt <= DateTime.UtcNow);
         Assert.NotNull(fileInfo.FileName);
         Assert.NotNull(fileInfo.ContentType);
-        Assert.True(fileInfo.size > 0);
+        Assert.True(fileInfo.Size > 0);
     }
 
     [Fact]

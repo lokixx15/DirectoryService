@@ -50,21 +50,18 @@ public class GetChunkUploadUrlEndpoint : IEndpoint
 public class GetChunkUploadUrlHandler : IQueryHandler<Result<ChunkUploadUrlDto, Errors>, GetChunkUploadUrlQuery>
 {
     private readonly IS3Provider _s3Provider;
-    private readonly ITransactionManager _transactionManager;
     private readonly IMediaRepository _mediaRepository;
     private readonly IValidator<GetChunkUploadUrlQuery> _validator;
     private readonly ILogger<GetChunkUploadUrlHandler> _logger;
 
     public GetChunkUploadUrlHandler(
         IS3Provider s3Provider,
-        ITransactionManager transactionManager,
         IMediaRepository mediaRepository,
         IValidator<GetChunkUploadUrlQuery> validator,
         ILogger<GetChunkUploadUrlHandler> logger)
     {
         _s3Provider = s3Provider;
         _mediaRepository = mediaRepository;
-        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }

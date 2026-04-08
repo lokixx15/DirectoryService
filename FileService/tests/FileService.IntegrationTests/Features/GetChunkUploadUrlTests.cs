@@ -44,6 +44,7 @@ public class GetChunkUploadUrlTests : FileServiceTestsBase
         Assert.NotEmpty(getChunkUploadUrlResult.Value.UploadUrl);
     }
 
+    [Fact]
     public async Task GetOutOfRangeChunkUploadUrl_Should_Fail()
     {
         CancellationToken cancellationToken = new CancellationTokenSource().Token;
