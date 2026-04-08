@@ -9,7 +9,7 @@ public class PreviewAsset : MediaAsset
     private PreviewAsset() { }
 
     public const long MAX_SIZE = 10_485_760;
-    public const string BUCKET = "preview";
+    public const string BUCKET = "previews";
     public const string RAW_PREFIX = "raw";
     public static readonly string[] AllowedExtensions = ["jpg", "jpeg", "png", "webp"];
 

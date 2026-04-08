@@ -57,7 +57,7 @@ public class DownloadFileHandler : IQueryHandler<Result<string, Errors>, Downloa
         if (mediaAssetResult == null)
             return GeneralErrors.EntityNotFound("Media asset").ToErrors();
 
-        var downloadResult = await _s3Provider.DownloadFileAsync(mediaAssetResult.FinalKey, PATH_TO_DOWNLOAD, cancellationToken);
+        var downloadResult = await _s3Provider.DownloadFileAsync(mediaAssetResult.RawKey, PATH_TO_DOWNLOAD, cancellationToken);
         if (downloadResult.IsFailure)
         {
             _logger.LogError("Errors occurred when downloading file with id {Id}", query.MediaAssetId);

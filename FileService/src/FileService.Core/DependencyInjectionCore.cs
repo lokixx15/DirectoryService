@@ -17,6 +17,12 @@ public static class DependencyInjectionCore
         services.AddScoped<DownloadFileHandler>();
         services.AddScoped<DeleteFileHandler>();
         services.AddScoped<GetDownloadUrlHandler>();
+        services.AddScoped<AbortMultipartUploadHandler>();
+        services.AddScoped<CompleteMultipartUploadHandler>();
+        services.AddScoped<GetChunkUploadUrlHandler>();
+        services.AddScoped<GetMediaAssetInfoHandler>();
+        services.AddScoped<GetMediaAssetsInfoHandler>();
+        services.AddScoped<StartMultipartUploadHandler>();
 
         return services;
     }

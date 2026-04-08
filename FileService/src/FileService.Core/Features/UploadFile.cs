@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
+using FileService.Contracts.Requests;
 using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
 using FileService.Domain;
-using FileService.Domain.Assets;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +54,7 @@ public class UploadFileEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/files/upload-file", async Task<EndpointResult>(
+        app.MapPost("/", async Task<EndpointResult>(
             [FromForm] UploadFileRequest request,
             [FromServices] UploadFileHandler handler,
             CancellationToken cancellationToken) =>
@@ -127,17 +127,29 @@ public class UploadFileHandler : ICommandHandler<UploadFileCommand>
         if (uploadResult.IsFailure)
             return uploadResult.Error.ToErrors();
 
+        var markUploadedResult = mediaAsset.MarkUploaded(DateTime.UtcNow);
+        if (markUploadedResult.IsFailure)
+            return markUploadedResult.Error.ToErrors();
+
         var beginTransactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
         if(beginTransactionResult.IsFailure)
             return beginTransactionResult.Error.ToErrors();
 
         var transactionScope = beginTransactionResult.Value;
 
-        await _mediaRepository.AddAsync(mediaAsset, cancellationToken);
+        var addingResult = await _mediaRepository.AddAsync(mediaAsset, cancellationToken);
+        if (addingResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when adding media asset");
+            return addingResult.Error.ToErrors();
+        }
 
         var completeUploadResult = mediaAsset.CompleteProcessing(DateTime.UtcNow);
         if (completeUploadResult.IsFailure)
+        {
+            transactionScope.Rollback();
             return completeUploadResult.Error.ToErrors();
+        }
 
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)

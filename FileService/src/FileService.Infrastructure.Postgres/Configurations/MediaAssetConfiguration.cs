@@ -26,6 +26,7 @@ public class MediaAssetConfiguration : IEntityTypeConfiguration<MediaAsset>
             mab.OwnsOne(md => md.FileName, mdb =>
             {
                 mdb.Property(fn => fn.Value);
+                mdb.Property(fn => fn.Name);
                 mdb.Property(fn => fn.Extension);
             });
 

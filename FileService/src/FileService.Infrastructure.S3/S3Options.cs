@@ -17,4 +17,8 @@ public class S3Options
     public int DownloadUrlExpirationHours { get; set; }
 
     public int MaxConcurrentRequests { get; set; }
+
+    public int RecommendedChunkSizeBytes { get; set; }
+
+    public int MaxChunks { get; set; }
 }

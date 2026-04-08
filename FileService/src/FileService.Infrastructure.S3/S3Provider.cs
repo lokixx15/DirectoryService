@@ -1,7 +1,9 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
+using FileService.Contracts.Dtos;
 using FileService.Core.Abstractions.FileStorage;
+using FileService.Core.Models;
 using FileService.Domain;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,6 +19,8 @@ public class S3Provider : IS3Provider
 
     private readonly ILogger<S3Provider> _logger;
 
+    private readonly SemaphoreSlim _semaphore;
+
     public S3Provider(
         IAmazonS3 amazonS3,
         IOptions<S3Options> options,
@@ -25,6 +29,7 @@ public class S3Provider : IS3Provider
         _amazonS3 = amazonS3;
         _options = options.Value;
         _logger = logger;
+        _semaphore = new SemaphoreSlim(_options.MaxConcurrentRequests);
     }
 
     public async Task<UnitResult<Error>> UploadFileAsync(
@@ -163,24 +168,36 @@ public class S3Provider : IS3Provider
         }
     }
 
-    public async Task<Result<IReadOnlyList<string>, Error>> GenerateDownloadUrlsAsync(
-        IEnumerable<StorageKey> storageKeys)
+    public async Task<Result<IReadOnlyList<MediaUrl>, Error>> GenerateDownloadUrlsAsync(
+        IEnumerable<StorageKey> storageKeys,
+        CancellationToken cancellationToken)
     {
+        var expirationTime = DateTime.UtcNow.AddHours(_options.DownloadUrlExpirationHours);
+
         try
         {
             var tasks = storageKeys.Select(async sK =>
             {
-                var request = new GetPreSignedUrlRequest()
-                {
-                    BucketName = sK.Bucket,
-                    Key = sK.Key,
-                    Verb = HttpVerb.GET,
-                    Expires = DateTime.UtcNow.AddHours(_options.DownloadUrlExpirationHours),
-                    Protocol = _options.WithSsl ? Protocol.HTTPS : Protocol.HTTP,
-                };
+                await _semaphore.WaitAsync(cancellationToken);
 
-                var url = await _amazonS3.GetPreSignedURLAsync(request);
-                return url;
+                try
+                {
+                    var request = new GetPreSignedUrlRequest()
+                    {
+                        BucketName = sK.Bucket,
+                        Key = sK.Key,
+                        Verb = HttpVerb.GET,
+                        Expires = expirationTime,
+                        Protocol = _options.WithSsl ? Protocol.HTTPS : Protocol.HTTP,
+                    };
+
+                    var url = await _amazonS3.GetPreSignedURLAsync(request);
+                    return new MediaUrl(sK, url);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
             });
 
             var urls = await Task.WhenAll(tasks);
@@ -189,6 +206,187 @@ public class S3Provider : IS3Provider
         catch (Exception ex)
         {
             _logger.LogError("Failed to generate download urls");
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<Result<string, Error>> StartMultipartUploadAsync(
+        StorageKey storageKey,
+        MediaData mediaData,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new InitiateMultipartUploadRequest()
+            {
+                BucketName = storageKey.Bucket,
+                Key = storageKey.Key,
+                ContentType = mediaData.ContentType.Value
+            };
+
+            var response = await _amazonS3.InitiateMultipartUploadAsync(request, cancellationToken);
+
+            return response.UploadId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to initiate multipart upload");
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<Result<ChunkUploadUrlDto, Error>> GenerateChunkUploadUrlAsync(
+        StorageKey storageKey,
+        string uploadId,
+        int partNumber)
+    {
+        try
+        {
+            var request = new GetPreSignedUrlRequest()
+            {
+                BucketName = storageKey.Bucket,
+                Key = storageKey.Key,
+                Verb = HttpVerb.PUT,
+                PartNumber = partNumber,
+                UploadId = uploadId,
+                Expires = DateTime.UtcNow.AddMinutes(_options.UploadUrlExpirationMinutes)
+            };
+
+            var url = await _amazonS3.GetPreSignedURLAsync(request);
+
+            return new ChunkUploadUrlDto(partNumber, url);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to generate chunk upload url by uploadId {Id}", uploadId);
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<Result<IReadOnlyList<ChunkUploadUrlDto>, Error>> GenerateAllChunkUploadUrlsAsync(
+        StorageKey storageKey,
+        string uploadId,
+        int totalChunks,
+        CancellationToken cancellationToken)
+    {
+        var expirationTime = DateTime.UtcNow.AddMinutes(_options.UploadUrlExpirationMinutes);
+
+        try
+        {
+            var tasks = Enumerable.Range(1, totalChunks).Select(async partNumber =>
+            {
+                await _semaphore.WaitAsync(cancellationToken);
+
+                try
+                {
+                    var request = new GetPreSignedUrlRequest()
+                    {
+                        BucketName = storageKey.Bucket,
+                        Key = storageKey.Key,
+                        Verb = HttpVerb.PUT,
+                        Protocol = Protocol.HTTP,
+                        PartNumber = partNumber,
+                        UploadId = uploadId,
+                        Expires = expirationTime
+                    };
+
+                    var url = await _amazonS3.GetPreSignedURLAsync(request);
+
+                    return new ChunkUploadUrlDto(partNumber, url);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            });
+
+            var urls = await Task.WhenAll(tasks);
+
+            return urls.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to generate all chunk upload urls by uploadId {Id}", uploadId);
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<Result<CompleteMultipartUploadDto, Error>> CompleteMultipartUploadAsync(
+        StorageKey storageKey,
+        string uploadId,
+        List<PartETagDto> partETags,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new CompleteMultipartUploadRequest()
+            {
+                BucketName = storageKey.Bucket,
+                Key = storageKey.Key,
+                UploadId = uploadId,
+                PartETags = partETags.Select(pET => new PartETag
+                {
+                    PartNumber = pET.PartNumber,
+                    ETag = pET.ETag,
+                })
+                .ToList()
+            };
+
+            var response = await _amazonS3.CompleteMultipartUploadAsync(request, cancellationToken);
+
+            return new CompleteMultipartUploadDto(response.Location, response.BucketName, response.Key);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to complete multipart upload with uploadId {Id}", uploadId);
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<UnitResult<Error>> AbortMultipartUploadAsync(
+        StorageKey storageKey,
+        string uploadId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new AbortMultipartUploadRequest()
+            {
+                BucketName = storageKey.Bucket,
+                Key = storageKey.Key,
+                UploadId = uploadId
+            };
+
+            await _amazonS3.AbortMultipartUploadAsync(request, cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to abort multipart upload with uploadId {Id}", uploadId);
+            return S3ErrorMapper.ToError(ex);
+        }
+    }
+
+    public async Task<Result<IReadOnlyList<MultipartUploadDto>, Error>> ListMultipartUploadAsync(
+        string bucketName,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new ListMultipartUploadsRequest()
+            {
+                BucketName = bucketName
+            };
+
+            var response = await _amazonS3.ListMultipartUploadsAsync(request, cancellationToken);
+
+            return response.MultipartUploads.Select(mU =>
+                new MultipartUploadDto(mU.Key, mU.UploadId)).ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to list multipart upload");
             return S3ErrorMapper.ToError(ex);
         }
     }
