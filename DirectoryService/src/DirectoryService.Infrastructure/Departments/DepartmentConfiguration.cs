@@ -73,6 +73,11 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnType("timestamp with time zone");
 
         builder
+            .Property(d => d.VideoId)
+            .IsRequired(false)
+            .HasColumnName("video_id");
+
+        builder
             .Property(d => d.DeletedAt)
             .HasColumnName("deleted_at")
             .HasColumnType("timestamp with time zone");

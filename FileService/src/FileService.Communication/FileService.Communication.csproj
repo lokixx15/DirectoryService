@@ -10,7 +10,7 @@
 
 	<PropertyGroup>
 		<PackageId>DirectoryService.FileService.Communication</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.2</Version>
 		<Authors>lokixx15</Authors>
 		<Company>lokixx15</Company>
 		<PackageDescription>Communication FileService Project</PackageDescription>

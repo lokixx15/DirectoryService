@@ -5,7 +5,7 @@
 
 	<PropertyGroup>
 		<PackageId>DirectoryService.FileService.Contracts</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.2</Version>
 		<Authors>lokixx15</Authors>
 		<Company>lokixx15</Company>
 		<PackageDescription>Contracts FileService Project</PackageDescription>

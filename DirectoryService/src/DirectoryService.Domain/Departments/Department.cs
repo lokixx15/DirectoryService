@@ -56,6 +56,8 @@ public class Department
 
     public DateTime? DeletedAt { get; private set; }
 
+    public Guid? VideoId { get; private set; }
+
     public IReadOnlyList<Department> ChildrenDepartments => _childrenDepartments;
 
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
@@ -140,5 +142,11 @@ public class Department
         DeletedAt = DateTime.UtcNow;
 
         return UnitResult.Success<Errors>();
+    }
+
+    public void AttachVideo(Guid videoId)
+    {
+        VideoId = videoId;
+        UpdatedAt = DateTime.UtcNow;
     }
 }

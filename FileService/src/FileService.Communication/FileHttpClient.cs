@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using FileService.Contracts.Requests;
 using FileService.Contracts.Responses;
+using FileService.Core.Features;
 using FileService.IntegrationTests.Features;
 using Microsoft.Extensions.Logging;
 using SharedService.SharedKernel;
@@ -50,6 +51,22 @@ internal sealed class FileHttpClient : IFileService
         {
             _logger.LogError(ex, "Error occurred when getting media assets by ids {Ids}", string.Join(", ", request.MediaAssetIds));
             return Error.Failure("internal.error", "Failed to get media assets info");
+        }
+    }
+
+    public async Task<Result<CheckVideoExistenceResponse, Error>> CheckVideoExistence(
+        Guid videoId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/files/{videoId}/exists", cancellationToken);
+            return await response.HandleResponseAsync<CheckVideoExistenceResponse>(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred when checking existence of video by id {Id}", videoId);
+            return Error.Failure("internal.error", "Failed to check existence of video");
         }
     }
 }
