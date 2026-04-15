@@ -1,5 +1,6 @@
 ﻿using FileService.Core.Abstractions.Database;
 using FileService.Domain.Assets;
+using FileService.Domain.MediaProcessing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -30,9 +31,7 @@ public class FileServiceDbContext : DbContext, IReadFileServiceDbContext
 
     public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
 
-    public DbSet<VideoAsset> VideoAssets => Set<VideoAsset>();
-
-    public DbSet<PreviewAsset> PreviewAssets => Set<PreviewAsset>();
+    public DbSet<VideoProcess> VideoProcesses => Set<VideoProcess>();
 
     public IQueryable<MediaAsset> ReadMediaAssets => Set<MediaAsset>().AsNoTracking().AsQueryable();
 
