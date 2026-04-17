@@ -23,6 +23,7 @@ public static class DependencyInjectionCore
         services.AddScoped<GetMediaAssetInfoHandler>();
         services.AddScoped<GetMediaAssetsInfoHandler>();
         services.AddScoped<StartMultipartUploadHandler>();
+        services.AddScoped<CheckVideoExistenceHandler>();
 
         return services;
     }

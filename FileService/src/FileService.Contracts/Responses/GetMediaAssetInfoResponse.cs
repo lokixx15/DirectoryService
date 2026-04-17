@@ -3,5 +3,5 @@
 namespace FileService.Contracts.Responses;
 
 public record GetMediaAssetInfoResponse(
-    MediaAssetDto mediaAsset,
+    MediaAssetDto MediaAsset,
     string? url);

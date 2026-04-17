@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using FileService.Communication;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharedService.Core.Abstractions;
@@ -18,6 +19,8 @@ public static class DependencyInjection
         services.AddHandlers([assembly]);
 
         services.AddCaching(configuration);
+
+        services.AddFileHttpCommunication(configuration);
 
         return services;
     }

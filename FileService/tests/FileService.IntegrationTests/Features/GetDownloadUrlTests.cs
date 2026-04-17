@@ -1,8 +1,4 @@
-﻿using Amazon.S3;
-using FileService.Contracts.Requests;
-using FileService.IntegrationTests.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using FileService.IntegrationTests.Infrastructure;
 
 namespace FileService.IntegrationTests.Features;
 

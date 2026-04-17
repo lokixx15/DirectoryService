@@ -1,4 +1,5 @@
-﻿using DirectoryService.Application.Departments.Features.CreateDepartment;
+﻿using DirectoryService.Application.Departments.Features.AttachDepartmentVideo;
+using DirectoryService.Application.Departments.Features.CreateDepartment;
 using DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
 using DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 using DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
@@ -26,9 +27,9 @@ public sealed class DepartmentsController : ControllerBase
     [HttpGet]
     [Route("roots")]
     public async Task<EndpointResult<IReadOnlyList<DepartmentDto>>> GetRootDepartmentsWithChildren(
-    [FromQuery] GetRootDepartmentsWithChildrenRequest request,
-    [FromServices] GetRootDepartmentsWithChildrenHandler handler,
-    CancellationToken cancellationToken)
+        [FromQuery] GetRootDepartmentsWithChildrenRequest request,
+        [FromServices] GetRootDepartmentsWithChildrenHandler handler,
+        CancellationToken cancellationToken)
     {
         var query = new GetRootDepartmentsWithChildrenQuery(request);
 
@@ -38,10 +39,10 @@ public sealed class DepartmentsController : ControllerBase
     [HttpGet]
     [Route("{parentId:guid}/children")]
     public async Task<EndpointResult<PaginationResponse<DepartmentDto>>> GetChildrenDepartmentsByRootId(
-    [FromRoute] Guid parentId,
-    [FromQuery] PaginationRequest request,
-    [FromServices] GetChildrenDepartmentsByParentIdHandler handler,
-    CancellationToken cancellationToken)
+        [FromRoute] Guid parentId,
+        [FromQuery] PaginationRequest request,
+        [FromServices] GetChildrenDepartmentsByParentIdHandler handler,
+        CancellationToken cancellationToken)
     {
         var query = new GetChildrenDepartmentsByParentIdQuery(parentId, request);
 
@@ -73,12 +74,24 @@ public sealed class DepartmentsController : ControllerBase
 
     [HttpPut("{departmentId:guid}/parent")]
     public async Task<EndpointResult> UpdateDepartmentParent(
-    [FromServices] UpdateDepartmentParentHandler handler,
-    [FromRoute] Guid departmentId,
-    [FromBody] UpdateDepartmentParentRequest request,
-    CancellationToken cancellationToken)
+        [FromServices] UpdateDepartmentParentHandler handler,
+        [FromRoute] Guid departmentId,
+        [FromBody] UpdateDepartmentParentRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new UpdateDepartmentParentCommand(departmentId, request);
+
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpPatch("{departmentId:guid}/video")]
+    public async Task<EndpointResult> UpdateDepartmentParent(
+        [FromRoute] Guid departmentId,
+        [FromBody] AttachDepartmentVideoRequest request,
+        [FromServices] AttachDepartmentVideoHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new AttachDepartmentVideoCommand(departmentId, request);
 
         return await handler.Handle(command, cancellationToken);
     }

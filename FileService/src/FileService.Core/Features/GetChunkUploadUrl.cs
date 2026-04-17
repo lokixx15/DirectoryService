@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Contracts.Dtos;
 using FileService.Contracts.Requests;
-using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +23,10 @@ public class GetChunkUploadUrlValidator : AbstractValidator<GetChunkUploadUrlQue
         RuleFor(command => command.GetChunkUploadUrlRequest)
             .NotNull()
                 .WithError(GeneralErrors.ValueIsNullOrWhitespace("Request"));
+
+        RuleFor(command => command.GetChunkUploadUrlRequest.MediaAssetId)
+            .NotEmpty()
+                .WithError(GeneralErrors.ValueIsNotValid("Media asset id cannot be empty"));
 
         RuleFor(command => command.GetChunkUploadUrlRequest.UploadId)
            .NotEmpty()
@@ -50,21 +53,18 @@ public class GetChunkUploadUrlEndpoint : IEndpoint
 public class GetChunkUploadUrlHandler : IQueryHandler<Result<ChunkUploadUrlDto, Errors>, GetChunkUploadUrlQuery>
 {
     private readonly IS3Provider _s3Provider;
-    private readonly ITransactionManager _transactionManager;
     private readonly IMediaRepository _mediaRepository;
     private readonly IValidator<GetChunkUploadUrlQuery> _validator;
     private readonly ILogger<GetChunkUploadUrlHandler> _logger;
 
     public GetChunkUploadUrlHandler(
         IS3Provider s3Provider,
-        ITransactionManager transactionManager,
         IMediaRepository mediaRepository,
         IValidator<GetChunkUploadUrlQuery> validator,
         ILogger<GetChunkUploadUrlHandler> logger)
     {
         _s3Provider = s3Provider;
         _mediaRepository = mediaRepository;
-        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }
@@ -87,6 +87,12 @@ public class GetChunkUploadUrlHandler : IQueryHandler<Result<ChunkUploadUrlDto, 
         {
             _logger.LogError("Media asset with id {Id} was not found", request.MediaAssetId);
             return GeneralErrors.EntityNotFound("Media asset").ToErrors();
+        }
+
+        if (mediaAssetResult.Value.MediaData.ExpectedChuncksCount < request.PartNumber)
+        {
+            _logger.LogError("Requested part number {PartNumber} is out of range for media asset with id {Id}", request.PartNumber, request.MediaAssetId);
+            return GeneralErrors.ValueIsNotValid("Part number is out of range").ToErrors();
         }
 
         var urlResult = await _s3Provider.GenerateChunkUploadUrlAsync(mediaAssetResult.Value.RawKey, request.UploadId, request.PartNumber);

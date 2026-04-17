@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="DirectoryService.Core" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FileService.Contracts\FileService.Contracts.csproj" />
+  </ItemGroup>
+
+	<PropertyGroup>
+		<PackageId>DirectoryService.FileService.Communication</PackageId>
+		<Version>1.0.2</Version>
+		<Authors>lokixx15</Authors>
+		<Company>lokixx15</Company>
+		<PackageDescription>Communication FileService Project</PackageDescription>
+		<RepositoryUrl>https://github.com/lokixx15/DirectoryService</RepositoryUrl>
+	</PropertyGroup>
+</Project>

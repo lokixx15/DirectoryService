@@ -2,4 +2,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http" />
   </ItemGroup>
+
+	<PropertyGroup>
+		<PackageId>DirectoryService.FileService.Contracts</PackageId>
+		<Version>1.0.2</Version>
+		<Authors>lokixx15</Authors>
+		<Company>lokixx15</Company>
+		<PackageDescription>Contracts FileService Project</PackageDescription>
+		<RepositoryUrl>https://github.com/lokixx15/DirectoryService</RepositoryUrl>
+	</PropertyGroup>
 </Project>

@@ -2,7 +2,8 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" />    
-	<PackageReference Include="DirectoryService.Core" />
+	<PackageReference Include="DirectoryService.Core" />    
+	<PackageReference Include="DirectoryService.FileService.Communication" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 

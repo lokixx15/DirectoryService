@@ -1,7 +1,7 @@
-﻿using FileService.Contracts.Requests;
+﻿using System.Net.Http.Json;
+using FileService.Contracts.Requests;
 using FileService.Contracts.Responses;
 using FileService.IntegrationTests.Infrastructure;
-using System.Net.Http.Json;
 
 namespace FileService.IntegrationTests.Features;
 
