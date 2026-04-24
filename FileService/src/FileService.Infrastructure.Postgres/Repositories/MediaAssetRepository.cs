@@ -51,6 +51,37 @@ public class MediaAssetRepository : IMediaRepository
         }
     }
 
+    public async Task<Result<VideoAsset, Error>> GetVideoByAsync(
+        Expression<Func<VideoAsset, bool>> predicate,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var mediaAsset = await _dbContext.MediaAssets
+                .OfType<VideoAsset>()
+                .FirstOrDefaultAsync(predicate, cancellationToken);
+
+            if (mediaAsset == null)
+            {
+                _logger.LogError("Video asset was not found in the database");
+                return GeneralErrors.EntityNotFound("Video asset");
+            }
+
+            _logger.LogInformation("Video asset was obtained from the database");
+            return mediaAsset;
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled while reading video asset");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error when reading video asset");
+            return GeneralErrors.DatabaseReadFailed(ex.Message);
+        }
+    }
+
     public async Task<Result<Guid, Error>> AddAsync(
         MediaAsset mediaAsset,
         CancellationToken cancellationToken)

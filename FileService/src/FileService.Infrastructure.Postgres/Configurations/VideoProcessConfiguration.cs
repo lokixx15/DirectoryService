@@ -41,7 +41,7 @@ public class VideoProcessConfiguration : IEntityTypeConfiguration<VideoProcess>
 
             sb.Property(vps => vps.ProcessId).HasColumnName("process_id");
             sb.Property(vps => vps.Order).IsRequired().HasColumnName("order");
-            sb.Property(vps => vps.Name).IsRequired().HasColumnName("name");
+            sb.Property(vps => vps.StepType).HasConversion<string>().HasColumnName("step_type");
             sb.Property(vps => vps.Status).HasConversion<string>().HasColumnName("status");
             sb.Property(vps => vps.Progress).IsRequired().HasColumnName("progress").HasDefaultValue(0);
 
@@ -53,30 +53,10 @@ public class VideoProcessConfiguration : IEntityTypeConfiguration<VideoProcess>
             sb.Property(vps => vps.UpdatedAt).IsRequired().HasColumnName("updated_at").HasColumnType("timestamp with time zone");
         });
 
+
         builder.OwnsOne(vp => vp.Metadata, mb =>
         {
             mb.ToJson("metadata");
-
-            mb.OwnsOne(ma => ma.MediaData, mab =>
-            {
-                mab.ToJson("media_data");
-
-                mab.OwnsOne(md => md.FileName, mdb =>
-                {
-                    mdb.Property(fn => fn.Value);
-                    mdb.Property(fn => fn.Name);
-                    mdb.Property(fn => fn.Extension);
-                });
-
-                mab.OwnsOne(md => md.ContentType, mdb =>
-                {
-                    mdb.Property(ct => ct.Value);
-                    mdb.Property(ct => ct.Category).HasConversion<string>();
-                });
-
-                mab.Property(s => s.Size);
-                mab.Property(e => e.ExpectedChuncksCount);
-            });
 
             mb.Property(m => m.Duration).IsRequired(false).HasColumnName("duration");
             mb.Property(m => m.Width).IsRequired(false).HasColumnName("width");
@@ -84,11 +64,13 @@ public class VideoProcessConfiguration : IEntityTypeConfiguration<VideoProcess>
             mb.Property(m => m.Codec).IsRequired(false).HasColumnName("codec");
         });
 
+        builder.Navigation(vp => vp.Metadata).IsRequired(false);
+
         builder.Property(vp => vp.TotalProgress).IsRequired().HasColumnName("total_progress").HasDefaultValue(0);
         builder.Property(vp => vp.Status).HasConversion<string>().HasColumnName("status");
         builder.Property(vp => vp.ErrorMessage).IsRequired(false).HasColumnName("error_message");
         builder.Property(vp => vp.CurrentStepOrder).IsRequired(false).HasColumnName("current_step_order");
-        builder.Property(vp => vp.CurrentStepName).IsRequired(false).HasColumnName("current_step_name");
+        builder.Property(vp => vp.CurrentStepType).HasConversion<string>().IsRequired(false).HasColumnName("current_step_type");
         builder.Property(vp => vp.CurrentStepProgress).IsRequired().HasColumnName("current_step_progress").HasDefaultValue(0);
         builder.Property(vp => vp.CreatedAt).IsRequired().HasColumnName("created_at").HasColumnType("timestamp with time zone");
         builder.Property(vp => vp.UpdatedAt).IsRequired().HasColumnName("updated_at").HasColumnType("timestamp with time zone");

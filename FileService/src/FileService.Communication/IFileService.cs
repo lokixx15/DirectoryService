@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using FileService.Contracts.Requests;
 using FileService.Contracts.Responses;
-using FileService.Core.Features;
 using SharedService.SharedKernel;
 
 namespace FileService.Communication;

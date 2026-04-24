@@ -13,6 +13,8 @@ public class VideoAsset : MediaAsset
     public const string RAW_PREFIX = "raw";
     public const string HLS_PREFIX = "hls";
     public const string MASTER_PLAYLIST_NAME = "master.m3u8";
+    public const string STREAM_PLAYLIST_PATTERN = "%v_stream.m3u8";
+    public const string SEGMENT_FILE_PATTERN = "%v_%06d.ts";
     public static readonly string[] AllowedExtensions = ["mp4", "mkv", "avi", "mov"];
 
     public StorageKey HslRootKey { get; private set; } = null!;
@@ -53,6 +55,8 @@ public class VideoAsset : MediaAsset
         var markReadyResult = MarkReady(appendSegmentResult.Value, timestamp);
         if (markReadyResult.IsFailure)
             return markReadyResult.Error;
+
+        HslRootKey = FinalKey;
 
         return UnitResult.Success<Error>();
     }

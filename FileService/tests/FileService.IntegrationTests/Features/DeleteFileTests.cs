@@ -8,14 +8,8 @@ namespace FileService.IntegrationTests.Features;
 
 public class DeleteFileTests : FileServiceTestsBase
 {
-    private readonly IntegrationTestsWebFactory _factory;
-
-    public DeleteFileTests(
-        IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
-        _factory = factory;
-    }
+    public DeleteFileTests(IntegrationTestsWebFactory factory)
+        : base(factory) { }
 
     [Fact]
     public async Task DeleteFile_Should_Success()
@@ -39,7 +33,7 @@ public class DeleteFileTests : FileServiceTestsBase
 
             Assert.NotNull(mediaAsset);
 
-            var amazonS3Client = _factory.Services.GetRequiredService<IAmazonS3>();
+            var amazonS3Client = Services.GetRequiredService<IAmazonS3>();
 
             var exception = await Record.ExceptionAsync(() => amazonS3Client.GetObjectMetadataAsync(
                 mediaAsset.RawKey.Bucket,

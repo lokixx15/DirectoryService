@@ -1,6 +1,7 @@
 ﻿using FileService.Core;
 using FileService.Infrastructure.Postgres;
 using FileService.Infrastructure.S3;
+using FileService.VideoProcessing;
 using SharedService.Framework.Endpoints;
 using SharedService.Framework.Logging;
 
@@ -13,6 +14,7 @@ public static class DependencyInjectionExtensions
             .AddPostgresInfrastructure(configuration)
             .AddS3Infrastructure(configuration)
             .AddCore()
+            .AddVideoProcessing(configuration)
             .AddSerilogLogging(configuration)
             .AddWeb();
 

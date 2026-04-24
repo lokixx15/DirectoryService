@@ -4,8 +4,8 @@ using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
 using FileService.Contracts.Requests;
 using FileService.Contracts.Responses;
+using FileService.Core;
 using FileService.Domain;
-using FileService.Domain.Assets;
 using FileService.Infrastructure.Postgres;
 using FileService.IntegrationTests.Features;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +14,7 @@ using SharedService.SharedKernel;
 
 namespace FileService.IntegrationTests.Infrastructure;
 
+[Collection("FileTestsCollection")]
 public abstract class FileServiceTestsBase : IClassFixture<IntegrationTestsWebFactory>, IAsyncLifetime
 {
     private readonly IntegrationTestsWebFactory _factory;
@@ -49,6 +50,15 @@ public abstract class FileServiceTestsBase : IClassFixture<IntegrationTestsWebFa
         var sut = scope.ServiceProvider.GetRequiredService<FileServiceDbContext>();
 
         await action(sut);
+    }
+
+    protected async Task ExecuteInDbAndS3(Func<FileServiceDbContext, IAmazonS3, Task> action)
+    {
+        await using var scope = Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<FileServiceDbContext>();
+        var amazonS3Client = scope.ServiceProvider.GetRequiredService<IAmazonS3>();
+
+        await action(dbContext, amazonS3Client);
     }
 
     protected async Task<Result<StartMultipartUploadResponse, Error>> StartMultipartUploadAsync(
@@ -111,27 +121,13 @@ public abstract class FileServiceTestsBase : IClassFixture<IntegrationTestsWebFa
     {
         FileInfo fileInfo = new(Path.Combine(AppContext.BaseDirectory, "Resources", Constants.IMAGE_FILE_NAME));
 
-        await using var stream = fileInfo.OpenRead();
-
-        var key = Guid.NewGuid();
-
-        var request = new PutObjectRequest()
-        {
-            BucketName = "previews",
-            Key = key.ToString(),
-            InputStream = stream,
-            ContentType = "image/png"
-        };
-
-        var amazonS3Client = _factory.Services.GetRequiredService<IAmazonS3>();
-        await amazonS3Client.PutObjectAsync(request, cancellationToken);
-
         var fileName = FileName.Create(fileInfo.Name).Value;
         var contentType = ContentType.Create("image/png").Value;
         var mediaData = MediaData.Create(fileName, contentType, fileInfo.Length, 1).Value;
-        var storageKey = StorageKey.Create("previews", null, key.ToString()).Value;
         var mediaOwner = MediaOwner.Create(Guid.NewGuid(), "lesson").Value;
-        var mediaAsset = new PreviewAsset(key, mediaData, AssetType.PREVIEW, MediaStatus.READY, storageKey, mediaOwner);
+
+        var mediaAssetFactory = new MediaAssetFactory();
+        var mediaAsset = mediaAssetFactory.CreateForUpload(mediaData, AssetType.PREVIEW, mediaOwner).Value;
 
         await ExecuteInDb(async dbContext =>
         {
@@ -139,6 +135,19 @@ public abstract class FileServiceTestsBase : IClassFixture<IntegrationTestsWebFa
             await dbContext.SaveChangesAsync(cancellationToken);
         });
 
-        return key;
+        await using var stream = fileInfo.OpenRead();
+
+        var request = new PutObjectRequest()
+        {
+            BucketName = "previews",
+            Key = mediaAsset.Id.ToString(),
+            InputStream = stream,
+            ContentType = "image/png"
+        };
+
+        var amazonS3Client = Services.GetRequiredService<IAmazonS3>();
+        await amazonS3Client.PutObjectAsync(request, cancellationToken);
+
+        return mediaAsset.Id;
     }
 }

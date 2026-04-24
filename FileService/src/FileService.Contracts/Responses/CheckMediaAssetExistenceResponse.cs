@@ -1,3 +1,3 @@
-﻿namespace FileService.Core.Features;
+﻿namespace FileService.Contracts.Responses;
 
 public record CheckVideoExistenceResponse(bool Exists);

@@ -9,6 +9,8 @@ public interface IMediaRepository
 {
     Task<Result<MediaAsset, Error>> GetByAsync(Expression<Func<MediaAsset, bool>> predicate, CancellationToken cancellationToken);
 
+    Task<Result<VideoAsset, Error>> GetVideoByAsync(Expression<Func<VideoAsset, bool>> predicate, CancellationToken cancellationToken);
+
     Task<Result<Guid, Error>> AddAsync(MediaAsset mediaAsset, CancellationToken cancellationToken);
 
     Task<UnitResult<Error>> DeleteById(Guid mediaAssetId, CancellationToken cancellationToken);

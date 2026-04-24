@@ -20,7 +20,7 @@ public class VideoProcess
 
     public int? CurrentStepOrder { get; private set; }
 
-    public string? CurrentStepName { get; private set; }
+    public StepType? CurrentStepType { get; private set; }
 
     public double CurrentStepProgress { get; private set; }
 
@@ -88,7 +88,7 @@ public class VideoProcess
         {
             Status = VideoProcessStatus.PENDING;
             CurrentStepOrder = null;
-            CurrentStepName = null;
+            CurrentStepType = null;
             CurrentStepProgress = 0;
             ErrorMessage = null;
 
@@ -99,20 +99,20 @@ public class VideoProcess
         return UnitResult.Success<Error>();
     }
 
-    public UnitResult<Error> StartStep(int order, string name)
+    public UnitResult<Error> StartStep(int order, StepType stepType)
     {
-        var step = _steps.FirstOrDefault(s => s.Order == order && s.Name == name);
+        var step = _steps.FirstOrDefault(s => s.Order == order && s.StepType == stepType);
         if (step is null)
             return Error.NotFound(
                 "value.does.not.exist",
-                $"Process step with order {order} and name {name} doesn't exist in steps");
+                $"Process step with order {order} and stepType {stepType} doesn't exist in steps");
 
         var startStepResult = step.Start();
         if (startStepResult.IsFailure)
             return startStepResult.Error;
 
         CurrentStepOrder = order;
-        CurrentStepName = name;
+        CurrentStepType = stepType;
         Status = VideoProcessStatus.RUNNING;
         UpdatedAt = DateTime.UtcNow;
 

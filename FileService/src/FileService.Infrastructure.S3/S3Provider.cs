@@ -43,7 +43,7 @@ public class S3Provider : IS3Provider
             var request = new PutObjectRequest()
             {
                 BucketName = storageKey.Bucket,
-                Key = storageKey.Key,
+                Key = storageKey.Value,
                 InputStream = stream,
                 ContentType = mediaData.ContentType.Value
             };

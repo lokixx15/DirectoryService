@@ -82,10 +82,6 @@ namespace FileService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("CurrentStepName")
-                        .HasColumnType("text")
-                        .HasColumnName("current_step_name");
-
                     b.Property<int?>("CurrentStepOrder")
                         .HasColumnType("integer")
                         .HasColumnName("current_step_order");
@@ -95,6 +91,10 @@ namespace FileService.Infrastructure.Postgres.Migrations
                         .HasColumnType("double precision")
                         .HasDefaultValue(0.0)
                         .HasColumnName("current_step_progress");
+
+                    b.Property<string>("CurrentStepType")
+                        .HasColumnType("text")
+                        .HasColumnName("current_step_type");
 
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("text")
@@ -285,11 +285,6 @@ namespace FileService.Infrastructure.Postgres.Migrations
                                 .HasColumnType("text")
                                 .HasColumnName("error_message");
 
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("name");
-
                             b1.Property<int>("Order")
                                 .HasColumnType("integer")
                                 .HasColumnName("order");
@@ -312,6 +307,11 @@ namespace FileService.Infrastructure.Postgres.Migrations
                                 .IsRequired()
                                 .HasColumnType("text")
                                 .HasColumnName("status");
+
+                            b1.Property<string>("StepType")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("step_type");
 
                             b1.Property<DateTime>("UpdatedAt")
                                 .HasColumnType("timestamp with time zone")
@@ -359,88 +359,9 @@ namespace FileService.Infrastructure.Postgres.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("VideoProcessId");
-
-                            b1.OwnsOne("FileService.Domain.MediaData", "MediaData", b2 =>
-                                {
-                                    b2.Property<Guid>("MetadataVideoProcessId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("ExpectedChuncksCount")
-                                        .HasColumnType("integer");
-
-                                    b2.Property<long>("Size")
-                                        .HasColumnType("bigint");
-
-                                    b2.HasKey("MetadataVideoProcessId");
-
-                                    b2.ToTable("video_processes");
-
-                                    b2
-                                        .ToJson("media_data")
-                                        .HasColumnType("jsonb");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("MetadataVideoProcessId");
-
-                                    b2.OwnsOne("FileService.Domain.ContentType", "ContentType", b3 =>
-                                        {
-                                            b3.Property<Guid>("MediaDataMetadataVideoProcessId")
-                                                .HasColumnType("uuid");
-
-                                            b3.Property<string>("Category")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("Value")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.HasKey("MediaDataMetadataVideoProcessId");
-
-                                            b3.ToTable("video_processes");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("MediaDataMetadataVideoProcessId");
-                                        });
-
-                                    b2.OwnsOne("FileService.Domain.FileName", "FileName", b3 =>
-                                        {
-                                            b3.Property<Guid>("MediaDataMetadataVideoProcessId")
-                                                .HasColumnType("uuid");
-
-                                            b3.Property<string>("Extension")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("Name")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("Value")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.HasKey("MediaDataMetadataVideoProcessId");
-
-                                            b3.ToTable("video_processes");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("MediaDataMetadataVideoProcessId");
-                                        });
-
-                                    b2.Navigation("ContentType")
-                                        .IsRequired();
-
-                                    b2.Navigation("FileName")
-                                        .IsRequired();
-                                });
-
-                            b1.Navigation("MediaData")
-                                .IsRequired();
                         });
 
-                    b.Navigation("Metadata")
-                        .IsRequired();
+                    b.Navigation("Metadata");
 
                     b.Navigation("Steps");
                 });
