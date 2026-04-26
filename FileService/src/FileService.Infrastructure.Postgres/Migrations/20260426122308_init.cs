@@ -38,7 +38,7 @@ namespace FileService.Infrastructure.Postgres.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     raw_key = table.Column<string>(type: "jsonb", nullable: false),
-                    hls_key = table.Column<string>(type: "jsonb", nullable: false),
+                    hls_key = table.Column<string>(type: "jsonb", nullable: true),
                     status = table.Column<string>(type: "text", nullable: false),
                     current_step_order = table.Column<int>(type: "integer", nullable: true),
                     current_step_type = table.Column<string>(type: "text", nullable: true),

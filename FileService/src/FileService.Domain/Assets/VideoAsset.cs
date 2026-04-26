@@ -56,8 +56,8 @@ public class VideoAsset : MediaAsset
         if (markReadyResult.IsFailure)
             return markReadyResult.Error;
 
-        HslRootKey = FinalKey;
-
         return UnitResult.Success<Error>();
     }
+
+    public override bool RequiresProcessing() => true;
 }

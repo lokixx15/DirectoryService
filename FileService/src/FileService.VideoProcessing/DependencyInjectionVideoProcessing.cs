@@ -1,9 +1,12 @@
 ﻿using FileService.VideoProcessing.FfmpegProcess;
+using FileService.VideoProcessing.Jobs;
 using FileService.VideoProcessing.Pipeline;
 using FileService.VideoProcessing.ProcessExecutor;
 using FileService.VideoProcessing.Steps;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
+using Quartz.Impl;
 
 namespace FileService.VideoProcessing;
 
@@ -29,6 +32,10 @@ public static class DependencyInjectionVideoProcessing
             VideoProcessingOptions.SECTION_NAME));
 
         services.AddScoped<IVideoProcessingService, VideoProcessingService>();
+
+        services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+        services.AddTransient<VideoProcessingJob>();
+        services.AddScoped<IVideoProcessingScheduler, VideoProcessingScheduler>();
 
         return services;
     }

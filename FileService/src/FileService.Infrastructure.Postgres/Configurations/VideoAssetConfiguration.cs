@@ -15,6 +15,7 @@ public class VideoAssetConfiguration : IEntityTypeConfiguration<VideoAsset>
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<StorageKey>(v, (JsonSerializerOptions?)null)!)
             .HasColumnName("hsl_root_key")
-            .HasColumnType("jsonb");
+            .HasColumnType("jsonb")
+            .IsRequired(false);
     }
 }

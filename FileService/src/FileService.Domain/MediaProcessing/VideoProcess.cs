@@ -14,7 +14,7 @@ public class VideoProcess
 
     public StorageKey RawKey { get; private set; } = null!;
 
-    public StorageKey HlsKey { get; private set; } = null!;
+    public StorageKey? HlsKey { get; private set; } = null!;
 
     public VideoProcessStatus Status { get; private set; }
 
@@ -36,15 +36,10 @@ public class VideoProcess
 
     public IReadOnlyList<VideoProcessStep> Steps => _steps;
 
-    public bool IsCompleted =>
-        Status == VideoProcessStatus.SUCCEEDED
-        || Status == VideoProcessStatus.FAILED
-        || Status == VideoProcessStatus.CANCELED;
-
     private VideoProcess(
         Guid id,
         StorageKey rawKey,
-        StorageKey hlsKey,
+        StorageKey? hlsKey,
         IEnumerable<VideoProcessStep> steps)
     {
         Id = id;
@@ -59,7 +54,7 @@ public class VideoProcess
     public static Result<VideoProcess, Error> Create(
         Guid id,
         StorageKey rawKey,
-        StorageKey hlsKey,
+        StorageKey? hlsKey,
         IEnumerable<VideoProcessStep> steps)
     {
         var stepsList = steps.ToList();
@@ -74,6 +69,28 @@ public class VideoProcess
             return GeneralErrors.ValueIsNotValid("Step's order cannot be less than 0", "Order");
 
         return new VideoProcess(id, rawKey, hlsKey, stepsList);
+    }
+
+    public static Result<List<VideoProcessStep>, Error> InitializeSteps(Guid processId)
+    {
+        int order = 1;
+        List<VideoProcessStep> steps = new();
+
+        foreach (StepType stepType in Enum.GetValues<StepType>())
+        {
+            var stepResult = VideoProcessStep.Create(
+                Guid.NewGuid(),
+                processId,
+                order++,
+                stepType);
+
+            if (stepResult.IsFailure)
+                return stepResult.Error;
+
+            steps.Add(stepResult.Value);
+        }
+
+        return steps;
     }
 
     public UnitResult<Error> PrepareForExecution()
@@ -223,6 +240,22 @@ public class VideoProcess
         UpdatedAt = DateTime.UtcNow;
         Status = VideoProcessStatus.CANCELED;
 
+        return UnitResult.Success<Error>();
+    }
+
+    public UnitResult<Error> SetHlsKey(StorageKey hlsKey)
+    {
+        if (Status != VideoProcessStatus.PENDING)
+            return Error.Validation(
+                "video.process.invalid_status",
+                "Can only set HLS key for PENDING processes",
+                nameof(VideoProcessStatus));
+
+        if (string.IsNullOrEmpty(hlsKey.Key))
+            return GeneralErrors.ValueIsNullOrWhitespace(nameof(hlsKey.Key));
+
+        HlsKey = hlsKey;
+        UpdatedAt = DateTime.UtcNow;
         return UnitResult.Success<Error>();
     }
 

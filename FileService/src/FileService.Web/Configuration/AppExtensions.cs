@@ -1,5 +1,7 @@
-﻿using FileService.Infrastructure.Postgres;
+﻿using CrystalQuartz.AspNetCore;
+using FileService.Infrastructure.Postgres;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using Serilog;
 using SharedService.Framework.Endpoints;
 using SharedService.Framework.Middlewares;
@@ -19,6 +21,9 @@ public static class AppExtensions
             app.MapOpenApi();
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "DirectoryService"));
         }
+
+        app.UseRouting();
+        app.UseCrystalQuartz(() => app.Services.GetRequiredService<ISchedulerFactory>().GetScheduler());
 
         var filesApiGroup = app.MapGroup("api/files");
         app.UseEndpoints(filesApiGroup);

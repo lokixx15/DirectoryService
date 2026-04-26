@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FileService.Infrastructure.Postgres.Migrations
 {
     [DbContext(typeof(FileServiceDbContext))]
-    [Migration("20260423171017_init")]
+    [Migration("20260426122308_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -104,7 +104,6 @@ namespace FileService.Infrastructure.Postgres.Migrations
                         .HasColumnName("error_message");
 
                     b.Property<string>("HlsKey")
-                        .IsRequired()
                         .HasColumnType("jsonb")
                         .HasColumnName("hls_key");
 
@@ -152,7 +151,6 @@ namespace FileService.Infrastructure.Postgres.Migrations
                     b.HasBaseType("FileService.Domain.Assets.MediaAsset");
 
                     b.Property<string>("HslRootKey")
-                        .IsRequired()
                         .HasColumnType("jsonb")
                         .HasColumnName("hsl_root_key");
 

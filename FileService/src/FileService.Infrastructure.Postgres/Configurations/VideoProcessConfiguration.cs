@@ -53,7 +53,6 @@ public class VideoProcessConfiguration : IEntityTypeConfiguration<VideoProcess>
             sb.Property(vps => vps.UpdatedAt).IsRequired().HasColumnName("updated_at").HasColumnType("timestamp with time zone");
         });
 
-
         builder.OwnsOne(vp => vp.Metadata, mb =>
         {
             mb.ToJson("metadata");

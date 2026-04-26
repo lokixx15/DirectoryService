@@ -13,7 +13,7 @@ public static class DependencyInjectionExtensions
         services
             .AddPostgresInfrastructure(configuration)
             .AddS3Infrastructure(configuration)
-            .AddCore()
+            .AddCore(configuration)
             .AddVideoProcessing(configuration)
             .AddSerilogLogging(configuration)
             .AddWeb();

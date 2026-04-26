@@ -3,7 +3,6 @@ using FileService.Core;
 using FileService.Core.Abstractions.Database;
 using FileService.Domain.MediaProcessing;
 using FileService.VideoProcessing.Steps;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SharedService.SharedKernel;
 
@@ -82,11 +81,12 @@ public class ProcessingPipeline : IProcessingPipeline
 
         if (videoProcessResult.IsFailure)
         {
-            var initializeStepsResult = InitializeSteps(videoAssetId);
+            var initializeStepsResult = VideoProcess.InitializeSteps(videoAssetId);
             if (initializeStepsResult.IsFailure)
             {
-                _logger.LogError("Failed to initialize processing steps. Video asset id: {VideoAssetId}. Error: {Error}",
-                    videoAssetId, initializeStepsResult.Error);
+                _logger.LogError("Failed to initialize video process steps for video process with id {Id}",
+                    videoAssetId);
+
                 return initializeStepsResult.Error;
             }
 
@@ -111,19 +111,26 @@ public class ProcessingPipeline : IProcessingPipeline
                     videoAssetId, addResult.Error);
                 return addResult.Error;
             }
-
-            var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
-            if (saveChangesResult.IsFailure)
-            {
-                _logger.LogError("Failed to save changes to the database. Video asset id: {VideoAssetId}. Error: {Error}",
-                    videoAssetId, saveChangesResult.Error);
-                return saveChangesResult.Error;
-            }
         }
         else
         {
+            _logger.LogInformation("Video process with id {VideoProcessId} was obtained from the database", videoAssetId);
+
             videoProcess = videoProcessResult.Value;
-            _logger.LogInformation("Video process with id {VideoProcessId} was obtained from the database", videoProcess.Id);
+            var setHlsResult = videoProcess.SetHlsKey(mediaAssetResult.Value.HslRootKey);
+            if (setHlsResult.IsFailure)
+            {
+                _logger.LogError("Failed to set hls key for video process with id {VideoProcessId}", videoAssetId);
+                return setHlsResult.Error;
+            }
+        }
+
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveChangesResult.IsFailure)
+        {
+            _logger.LogError("Failed to save changes to the database. Video asset id: {VideoAssetId}. Error: {Error}",
+                videoAssetId, saveChangesResult.Error);
+            return saveChangesResult.Error;
         }
 
         var context = new ProcessingContext
@@ -133,28 +140,6 @@ public class ProcessingPipeline : IProcessingPipeline
         };
 
         return context;
-    }
-
-    private Result<List<VideoProcessStep>, Error> InitializeSteps(Guid processId)
-    {
-        int order = 1;
-        List<VideoProcessStep> steps = new();
-
-        foreach (StepType stepType in Enum.GetValues<StepType>())
-        {
-            var stepResult = VideoProcessStep.Create(
-                Guid.NewGuid(),
-                processId,
-                order++,
-                stepType);
-
-            if (stepResult.IsFailure)
-                return stepResult.Error;
-
-            steps.Add(stepResult.Value);
-        }
-
-        return steps;
     }
 
     private async Task<UnitResult<Error>> ExecuteAllSteps(

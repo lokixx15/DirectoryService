@@ -1,10 +1,10 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using CSharpFunctionalExtensions;
 using FileService.Domain;
 using FileService.Domain.MediaProcessing;
 using SharedService.SharedKernel;
-using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace FileService.VideoProcessing.FfmpegProcess;
 

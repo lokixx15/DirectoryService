@@ -3,6 +3,8 @@ using FileService.Contracts.Requests;
 using FileService.Contracts.Responses;
 using FileService.Core.Abstractions.Database;
 using FileService.Core.Abstractions.FileStorage;
+using FileService.Domain.MediaProcessing;
+using FileService.VideoProcessing.Jobs;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +55,8 @@ public class CompleteMultipartUploadHandler : ICommandHandler<CompleteMultipartU
     private readonly ITransactionManager _transactionManager;
     private readonly IMediaRepository _mediaRepository;
     private readonly IValidator<CompleteMultipartUploadCommand> _validator;
+    private readonly IVideoProcessingScheduler _videoProcessingScheduler;
+    private readonly IVideoProcessRepository _videoProcessRepository;
     private readonly ILogger<CompleteMultipartUploadHandler> _logger;
 
     public CompleteMultipartUploadHandler(
@@ -60,12 +64,16 @@ public class CompleteMultipartUploadHandler : ICommandHandler<CompleteMultipartU
         ITransactionManager transactionManager,
         IMediaRepository mediaRepository,
         IValidator<CompleteMultipartUploadCommand> validator,
+        IVideoProcessingScheduler videoProcessingScheduler,
+        IVideoProcessRepository videoProcessRepository,
         ILogger<CompleteMultipartUploadHandler> logger)
     {
         _s3Provider = s3Provider;
         _mediaRepository = mediaRepository;
         _transactionManager = transactionManager;
         _validator = validator;
+        _videoProcessingScheduler = videoProcessingScheduler;
+        _videoProcessRepository = videoProcessRepository;
         _logger = logger;
     }
 
@@ -115,10 +123,21 @@ public class CompleteMultipartUploadHandler : ICommandHandler<CompleteMultipartU
             return completeMultipartUpload.Error.ToErrors();
         }
 
+        var beginTransactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
+        if (beginTransactionResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when begin transaction");
+            return beginTransactionResult.Error.ToErrors();
+        }
+
+        var transactionScope = beginTransactionResult.Value;
+
         var markUploadedResult = mediaAsset.MarkUploaded(DateTime.UtcNow);
         if (markUploadedResult.IsFailure)
         {
             _logger.LogError("Errors occurred when marking media asset as uploaded");
+            transactionScope.Rollback();
+
             return markUploadedResult.Error.ToErrors();
         }
 
@@ -126,7 +145,59 @@ public class CompleteMultipartUploadHandler : ICommandHandler<CompleteMultipartU
         if (saveUploadedResult.IsFailure)
         {
             _logger.LogError("Errors occurred when saving changes");
+            transactionScope.Rollback();
+
             return saveUploadedResult.Error.ToErrors();
+        }
+
+        if (mediaAsset.RequiresProcessing())
+        {
+            var initializeStepsResult = VideoProcess.InitializeSteps(mediaAsset.Id);
+            if (initializeStepsResult.IsFailure)
+            {
+                _logger.LogError("Failed to initialize video process steps for video process with id {Id}",
+                    mediaAsset.Id);
+                transactionScope.Rollback();
+
+                return initializeStepsResult.Error.ToErrors();
+            }
+
+            var videoProcessResult = VideoProcess.Create(mediaAsset.Id, mediaAsset.RawKey, null!, initializeStepsResult.Value);
+            if (videoProcessResult.IsFailure)
+            {
+                _logger.LogError("Failed to create video process after comlete multipart upload with id {Id}",
+                    mediaAsset.Id);
+                transactionScope.Rollback();
+
+                return videoProcessResult.Error.ToErrors();
+            }
+
+            var addResult = await _videoProcessRepository.AddAsync(videoProcessResult.Value, cancellationToken);
+            if (addResult.IsFailure)
+            {
+                _logger.LogError("Failed to add video process with id {VideoProcessId}", mediaAsset.Id);
+                transactionScope.Rollback();
+
+                return addResult.Error.ToErrors();
+            }
+
+            await _videoProcessingScheduler.ScheduleProcessingAsync(mediaAsset.Id, cancellationToken);
+
+            var saveVideoProcessResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+            if (saveVideoProcessResult.IsFailure)
+            {
+                _logger.LogError("Errors occurred when saving changes");
+                transactionScope.Rollback();
+
+                return saveVideoProcessResult.Error.ToErrors();
+            }
+        }
+
+        var commitResult = transactionScope.Commit();
+        if (commitResult.IsFailure)
+        {
+            _logger.LogError("Errors occurred when committing transaction");
+            return commitResult.Error.ToErrors();
         }
 
         return new CompleteMultipartUploadResponse(mediaAsset.Id);
