@@ -6,20 +6,13 @@ using FileService.Contracts.Responses;
 using FileService.Domain;
 using FileService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FileService.IntegrationTests.Features;
 
 public class MultipartUploadFileTests : FileServiceTestsBase
 {
-    private readonly IntegrationTestsWebFactory _factory;
-
-    public MultipartUploadFileTests(
-        IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
-        _factory = factory;
-    }
+    public MultipartUploadFileTests(IntegrationTestsWebFactory factory)
+        : base(factory) { }
 
     [Fact]
     public async Task MultipartUpload_FullCycle_PersistsAsset()
@@ -41,7 +34,7 @@ public class MultipartUploadFileTests : FileServiceTestsBase
 
         await CompleteMultipartUpload(startMultipartUploadResponse.Value, partETags, cancellationToken);
 
-        await ExecuteInDb(async dbContext =>
+        await ExecuteInDbAndS3(async (dbContext, amazonS3Client) =>
         {
             var mediaAsset = await dbContext.MediaAssets.FirstOrDefaultAsync(
                 mA => mA.Id == startMultipartUploadResponse.Value.MediaAssetId
@@ -49,8 +42,6 @@ public class MultipartUploadFileTests : FileServiceTestsBase
                 cancellationToken);
 
             Assert.NotNull(mediaAsset);
-
-            var amazonS3Client = _factory.Services.GetRequiredService<IAmazonS3>();
 
             var getObjectResponse = await amazonS3Client.GetObjectAsync(
                 mediaAsset.RawKey.Bucket,

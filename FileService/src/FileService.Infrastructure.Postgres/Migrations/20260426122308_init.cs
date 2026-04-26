@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FileService.Infrastructure.Postgres.Migrations
 {
     /// <inheritdoc />
-    public partial class AddVideoProcessing : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,16 +38,16 @@ namespace FileService.Infrastructure.Postgres.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     raw_key = table.Column<string>(type: "jsonb", nullable: false),
-                    hls_key = table.Column<string>(type: "jsonb", nullable: false),
+                    hls_key = table.Column<string>(type: "jsonb", nullable: true),
                     status = table.Column<string>(type: "text", nullable: false),
                     current_step_order = table.Column<int>(type: "integer", nullable: true),
-                    current_step_name = table.Column<string>(type: "text", nullable: true),
+                    current_step_type = table.Column<string>(type: "text", nullable: true),
                     current_step_progress = table.Column<double>(type: "double precision", nullable: false, defaultValue: 0.0),
                     total_progress = table.Column<double>(type: "double precision", nullable: false, defaultValue: 0.0),
                     error_message = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    metadata = table.Column<string>(type: "jsonb", nullable: false)
+                    metadata = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -61,7 +61,7 @@ namespace FileService.Infrastructure.Postgres.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     process_id = table.Column<Guid>(type: "uuid", nullable: false),
                     order = table.Column<int>(type: "integer", nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
+                    step_type = table.Column<string>(type: "text", nullable: false),
                     status = table.Column<string>(type: "text", nullable: false),
                     progress = table.Column<double>(type: "double precision", nullable: false, defaultValue: 0.0),
                     started_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

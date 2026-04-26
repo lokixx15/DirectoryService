@@ -17,7 +17,7 @@ public class UploadFileTests : FileServiceTestsBase
         CancellationToken cancellationToken = new CancellationTokenSource().Token;
 
         var uploadFileResult = await UploadFileAsync(
-            "test-file.mp4",
+            Constants.VIDEO_FILE_NAME,
             "video/mp4",
             "video",
             "lesson",
@@ -32,7 +32,7 @@ public class UploadFileTests : FileServiceTestsBase
         CancellationToken cancellationToken = new CancellationTokenSource().Token;
 
         var uploadFileResult = await UploadFileAsync(
-            "test-image.png",
+            Constants.IMAGE_FILE_NAME,
             "image/png",
             "preview",
             "lesson",
@@ -47,7 +47,7 @@ public class UploadFileTests : FileServiceTestsBase
         CancellationToken cancellationToken = new CancellationTokenSource().Token;
 
         var uploadFileResult = await UploadFileAsync(
-            "test-image.png",
+            Constants.IMAGE_FILE_NAME,
             "image/png",
             "picture",
             "lesson",

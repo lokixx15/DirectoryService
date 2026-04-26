@@ -19,11 +19,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\FileService.Communication\FileService.Communication.csproj" />
     <ProjectReference Include="..\..\src\FileService.Contracts\FileService.Contracts.csproj" />
     <ProjectReference Include="..\..\src\FileService.Core\FileService.Core.csproj" />
     <ProjectReference Include="..\..\src\FileService.Domain\FileService.Domain.csproj" />
     <ProjectReference Include="..\..\src\FileService.Infrastructure.Postgres\FileService.Infrastructure.Postgres.csproj" />
     <ProjectReference Include="..\..\src\FileService.Infrastructure.S3\FileService.Infrastructure.S3.csproj" />
+    <ProjectReference Include="..\..\src\FileService.VideoProcessing\FileService.VideoProcessing.csproj" />
     <ProjectReference Include="..\..\src\FileService.Web\FileService.Web.csproj" />
   </ItemGroup>
 

@@ -14,7 +14,7 @@ public class VideoProcessStep
 
     public int Order { get; private set; }
 
-    public string Name { get; private set; } = string.Empty;
+    public StepType StepType { get; private set; }
 
     public VideoProcessStatus Status { get; private set; }
 
@@ -34,12 +34,12 @@ public class VideoProcessStep
         Guid id,
         Guid processId,
         int order,
-        string name)
+        StepType stepType)
     {
         Id = id;
         ProcessId = processId;
         Order = order;
-        Name = name;
+        StepType = stepType;
         Status = VideoProcessStatus.PENDING;
         Progress = 0;
         CreatedAt = DateTime.UtcNow;
@@ -50,15 +50,12 @@ public class VideoProcessStep
         Guid id,
         Guid processId,
         int order,
-        string name)
+        StepType stepType)
     {
         if (order <= 0)
             return GeneralErrors.ValueIsNotValid("Step's order cannot be less than 0", "Order");
 
-        if (string.IsNullOrWhiteSpace(name))
-            return GeneralErrors.ValueIsNullOrWhitespace("Name");
-
-        return new VideoProcessStep(id, processId, order, name);
+        return new VideoProcessStep(id, processId, order, stepType);
     }
 
     internal UnitResult<Error> Start()

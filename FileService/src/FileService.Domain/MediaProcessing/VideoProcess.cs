@@ -14,13 +14,13 @@ public class VideoProcess
 
     public StorageKey RawKey { get; private set; } = null!;
 
-    public StorageKey HlsKey { get; private set; } = null!;
+    public StorageKey? HlsKey { get; private set; } = null!;
 
     public VideoProcessStatus Status { get; private set; }
 
     public int? CurrentStepOrder { get; private set; }
 
-    public string? CurrentStepName { get; private set; }
+    public StepType? CurrentStepType { get; private set; }
 
     public double CurrentStepProgress { get; private set; }
 
@@ -36,15 +36,10 @@ public class VideoProcess
 
     public IReadOnlyList<VideoProcessStep> Steps => _steps;
 
-    public bool IsCompleted =>
-        Status == VideoProcessStatus.SUCCEEDED
-        || Status == VideoProcessStatus.FAILED
-        || Status == VideoProcessStatus.CANCELED;
-
     private VideoProcess(
         Guid id,
         StorageKey rawKey,
-        StorageKey hlsKey,
+        StorageKey? hlsKey,
         IEnumerable<VideoProcessStep> steps)
     {
         Id = id;
@@ -59,7 +54,7 @@ public class VideoProcess
     public static Result<VideoProcess, Error> Create(
         Guid id,
         StorageKey rawKey,
-        StorageKey hlsKey,
+        StorageKey? hlsKey,
         IEnumerable<VideoProcessStep> steps)
     {
         var stepsList = steps.ToList();
@@ -76,6 +71,28 @@ public class VideoProcess
         return new VideoProcess(id, rawKey, hlsKey, stepsList);
     }
 
+    public static Result<List<VideoProcessStep>, Error> InitializeSteps(Guid processId)
+    {
+        int order = 1;
+        List<VideoProcessStep> steps = new();
+
+        foreach (StepType stepType in Enum.GetValues<StepType>())
+        {
+            var stepResult = VideoProcessStep.Create(
+                Guid.NewGuid(),
+                processId,
+                order++,
+                stepType);
+
+            if (stepResult.IsFailure)
+                return stepResult.Error;
+
+            steps.Add(stepResult.Value);
+        }
+
+        return steps;
+    }
+
     public UnitResult<Error> PrepareForExecution()
     {
         if (Status == VideoProcessStatus.CANCELED)
@@ -88,7 +105,7 @@ public class VideoProcess
         {
             Status = VideoProcessStatus.PENDING;
             CurrentStepOrder = null;
-            CurrentStepName = null;
+            CurrentStepType = null;
             CurrentStepProgress = 0;
             ErrorMessage = null;
 
@@ -99,20 +116,20 @@ public class VideoProcess
         return UnitResult.Success<Error>();
     }
 
-    public UnitResult<Error> StartStep(int order, string name)
+    public UnitResult<Error> StartStep(int order, StepType stepType)
     {
-        var step = _steps.FirstOrDefault(s => s.Order == order && s.Name == name);
+        var step = _steps.FirstOrDefault(s => s.Order == order && s.StepType == stepType);
         if (step is null)
             return Error.NotFound(
                 "value.does.not.exist",
-                $"Process step with order {order} and name {name} doesn't exist in steps");
+                $"Process step with order {order} and stepType {stepType} doesn't exist in steps");
 
         var startStepResult = step.Start();
         if (startStepResult.IsFailure)
             return startStepResult.Error;
 
         CurrentStepOrder = order;
-        CurrentStepName = name;
+        CurrentStepType = stepType;
         Status = VideoProcessStatus.RUNNING;
         UpdatedAt = DateTime.UtcNow;
 
@@ -223,6 +240,22 @@ public class VideoProcess
         UpdatedAt = DateTime.UtcNow;
         Status = VideoProcessStatus.CANCELED;
 
+        return UnitResult.Success<Error>();
+    }
+
+    public UnitResult<Error> SetHlsKey(StorageKey hlsKey)
+    {
+        if (Status != VideoProcessStatus.PENDING)
+            return Error.Validation(
+                "video.process.invalid_status",
+                "Can only set HLS key for PENDING processes",
+                nameof(VideoProcessStatus));
+
+        if (string.IsNullOrEmpty(hlsKey.Key))
+            return GeneralErrors.ValueIsNullOrWhitespace(nameof(hlsKey.Key));
+
+        HlsKey = hlsKey;
+        UpdatedAt = DateTime.UtcNow;
         return UnitResult.Success<Error>();
     }
 

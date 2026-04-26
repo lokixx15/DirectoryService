@@ -5,14 +5,8 @@ namespace FileService.IntegrationTests.Features;
 
 public class DownloadFileTests : FileServiceTestsBase
 {
-    private readonly IntegrationTestsWebFactory _factory;
-
-    public DownloadFileTests(
-        IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
-        _factory = factory;
-    }
+    public DownloadFileTests(IntegrationTestsWebFactory factory)
+        : base(factory) { }
 
     [Fact]
     public async Task DownloadFile_Should_Success()

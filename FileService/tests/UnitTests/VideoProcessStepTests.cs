@@ -22,7 +22,7 @@ public class VideoProcessStepTests
         var step = process.Steps[0];
 
         process.PrepareForExecution();
-        var result = process.StartStep(step.Order, step.Name);
+        var result = process.StartStep(step.Order, step.StepType);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(VideoProcessStatus.RUNNING, step.Status);
@@ -36,7 +36,7 @@ public class VideoProcessStepTests
         var step = process.Steps[0];
 
         process.PrepareForExecution();
-        process.StartStep(step.Order, step.Name);
+        process.StartStep(step.Order, step.StepType);
 
         var result = process.ReportStepProgress(55.5);
         Assert.True(result.IsSuccess);
@@ -50,7 +50,7 @@ public class VideoProcessStepTests
         var step = process.Steps[0];
 
         process.PrepareForExecution();
-        process.StartStep(step.Order, step.Name);
+        process.StartStep(step.Order, step.StepType);
         var result = process.CompleteStep(step.Order);
 
         Assert.True(result.IsSuccess);
@@ -66,7 +66,7 @@ public class VideoProcessStepTests
         var step = process.Steps[0];
 
         process.PrepareForExecution();
-        process.StartStep(step.Order, step.Name);
+        process.StartStep(step.Order, step.StepType);
         var errorMessage = "fail reason";
         var result = process.Fail(errorMessage);
 
@@ -83,7 +83,7 @@ public class VideoProcessStepTests
         var step = process.Steps[0];
 
         process.PrepareForExecution();
-        process.StartStep(step.Order, step.Name);
+        process.StartStep(step.Order, step.StepType);
         process.CompleteStep(step.Order);
         process.PrepareForExecution();
 
@@ -100,17 +100,17 @@ public class VideoProcessStepTests
         var step = process.Steps[0];
 
         process.PrepareForExecution();
-        process.StartStep(step.Order, step.Name);
+        process.StartStep(step.Order, step.StepType);
         process.CompleteStep(step.Order);
-        var result = process.StartStep(step.Order, step.Name);
+        var result = process.StartStep(step.Order, step.StepType);
 
         Assert.True(result.IsFailure);
         Assert.Equal(VideoProcessStatus.SUCCEEDED, step.Status);
     }
 
-    private static VideoProcess CreateProcessWithStep(int order = 1, string name = "step")
+    private static VideoProcess CreateProcessWithStep(int order = 1, StepType stepType = StepType.INITIALIZE)
     {
-        var step = VideoProcessStep.Create(Guid.NewGuid(), Guid.NewGuid(), order, name).Value;
+        var step = VideoProcessStep.Create(Guid.NewGuid(), Guid.NewGuid(), order, stepType).Value;
         var process = VideoProcess.Create(
             Guid.NewGuid(),
             StorageKey.Create("bucket", null, "raw").Value,

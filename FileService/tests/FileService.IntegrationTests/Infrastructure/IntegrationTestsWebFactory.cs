@@ -4,6 +4,8 @@ using Amazon.S3;
 using FileService.Core.Abstractions.Database;
 using FileService.Infrastructure.Postgres;
 using FileService.Infrastructure.S3;
+using FileService.IntegrationTests.Mocks;
+using FileService.VideoProcessing.FfmpegProcess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -98,6 +100,9 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
                 var credentials = new BasicAWSCredentials(s3Options.AccessKey, s3Options.SecretKey);
                 return new AmazonS3Client(credentials, s3Config);
             });
+
+            services.RemoveAll<IFfmpegProcessRunner>();
+            services.AddSingleton<IFfmpegProcessRunner, FakeHlsGenerator>();
         });
     }
 

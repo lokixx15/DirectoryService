@@ -45,6 +45,8 @@ public abstract class MediaAsset
 
     public abstract UnitResult<Error> CompleteProcessing(DateTime timestamp);
 
+    public virtual bool RequiresProcessing() => false;
+
     public UnitResult<Error> MarkUploaded(DateTime uploadedAt)
     {
         if (MediaStatus == MediaStatus.UPLOADED)

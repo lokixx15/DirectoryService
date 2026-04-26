@@ -31,12 +31,15 @@ public sealed record FileName
         value = value.Trim();
 
         var extension = Path.GetExtension(value);
-
         if (string.IsNullOrEmpty(extension))
             return GeneralErrors.ValueIsNotValid("File must have valid extension", value);
 
+        var name = Path.GetFileNameWithoutExtension(value);
+        if (string.IsNullOrEmpty(name))
+            return GeneralErrors.ValueIsNotValid("File must have valid name", value);
+
         extension = extension.Substring(1).ToLowerInvariant();
 
-        return new FileName(value, extension);
+        return new FileName(name, extension);
     }
 }

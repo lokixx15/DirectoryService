@@ -10,14 +10,8 @@ namespace FileService.IntegrationTests.Features;
 
 public class AbortMultipartUploadTests : FileServiceTestsBase
 {
-    private readonly IntegrationTestsWebFactory _factory;
-
-    public AbortMultipartUploadTests(
-        IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
-        _factory = factory;
-    }
+    public AbortMultipartUploadTests(IntegrationTestsWebFactory factory)
+        : base(factory) { }
 
     [Fact]
     public async Task AbortMultipartUpload_Should_Succeed()
@@ -48,7 +42,7 @@ public class AbortMultipartUploadTests : FileServiceTestsBase
 
         Assert.True(abortMultipartUploadResult.IsSuccess);
 
-        await ExecuteInDb(async dbContext =>
+        await ExecuteInDbAndS3(async (dbContext, amazonS3Client) =>
         {
             var mediaAsset = await dbContext.MediaAssets.FirstOrDefaultAsync(
                 mA => mA.Id == startMultipartUploadResponse.Value.MediaAssetId
@@ -56,8 +50,6 @@ public class AbortMultipartUploadTests : FileServiceTestsBase
                 cancellationToken);
 
             Assert.NotNull(mediaAsset);
-
-            var amazonS3Client = _factory.Services.GetRequiredService<IAmazonS3>();
 
             var exception = await Record.ExceptionAsync(() => amazonS3Client.GetObjectMetadataAsync(
                 mediaAsset.RawKey.Bucket,

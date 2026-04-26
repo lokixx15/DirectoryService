@@ -22,6 +22,7 @@ public static class DependencyInjectionPostgres
         services.AddScoped<ITransactionManager, TransactionManager>();
 
         services.AddScoped<IMediaRepository, MediaAssetRepository>();
+        services.AddScoped<IVideoProcessRepository, VideoProcessRepository>();
 
         return services;
     }
