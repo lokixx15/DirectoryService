@@ -1,8 +1,8 @@
 ﻿services:
   directory-service:
     container_name: directory-service
-    build: 
-      context: ./DirectoryService
+    build:
+      context: ./backend/DirectoryService
       dockerfile: Dockerfile
       args:
         NUGET_USERNAME: ${NUGET_USERNAME}
@@ -10,18 +10,18 @@
     env_file:
       - .env
     ports:
-    - "9001:9001"
+      - "9001:9001"
     environment:
-    - ASPNETCORE_ENVIRONMENT=Docker
-    - ASPNETCORE_URLS=http://s+:9001
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://s+:9001
     depends_on:
       - postgres
     restart: always
 
   file-service:
     container_name: file-service
-    build: 
-      context: ./FileService
+    build:
+      context: ./backend/FileService
       dockerfile: Dockerfile
       args:
         NUGET_USERNAME: ${NUGET_USERNAME}
@@ -29,10 +29,10 @@
     env_file:
       - .env
     ports:
-    - "9002:9001"
+      - "9002:9001"
     environment:
-    - ASPNETCORE_ENVIRONMENT=Docker
-    - ASPNETCORE_URLS=http://s+:9001
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://s+:9001
     depends_on:
       - postgres
       - minio
@@ -67,7 +67,7 @@
     image: redis:alpine
     ports:
       - "6379:6379"
-    volumes: 
+    volumes:
       - redis_data:/data
     restart: always
 
