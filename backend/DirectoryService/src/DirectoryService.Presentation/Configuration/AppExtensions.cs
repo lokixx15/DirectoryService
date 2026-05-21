@@ -8,6 +8,14 @@ public static class AppExtensions
 {
     public static async Task<IApplicationBuilder> Configure(this WebApplication app, string[] args)
     {
+        app.UseCors(builder =>
+        {
+            builder.WithOrigins("http://localhost:3000");
+            builder.AllowCredentials();
+            builder.AllowAnyMethod();
+            builder.AllowAnyHeader();
+        });
+
         app.UseSerilogRequestLogging();
 
         app.UseMiddleware<ExceptionMiddleware>();

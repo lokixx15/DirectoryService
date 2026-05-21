@@ -40,11 +40,12 @@ public sealed class DepartmentsController : ControllerBase
     [Route("{parentId:guid}/children")]
     public async Task<EndpointResult<PaginationResponse<DepartmentDto>>> GetChildrenDepartmentsByRootId(
         [FromRoute] Guid parentId,
-        [FromQuery] PaginationRequest request,
         [FromServices] GetChildrenDepartmentsByParentIdHandler handler,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        [FromQuery] int Page = 1,
+        [FromQuery] int Size = 20)
     {
-        var query = new GetChildrenDepartmentsByParentIdQuery(parentId, request);
+        var query = new GetChildrenDepartmentsByParentIdQuery(parentId, Page, Size);
 
         return await handler.Handle(query, cancellationToken);
     }

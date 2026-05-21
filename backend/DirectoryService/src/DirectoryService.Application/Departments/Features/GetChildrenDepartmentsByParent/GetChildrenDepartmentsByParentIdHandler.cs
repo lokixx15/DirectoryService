@@ -70,12 +70,12 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
         var parameters = new DynamicParameters();
 
         parameters.Add("parent_id", query.ParentId);
-        parameters.Add("children_limit", query.Request.Size);
-        parameters.Add("offset", (query.Request.Page - 1) * query.Request.Size);
+        parameters.Add("children_limit", query.Size);
+        parameters.Add("offset", (query.Page - 1) * query.Size);
 
         long? totalCount = null!;
 
-        var key = $"{CacheConstants.CHILDREN_DEPARTMENTS_CACHE_KEY}_parentid_{query.ParentId}_page_{query.Request.Page}_pagesize_{query.Request.Size}";
+        var key = $"{CacheConstants.CHILDREN_DEPARTMENTS_CACHE_KEY}_parentid_{query.ParentId}_page_{query.Page}_pagesize_{query.Size}";
 
         var departmentDtos = await _cache.GetOrCreateAsync(
             key,

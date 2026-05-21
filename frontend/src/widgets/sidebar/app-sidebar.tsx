@@ -10,7 +10,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "../../shared/components/ui/sidebar";
 import { routes } from "@/shared/routes";
@@ -25,12 +24,27 @@ const menuItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { setOpenMobile } = useSidebar();
+  const { setOpenMobile, toggleSidebar, state, isMobile, openMobile } = useSidebar();
+
+  const showLabel = isMobile ? openMobile : state === "expanded";
 
   return (
     <Sidebar variant="floating" collapsible="icon">
-      <SidebarHeader>
-        <SidebarTrigger className="mt-1 pl-1" />
+      <SidebarHeader className="mt-2">
+        <button
+          onClick={toggleSidebar}
+          className="group flex w-full items-center gap-2 rounded-md p-2 text-left transition-colors hover:bg-sidebar-accent cursor-pointer"
+        >
+          <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-4xl bg-linear-to-br from-primary via-primary to-chart-2 text-primary-foreground shadow-lg shadow-primary/25 group-hover:shadow-xl group-hover:shadow-primary/30 group-hover:scale-102 transition-all duration-200">
+            <span className="text-sm font-black tracking-tight">DS</span>
+            <div className="absolute inset-0 rounded-4xl bg-linear-to-br from-white/20 via-white/10 to-transparent" />
+          </div>
+          {showLabel && (
+            <span className="text-lg font-bold tracking-tight text-sidebar-foreground transition-colors overflow-hidden whitespace-nowrap">
+              DirectoryService
+            </span>
+          )}
+        </button>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="mt-8">

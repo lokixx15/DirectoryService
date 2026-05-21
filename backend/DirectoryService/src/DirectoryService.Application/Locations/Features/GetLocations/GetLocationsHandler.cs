@@ -71,8 +71,8 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
             whereConditions.Add("l.is_active = @is_active");
         }
 
-        parameters.Add("page_size", query.Request.Pagination.Size);
-        parameters.Add("offset", (query.Request.Pagination.Page - 1) * query.Request.Pagination.Size);
+        parameters.Add("page_size", query.Request.pageSize);
+        parameters.Add("offset", (query.Request.Page - 1) * query.Request.pageSize);
 
         var orderBy = query.Request.OrderBy switch
         {

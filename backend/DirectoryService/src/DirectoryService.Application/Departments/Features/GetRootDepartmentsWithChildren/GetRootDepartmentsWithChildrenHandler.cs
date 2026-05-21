@@ -83,11 +83,11 @@ public sealed class GetRootDepartmentsWithChildrenHandler
 
         var parameters = new DynamicParameters();
 
-        parameters.Add("root_limit", query.Request.Pagination.Size);
-        parameters.Add("offset", (query.Request.Pagination.Page - 1) * query.Request.Pagination.Size);
+        parameters.Add("root_limit", query.Request.Size);
+        parameters.Add("offset", (query.Request.Page - 1) * query.Request.Size);
         parameters.Add("children_limit", query.Request.Prefetch);
 
-        var key = $"{CacheConstants.ROOT_DEPARTMENTS_WITH_CHILDREN_CACHE_KEY}_page_{query.Request.Pagination.Page}_pagesize_{query.Request.Pagination.Size}_prefetch_{query.Request.Prefetch}";
+        var key = $"{CacheConstants.ROOT_DEPARTMENTS_WITH_CHILDREN_CACHE_KEY}_page_{query.Request.Page}_pagesize_{query.Request.Size}_prefetch_{query.Request.Prefetch}";
 
         var departmentDtos = await _cache.GetOrCreateAsync(
             key,
