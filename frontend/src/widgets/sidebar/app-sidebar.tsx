@@ -24,7 +24,8 @@ const menuItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { setOpenMobile, toggleSidebar, state, isMobile, openMobile } = useSidebar();
+  const { setOpenMobile, toggleSidebar, state, isMobile, openMobile } =
+    useSidebar();
 
   const showLabel = isMobile ? openMobile : state === "expanded";
 

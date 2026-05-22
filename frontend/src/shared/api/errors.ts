@@ -8,6 +8,6 @@ export type Envelope<T = unknown> = {
 export type Error = {
   code: string;
   message: string;
-  errorType: "none" | "validation" | "not_found" | "failure" | "conflict";
+  type: "none" | "validation" | "not_found" | "failure" | "conflict";
   invalidField?: string;
 };

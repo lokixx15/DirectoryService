@@ -16,7 +16,6 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { PaginationIconsOnly } from "@/shared/components/pagination/pagination-icons-only";
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];

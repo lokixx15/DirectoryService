@@ -5,9 +5,9 @@ export function SkeletonTable() {
     <div className="flex w-full flex-col gap-2">
       {Array.from({ length: 10 }).map((_, index) => (
         <div className="flex gap-4" key={index}>
-          <Skeleton className="h-7 flex-1" />
-          <Skeleton className="h-7 w-24" />
-          <Skeleton className="h-7 w-20" />
+          <Skeleton className="h-8 flex-1 bg-primary/10" />
+          <Skeleton className="h-8 w-24 bg-primary/10" />
+          <Skeleton className="h-8 w-20 bg-primary/10" />
         </div>
       ))}
     </div>

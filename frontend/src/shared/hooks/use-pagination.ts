@@ -23,3 +23,4 @@ export function usePagination(): UsePaginationReturn {
     onPageSizeChange: handlePageSizeChange,
   };
 }
+
