@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { memo, useEffect, useState } from "react";
 import { useDebounce } from "@/shared/hooks/use-debounce";
@@ -21,8 +21,8 @@ const SearchBar = memo(function SearchBar({ onSearch }: SearchBarProps) {
       type="text"
       value={value}
       onChange={(e) => setValue(e.target.value)}
-      placeholder="Search by name..."
-      className="w-[25%] min-w-62.5"
+      placeholder="Search..."
+      className="w-[25%] min-w-62.5 rounded-md border-border"
     />
   );
 });

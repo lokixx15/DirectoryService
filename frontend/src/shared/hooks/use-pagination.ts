@@ -7,9 +7,9 @@ interface UsePaginationReturn {
   onPageSizeChange: (pageSize: number) => void;
 }
 
-export function usePagination(): UsePaginationReturn {
+export function usePagination(defaultPageSize: number): UsePaginationReturn {
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
@@ -23,4 +23,3 @@ export function usePagination(): UsePaginationReturn {
     onPageSizeChange: handlePageSizeChange,
   };
 }
-

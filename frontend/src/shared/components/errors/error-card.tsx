@@ -11,6 +11,7 @@ import {
   FileX,
   ServerCrash,
   HelpCircle,
+  RotateCcw,
 } from "lucide-react";
 import type { Error } from "@/shared/api/errors";
 import { cn } from "@/shared/lib/utils";
@@ -24,6 +25,7 @@ import {
 
 interface ErrorCardProps {
   errors: Error[];
+  refetch: () => void;
 }
 
 const errorTypeIcon = {
@@ -47,9 +49,9 @@ const errorTypeLabel = {
   conflict: "Conflict",
 } as const;
 
-function ErrorCard({ errors }: ErrorCardProps) {
+function ErrorCard({ errors, refetch }: ErrorCardProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   if (!errors?.length) return null;
 
@@ -63,7 +65,7 @@ function ErrorCard({ errors }: ErrorCardProps) {
     <Card className="border-destructive/30">
       <CardHeader className="my-[-7]">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 ">
             <Icon
               className={cn("mt-0.5 size-5 shrink-0", errorTypeColor[type])}
             />
@@ -72,6 +74,10 @@ function ErrorCard({ errors }: ErrorCardProps) {
                 {errorTypeLabel[type]}
               </CardTitle>
             </div>
+            <Button variant="secondary" className="h-6" onClick={refetch}>
+              Retry
+              <RotateCcw className="h-4 w-4" />
+            </Button>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             {hasMultiple && (

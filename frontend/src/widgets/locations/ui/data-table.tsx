@@ -4,7 +4,10 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  OnChangeFn,
+  SortingState,
   useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table";
 
 import {
@@ -16,6 +19,13 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { PaginationIconsOnly } from "@/shared/components/pagination/pagination-icons-only";
+import { SearchBar } from "@/shared/components/search/search-bar";
+import { memo, useState } from "react";
+
+import { ColumnsDropdown } from "@/shared/components/dropdowns/columns-dropdown";
+import { StatusFilter } from "@/features/locations/ui/status-filter";
+import { DepartmentMenu } from "../../../features/departments/ui/department-menu";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -24,9 +34,14 @@ interface DataTableProps<TData, TValue> {
   totalPages: number;
   onPageIndexChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
+  sorting: SortingState;
+  onSortingChange: OnChangeFn<SortingState>;
+  onSearch: (value: string) => void;
+  onIsActive: (value: boolean | undefined) => void;
+  onDepartmentIdsChange: (departmentIds: string[]) => void;
 }
 
-export function DataTable<TData, TValue>({
+const DataTableRaw = <TData, TValue>({
   columns,
   data,
   page,
@@ -34,29 +49,51 @@ export function DataTable<TData, TValue>({
   totalPages,
   onPageIndexChange,
   onPageSizeChange,
-}: DataTableProps<TData, TValue>) {
+  sorting,
+  onSortingChange,
+  onSearch,
+  onIsActive,
+  onDepartmentIdsChange,
+}: DataTableProps<TData, TValue>) => {
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    id: false,
+  });
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,
     manualPagination: true,
+    manualSorting: true,
+    enableSortingRemoval: false,
+    onColumnVisibilityChange: setColumnVisibility,
+    onSortingChange: onSortingChange,
     state: {
       pagination: {
         pageIndex: page,
         pageSize: pageSize,
       },
+      columnVisibility,
+      sorting,
     },
   });
 
   return (
     <div className="flex flex-col gap-2">
+      <div className="flex flex-row items-center justify-between gap-2">
+        <SearchBar onSearch={onSearch} />
+        <div className="flex flex-row items-center gap-2">
+          <ColumnsDropdown table={table} />
+          <StatusFilter onIsActive={onIsActive} />
+          <DepartmentMenu onDepartmentIdsChange={onDepartmentIdsChange} />
+        </div>
+      </div>
+
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-b-foreground/50">
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
@@ -102,6 +139,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
       <PaginationIconsOnly
         page={page}
         pageSize={pageSize}
@@ -113,4 +151,6 @@ export function DataTable<TData, TValue>({
       />
     </div>
   );
-}
+};
+
+export const DataTable = memo(DataTableRaw) as typeof DataTableRaw;

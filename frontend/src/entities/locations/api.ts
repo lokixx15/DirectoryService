@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GetLocationsRequest, Location } from "@/entities/locations/types";
+import { GetLocationsRequest, Location } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/errors";
 import { PaginationResponse } from "@/shared/api/pagination-response";
@@ -26,16 +26,36 @@ export const locationsApi = {
 
 export const locationsQueryOptions = {
   baseKey: "locations",
-
-  getLocationsOptions: ({ page, pageSize, search }: GetLocationsRequest) => {
+  getLocationsOptions: ({
+    page,
+    pageSize,
+    search,
+    orderBy,
+    orderDirection,
+    isActive,
+    departmentIds,
+  }: GetLocationsRequest) => {
     return queryOptions({
       queryFn: async () =>
         await locationsApi.getLocations({
           page: page + 1,
-          pageSize: pageSize,
-          search: search,
+          pageSize,
+          search,
+          orderBy,
+          orderDirection,
+          isActive,
+          departmentIds,
         }),
-      queryKey: ["locations", page, pageSize, search],
+      queryKey: [
+        locationsQueryOptions.baseKey,
+        page,
+        pageSize,
+        search,
+        orderBy,
+        orderDirection,
+        isActive,
+        departmentIds,
+      ],
       placeholderData: keepPreviousData,
     });
   },

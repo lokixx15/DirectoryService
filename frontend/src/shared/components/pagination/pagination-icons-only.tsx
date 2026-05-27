@@ -1,5 +1,4 @@
 import { Field, FieldLabel } from "../ui/field";
-
 import {
   Pagination,
   PaginationContent,
@@ -58,8 +57,8 @@ export function PaginationIconsOnly({
         </Select>
       </Field>
       <div>
-        <p>
-          {page + 1} of {totalPages} pages
+        <p className="text-sm">
+          {page + 1} of {totalPages} pages / {Math.min(pageSize * (page + 1), pageSize * totalPages)} of {pageSize * totalPages} elements
         </p>
       </div>
       <Pagination className="mx-0 w-auto">

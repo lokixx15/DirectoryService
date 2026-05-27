@@ -12,7 +12,7 @@ export default function AppLayout({
 }>) {
   return (
     <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <TooltipProvider>{children}</TooltipProvider>
       </SidebarProvider>
     </QueryClientProvider>

@@ -64,7 +64,7 @@
   --accent: oklch(0.93 0 0);
   --accent-foreground: oklch(0.2 0 0);
   --destructive: oklch(0.55 0.2 25);
-  --border: oklch(0.88 0 0);
+  --border: oklch(64.433% 0.03949 142.716);
   --input: oklch(0.92 0 0);
   --ring: oklch(0.35 0.14 155);
   --chart-1: oklch(0.35 0.14 155);
@@ -129,5 +129,3 @@
     @apply font-sans;
   }
 }
-
-
