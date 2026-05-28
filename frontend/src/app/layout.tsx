@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "../widgets/header/header";
-import { SidebarProvider } from "@/shared/components/ui/sidebar";
-import { AppSidebar } from "../widgets/sidebar/app-sidebar";
-import { TooltipProvider } from "@/shared/components/ui/tooltip";
+import AppLayout from "@/features/layout/layout";
+import { AppSidebar } from "@/widgets/sidebar/app-sidebar";
+import { SidebarTrigger } from "@/shared/components/ui/sidebar";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -32,14 +31,14 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <SidebarProvider>
-          <TooltipProvider>
-            <AppSidebar />
-            <Header />
-            <main>{children}</main>
-          </TooltipProvider>
-        </SidebarProvider>
+      <body className="flex min-h-svh bg-background antialiased">
+        <AppLayout>
+          <AppSidebar />
+          <div className="flex flex-1 flex-col gap-2 p-2">
+            <SidebarTrigger className="md:hidden sticky top-2 z-50 self-start" />
+            <div className="flex-1 p-4">{children}</div>
+          </div>
+        </AppLayout>
       </body>
     </html>
   );

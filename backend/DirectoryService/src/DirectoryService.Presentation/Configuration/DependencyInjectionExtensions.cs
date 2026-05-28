@@ -16,6 +16,8 @@ public static class DependencyInjectionExtensions
 
     private static IServiceCollection AddWeb(this IServiceCollection services)
     {
+        services.AddCors();
+
         services.AddControllers();
 
         services.Configure<ApiBehaviorOptions>(options =>

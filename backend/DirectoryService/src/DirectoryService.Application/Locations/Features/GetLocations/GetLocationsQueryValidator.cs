@@ -12,13 +12,13 @@ public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
             .MaximumLength(1000)
                 .WithError(GeneralErrors.ValueLengthIsNotValid(1000, "Search"));
 
-        RuleFor(query => query.Request.Pagination.Page)
+        RuleFor(query => query.Request.Page)
             .GreaterThan(0)
                 .WithError(GeneralErrors.ValueIsNotValid("Page must be greater than 0", "Page"))
             .LessThanOrEqualTo(10000)
                 .WithError(GeneralErrors.ValueIsNotValid("Page cannot exceed 10000", "Page"));
 
-        RuleFor(query => query.Request.Pagination.Size)
+        RuleFor(query => query.Request.pageSize)
             .GreaterThan(0)
                 .WithError(GeneralErrors.ValueIsNotValid("Page size must be greater than 0", "Page size"))
             .LessThanOrEqualTo(150)

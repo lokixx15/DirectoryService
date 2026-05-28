@@ -1,11 +1,13 @@
 ﻿using DirectoryService.Application.Departments.Features.AttachDepartmentVideo;
 using DirectoryService.Application.Departments.Features.CreateDepartment;
 using DirectoryService.Application.Departments.Features.GetChildrenDepartmentsByParent;
+using DirectoryService.Application.Departments.Features.GetDepartments;
 using DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 using DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
 using DirectoryService.Application.Departments.Features.SoftDeleteDepartment;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
+using DirectoryService.Application.Locations.Features.GetLocations;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +19,17 @@ namespace DirectoryService.Presentation.Controllers;
 [Route("api/departments")]
 public sealed class DepartmentsController : ControllerBase
 {
+    [HttpGet]
+    [Route("summary")]
+    public async Task<EndpointResult<PaginationResponse<DepartmentSummaryDto>>> GetDepartmentsSummary(
+        [FromQuery] GetDepartmentsSummaryRequest request,
+        [FromServices] GetDepartmentsSummaryHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetDepartmentsSummaryQuery(request);
+        return await handler.Handle(query, cancellationToken);
+    }
+
     [HttpGet]
     [Route("top-positions")]
     public async Task<EndpointResult<IReadOnlyList<DepartmentDto>>> GetDepartmentsWithMostPositions(
@@ -40,11 +53,12 @@ public sealed class DepartmentsController : ControllerBase
     [Route("{parentId:guid}/children")]
     public async Task<EndpointResult<PaginationResponse<DepartmentDto>>> GetChildrenDepartmentsByRootId(
         [FromRoute] Guid parentId,
-        [FromQuery] PaginationRequest request,
         [FromServices] GetChildrenDepartmentsByParentIdHandler handler,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        [FromQuery] int Page = 1,
+        [FromQuery] int Size = 20)
     {
-        var query = new GetChildrenDepartmentsByParentIdQuery(parentId, request);
+        var query = new GetChildrenDepartmentsByParentIdQuery(parentId, Page, Size);
 
         return await handler.Handle(query, cancellationToken);
     }

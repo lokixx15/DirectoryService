@@ -1,5 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Departments;
 
 public record GetRootDepartmentsWithChildrenRequest(
-    PaginationRequest Pagination,
+    int Page = 1,
+    int Size = 20,
     int Prefetch = 3);
