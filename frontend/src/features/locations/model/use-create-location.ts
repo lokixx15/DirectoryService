@@ -1,4 +1,4 @@
-import { locationsQueryOptions } from "@/entities/locations/api";
+import { locationsQueryOptions } from "@/entities/locations";
 import { useMutation } from "@tanstack/react-query";
 
 export function useCreateLocation() {

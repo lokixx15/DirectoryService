@@ -1,7 +1,4 @@
-"use client";
-
-import { Location } from "@/entities/locations/types";
-import { formatAddress } from "@/entities/locations/helpers";
+import { Location, formatAddress } from "@/entities/locations";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 

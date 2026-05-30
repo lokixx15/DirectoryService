@@ -1,5 +1,4 @@
-import { departmentsQueryOptions } from "@/entities/departments/api";
-import { DepartmentSummary } from "@/entities/departments/types";
+import { departmentsQueryOptions, DepartmentSummary } from "@/entities/departments";
 import { useQuery } from "@tanstack/react-query";
 
 interface UseDepartmentSummaryListReturn {

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import AppLayout from "@/features/layout/layout";
-import { AppSidebar } from "@/widgets/sidebar/app-sidebar";
+import AppLayout from "./providers";
+import { AppSidebar } from "@/widgets/sidebar";
 import { SidebarTrigger } from "@/shared/components/ui/sidebar";
 
 const inter = Inter({

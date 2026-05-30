@@ -23,9 +23,8 @@ import { SearchBar } from "@/shared/components/search/search-bar";
 import { memo, useState } from "react";
 
 import { ColumnsDropdown } from "@/shared/components/dropdowns/columns-dropdown";
-import { StatusFilter } from "@/features/locations/ui/status-filter";
-import { DepartmentMenu } from "../../../features/departments/ui/department-menu";
-import { CreateLocationDialog } from "@/features/locations/ui/create-location-dialog";
+import { StatusFilter, CreateLocationDialog } from "@/features/locations";
+import { DepartmentMenu } from "@/features/departments";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

@@ -1,4 +1,4 @@
-import { DepartmentSummary } from "@/entities/departments/types";
+import { DepartmentSummary } from "@/entities/departments";
 import { useState } from "react";
 
 interface UseDepartmentSelectorReturn {

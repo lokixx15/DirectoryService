@@ -17,59 +17,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useCreateLocation } from "../model/use-create-location";
 import tzdb from "iana-db-timezones";
-import { CreateLocationRequest } from "@/entities/locations/types";
+import { CreateLocationRequest } from "@/entities/locations";
 import { FormInput } from "@/shared/components/form/form-input";
 import { FormSelect } from "@/shared/components/form/form-select";
 
 export function CreateLocationDialog() {
   const [open, setOpen] = useState(false);
 
-  const createLocationSchema = z
-    .object({
-      name: z
-        .string()
-        .min(1, "Location name is required.")
-        .min(3, "Location name must be at least 3 characters.")
-        .max(120, "Location name should be no more than 120 characters."),
-      timezone: z
-        .string()
-        .min(1, "Timezone is required.")
-        .max(120, "Timezone should be no more than 120 characters."),
-      country: z.string().min(1, "Country is required."),
-      city: z.string().min(1, "City is required."),
-      street: z.string().min(1, "Street is required."),
-      building: z.string().min(1, "Building is required."),
-      region: z.string().optional(),
-      district: z.string().optional(),
-      apartment: z.string().optional(),
-    })
-
-    .superRefine((data, ctx) => {
-      const addressParts = [
-        data.country,
-        data.city,
-        data.street,
-        data.building,
-        data.region,
-        data.district,
-        data.apartment,
-      ].filter(Boolean);
-
-      const totalLength = addressParts.join(", ").length;
-      const MAX_ADDRESS_LENGTH = 200;
-
-      if (totalLength > MAX_ADDRESS_LENGTH) {
-        ctx.addIssue({
-          code: "too_big",
-          type: "string",
-          maximum: MAX_ADDRESS_LENGTH,
-          inclusive: true,
-          origin: "value",
-          message: `Full address is too long (${totalLength}/${MAX_ADDRESS_LENGTH} characters)`,
-          path: ["address"],
-        });
-      }
-    });
+  const createLocationSchema = z.object({
+    name: z
+      .string()
+      .min(1, "Location name is required.")
+      .min(3, "Location name must be at least 3 characters.")
+      .max(120, "Location name should be no more than 120 characters."),
+    timezone: z
+      .string()
+      .min(1, "Timezone is required.")
+      .max(120, "Timezone should be no more than 120 characters."),
+    country: z.string().min(1, "Country is required."),
+    city: z.string().min(1, "City is required."),
+    street: z.string().min(1, "Street is required."),
+    building: z.string().min(1, "Building is required."),
+    region: z.string().optional(),
+    district: z.string().optional(),
+    apartment: z.string().optional(),
+  });
 
   type CreateLocationData = z.infer<typeof createLocationSchema>;
 
@@ -90,6 +62,7 @@ export function CreateLocationDialog() {
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
   } = useForm<CreateLocationData>({
     defaultValues: initialData,
     resolver: zodResolver(createLocationSchema),
@@ -98,6 +71,26 @@ export function CreateLocationDialog() {
   const { createLocation, isPending } = useCreateLocation();
 
   const onSubmit = async (data: CreateLocationData) => {
+    const addressParts = [
+      data.country,
+      data.city,
+      data.street,
+      data.building,
+      data.region,
+      data.district,
+      data.apartment,
+    ].filter(Boolean);
+
+    const totalLength = addressParts.join(", ").length;
+    const MAX_ADDRESS_LENGTH = 200;
+
+    if (totalLength > MAX_ADDRESS_LENGTH) {
+      setError("root", {
+        message: `Full address is too long (${totalLength}/${MAX_ADDRESS_LENGTH} characters)`,
+      });
+      return;
+    }
+
     const request: CreateLocationRequest = {
       name: data.name,
       timezone: data.timezone,
@@ -136,11 +129,16 @@ export function CreateLocationDialog() {
       <DialogTrigger asChild>
         <Button>Create location</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-sm min-[850px]:max-w-[50rem]">
+      <DialogContent className="max-w-sm min-[850px]:max-w-200">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader className="mb-5">
             <DialogTitle>Creating a location</DialogTitle>
           </DialogHeader>
+          {errors.root && (
+            <div className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2.5 mb-4">
+              <p className="text-sm text-destructive">{errors.root.message}</p>
+            </div>
+          )}
           <FieldGroup>
             <div className="grid grid-cols-1 min-[850px]:grid-cols-2 gap-5 max-w-sm mx-auto min-[850px]:max-w-none min-[850px]:mx-0">
               <FormInput
