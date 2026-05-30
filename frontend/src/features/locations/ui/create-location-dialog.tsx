@@ -63,6 +63,7 @@ export function CreateLocationDialog() {
     formState: { errors },
     reset,
     setError,
+    watch,
   } = useForm<CreateLocationData>({
     defaultValues: initialData,
     resolver: zodResolver(createLocationSchema),
@@ -152,6 +153,7 @@ export function CreateLocationDialog() {
               <FormSelect
                 label="Timezone"
                 id="timezone"
+                value={watch("timezone")}
                 options={timezones.map((t) => ({
                   key: t.code,
                   value: t.code,

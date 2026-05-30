@@ -6,8 +6,6 @@ export function useCreateLocation() {
 
   return {
     createLocation: mutation.mutate,
-    isError: mutation.data?.isError || false,
-    errorList: mutation.data?.errorList || [],
     isPending: mutation.isPending,
   };
 }
