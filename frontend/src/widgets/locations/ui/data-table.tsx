@@ -25,6 +25,7 @@ import { memo, useState } from "react";
 import { ColumnsDropdown } from "@/shared/components/dropdowns/columns-dropdown";
 import { StatusFilter } from "@/features/locations/ui/status-filter";
 import { DepartmentMenu } from "../../../features/departments/ui/department-menu";
+import { CreateLocationDialog } from "@/features/locations/ui/create-location-dialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -86,6 +87,7 @@ const DataTableRaw = <TData, TValue>({
           <ColumnsDropdown table={table} />
           <StatusFilter onIsActive={onIsActive} />
           <DepartmentMenu onDepartmentIdsChange={onDepartmentIdsChange} />
+          <CreateLocationDialog />
         </div>
       </div>
 

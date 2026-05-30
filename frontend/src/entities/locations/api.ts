@@ -1,26 +1,32 @@
-import axios from "axios";
-import { GetLocationsRequest, Location } from "./types";
+import { CreateLocationRequest, GetLocationsRequest, Location } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/errors";
 import { PaginationResponse } from "@/shared/api/pagination-response";
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { queryClient } from "@/shared/api/query-client";
+import {
+  keepPreviousData,
+  mutationOptions,
+  queryOptions,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const locationsApi = {
   getLocations: async (request: GetLocationsRequest) => {
-    try {
-      const response = await apiClient.get<
-        Envelope<PaginationResponse<Location>>
-      >("/locations", {
-        params: request,
-      });
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Location>>
+    >("/locations", {
+      params: request,
+    });
 
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data) {
-        return error.response.data as Envelope<PaginationResponse<Location>>;
-      }
-      throw error;
-    }
+    return response.data;
+  },
+  createLocation: async (request: CreateLocationRequest) => {
+    const response = await apiClient.post<Envelope<string>>(
+      "/locations",
+      request,
+    );
+
+    return response.data;
   },
 };
 
@@ -57,6 +63,21 @@ export const locationsQueryOptions = {
         departmentIds,
       ],
       placeholderData: keepPreviousData,
+    });
+  },
+  createLocationOptions: () => {
+    return mutationOptions({
+      mutationFn: locationsApi.createLocation,
+      onSettled: () =>
+        queryClient.invalidateQueries({
+          queryKey: [locationsQueryOptions.baseKey],
+        }),
+      onError: () => {
+        toast.error("Errors occured when creating a location.");
+      },
+      onSuccess: () => {
+        toast.success("Location was created successfully");
+      },
     });
   },
 };
