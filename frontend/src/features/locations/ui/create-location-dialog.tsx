@@ -12,7 +12,7 @@ import {
 } from "@/shared/components/ui/dialog";
 import { FieldGroup } from "@/shared/components/ui/field";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useCreateLocation } from "../model/use-create-location";
@@ -58,12 +58,12 @@ export function CreateLocationDialog() {
   };
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
     reset,
     setError,
-    watch,
   } = useForm<CreateLocationData>({
     defaultValues: initialData,
     resolver: zodResolver(createLocationSchema),
@@ -150,19 +150,27 @@ export function CreateLocationDialog() {
                 placeholder="Enter the name..."
                 {...register("name")}
               />
-              <FormSelect
-                label="Timezone"
-                id="timezone"
-                value={watch("timezone")}
-                options={timezones.map((t) => ({
-                  key: t.code,
-                  value: t.code,
-                  label: t.label,
-                }))}
-                error={errors.timezone?.message}
-                required={true}
-                placeholder="Select the timezone"
-                {...register("timezone")}
+              <Controller
+                name="timezone"
+                control={control}
+                render={({ field }) => (
+                  <FormSelect
+                    label="Timezone"
+                    id="timezone"
+                    options={timezones.map((t) => ({
+                      key: t.code,
+                      value: t.code,
+                      label: t.label,
+                    }))}
+                    error={errors.timezone?.message}
+                    required
+                    placeholder="Select the timezone"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    name={field.name}
+                  />
+                )}
               />
               <FormInput
                 label="Country"

@@ -6,14 +6,13 @@ interface Option {
   label: string;
 }
 
-interface FormSelectProps {
+interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   options: Option[];
   id?: string;
   error?: string;
   required?: boolean;
   placeholder?: string;
-  value?: string;
 }
 
 export function FormSelect({
@@ -23,15 +22,13 @@ export function FormSelect({
   id,
   options,
   placeholder,
-  value,
   ...props
 }: FormSelectProps) {
   return (
     <FormField label={label} required={required} error={error} id={id}>
       <select
         id={id}
-        required
-        value={value}
+        required={required}
         className="w-full border rounded h-8 text-sm pl-1 invalid:text-muted-foreground"
         {...props}
       >
