@@ -56,7 +56,7 @@ export function DepartmentMenu({
         className="w-fit gap-2"
       >
         <Building2 className="h-4 w-4" />
-        Related departments
+        Связанные отделы
         {!open && appliedDepartments.length > 0 && (
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-medium text-primary-foreground">
             {appliedDepartments.length}
@@ -90,7 +90,7 @@ export function DepartmentMenu({
                 size="xs"
                 className="text-xs"
               >
-                Clear all
+                Очистить все
               </Button>
             )}
             <Button
@@ -99,12 +99,12 @@ export function DepartmentMenu({
               size="xs"
               className="text-xs"
             >
-              Apply
+              Применить
             </Button>
           </div>
 
           <CommandInput
-            placeholder="Type a department name..."
+            placeholder="Введите название отдела..."
             onValueChange={setSearch}
           />
           <CommandList>
@@ -137,7 +137,7 @@ export function DepartmentMenu({
                 );
               })}
               {!departmentsSummary?.length && (
-                <CommandEmpty>No results found</CommandEmpty>
+                <CommandEmpty>Результатов не найдено</CommandEmpty>
               )}
             </CommandGroup>
             <div className="p-2">

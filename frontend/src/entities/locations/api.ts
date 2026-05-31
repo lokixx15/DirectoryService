@@ -73,10 +73,10 @@ export const locationsQueryOptions = {
           queryKey: [locationsQueryOptions.baseKey],
         }),
       onError: () => {
-        toast.error("Errors occured when creating a location.");
+        toast.error("Произошла ошибка при создании локации.");
       },
       onSuccess: () => {
-        toast.success("Location was created successfully");
+        toast.success("Локация успешно создана");
       },
     });
   },

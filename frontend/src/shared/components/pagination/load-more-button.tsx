@@ -29,7 +29,7 @@ export function LoadMoreButton({
       onClick={handleClick}
       className={className}
     >
-      Load more
+      Загрузить ещё
     </Button>
   );
 }

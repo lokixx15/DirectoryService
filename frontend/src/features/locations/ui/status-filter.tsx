@@ -14,9 +14,9 @@ interface StatusFilterProps {
 }
 
 const items = [
-  { label: "All", value: "all" },
-  { label: "Active", value: "true" },
-  { label: "Inactive", value: "false" },
+  { label: "Все", value: "all" },
+  { label: "Активные", value: "true" },
+  { label: "Неактивные", value: "false" },
 ];
 
 export function StatusFilter({ onIsActive }: StatusFilterProps) {

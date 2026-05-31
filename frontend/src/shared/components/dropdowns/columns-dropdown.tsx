@@ -18,7 +18,7 @@ export function ColumnsDropdown<TData>({ table }: ColumnsDropdownProps<TData>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Columns</Button>
+        <Button variant="outline">Колонки</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {table

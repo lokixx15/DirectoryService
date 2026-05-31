@@ -27,17 +27,17 @@ export function CreateLocationDialog() {
   const createLocationSchema = z.object({
     name: z
       .string()
-      .min(1, "Location name is required.")
-      .min(3, "Location name must be at least 3 characters.")
-      .max(120, "Location name should be no more than 120 characters."),
+      .min(1, "Название локации обязательно.")
+      .min(3, "Название локации должно содержать минимум 3 символа.")
+      .max(120, "Название локации должно содержать не более 120 символов."),
     timezone: z
       .string()
-      .min(1, "Timezone is required.")
-      .max(120, "Timezone should be no more than 120 characters."),
-    country: z.string().min(1, "Country is required."),
-    city: z.string().min(1, "City is required."),
-    street: z.string().min(1, "Street is required."),
-    building: z.string().min(1, "Building is required."),
+      .min(1, "Часовой пояс обязателен.")
+      .max(120, "Часовой пояс должен содержать не более 120 символов."),
+    country: z.string().min(1, "Страна обязательна."),
+    city: z.string().min(1, "Город обязателен."),
+    street: z.string().min(1, "Улица обязательна."),
+    building: z.string().min(1, "Здание обязательно."),
     region: z.string().optional(),
     district: z.string().optional(),
     apartment: z.string().optional(),
@@ -87,7 +87,7 @@ export function CreateLocationDialog() {
 
     if (totalLength > MAX_ADDRESS_LENGTH) {
       setError("root", {
-        message: `Full address is too long (${totalLength}/${MAX_ADDRESS_LENGTH} characters)`,
+        message: `Полный адрес слишком длинный (${totalLength}/${MAX_ADDRESS_LENGTH} символов)`,
       });
       return;
     }
@@ -128,12 +128,12 @@ export function CreateLocationDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button>Create location</Button>
+        <Button>Создать локацию</Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm min-[850px]:max-w-200">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader className="mb-5">
-            <DialogTitle>Creating a location</DialogTitle>
+            <DialogTitle>Создание локации</DialogTitle>
           </DialogHeader>
           {errors.root && (
             <div className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2.5 mb-4">
@@ -143,11 +143,11 @@ export function CreateLocationDialog() {
           <FieldGroup>
             <div className="grid grid-cols-1 min-[850px]:grid-cols-2 gap-5 max-w-sm mx-auto min-[850px]:max-w-none min-[850px]:mx-0">
               <FormInput
-                label="Name"
+                label="Название"
                 id="name"
                 error={errors.name?.message}
                 required={true}
-                placeholder="Enter the name..."
+                placeholder="Введите название..."
                 {...register("name")}
               />
               <Controller
@@ -155,7 +155,7 @@ export function CreateLocationDialog() {
                 control={control}
                 render={({ field }) => (
                   <FormSelect
-                    label="Timezone"
+                    label="Часовой пояс"
                     id="timezone"
                     options={timezones.map((t) => ({
                       key: t.code,
@@ -164,7 +164,7 @@ export function CreateLocationDialog() {
                     }))}
                     error={errors.timezone?.message}
                     required
-                    placeholder="Select the timezone"
+                    placeholder="Выберите часовой пояс"
                     value={field.value}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
@@ -173,56 +173,56 @@ export function CreateLocationDialog() {
                 )}
               />
               <FormInput
-                label="Country"
+                label="Страна"
                 id="country"
                 error={errors.country?.message}
                 required={true}
-                placeholder="Enter the country..."
+                placeholder="Введите страну..."
                 {...register("country")}
               />
               <FormInput
-                label="City"
+                label="Город"
                 id="city"
                 error={errors.city?.message}
                 required={true}
-                placeholder="Enter the city..."
+                placeholder="Введите город..."
                 {...register("city")}
               />
               <FormInput
-                label="Street"
+                label="Улица"
                 id="street"
                 error={errors.street?.message}
                 required={true}
-                placeholder="Enter the street..."
+                placeholder="Введите улицу..."
                 {...register("street")}
               />
               <FormInput
-                label="Building"
+                label="Здание"
                 id="building"
                 error={errors.building?.message}
                 required={true}
-                placeholder="Enter the building..."
+                placeholder="Введите здание..."
                 {...register("building")}
               />
               <FormInput
-                label="Region"
+                label="Регион"
                 id="region"
                 error={errors.region?.message}
-                placeholder="Enter the region..."
+                placeholder="Введите регион..."
                 {...register("region")}
               />
               <FormInput
-                label="District"
+                label="Район"
                 id="district"
                 error={errors.district?.message}
-                placeholder="Enter the district..."
+                placeholder="Введите район..."
                 {...register("district")}
               />
               <FormInput
-                label="Apartment"
+                label="Квартира"
                 id="apartment"
                 error={errors.apartment?.message}
-                placeholder="Enter the apartment..."
+                placeholder="Введите квартиру..."
                 {...register("apartment")}
               />
             </div>
@@ -230,11 +230,11 @@ export function CreateLocationDialog() {
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline" onClick={() => reset()}>
-                Cancel
+                Отмена
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isPending}>
-              Submit
+              Создать
             </Button>
           </DialogFooter>
         </form>

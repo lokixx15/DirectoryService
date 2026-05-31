@@ -21,7 +21,7 @@ const SearchBar = memo(function SearchBar({ onSearch }: SearchBarProps) {
       type="text"
       value={value}
       onChange={(e) => setValue(e.target.value)}
-      placeholder="Search..."
+      placeholder="Поиск..."
       className="w-[25%] min-w-62.5 rounded-md border-border"
     />
   );
