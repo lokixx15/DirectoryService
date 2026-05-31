@@ -2,7 +2,7 @@ import { apiClient } from "@/shared/api/axios-instance";
 import { DepartmentSummary, GetDepartmentsSummaryRequest } from "./types";
 import { Envelope } from "@/shared/api/errors";
 import { PaginationResponse } from "@/shared/api/pagination-response";
-import axios from "axios";
+import { isAxiosError } from "axios";
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 export const departmentsApi = {
@@ -16,7 +16,7 @@ export const departmentsApi = {
 
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data) {
+      if (isAxiosError(error) && error.response?.data) {
         return error.response.data as Envelope<
           PaginationResponse<DepartmentSummary>
         >;

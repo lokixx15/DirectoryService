@@ -1,14 +1,11 @@
-"use client";
-
-import { Location } from "@/entities/locations/types";
-import { formatAddress } from "@/entities/locations/helpers";
+import { Location, formatAddress } from "@/entities/locations";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
 export const columns: ColumnDef<Location>[] = [
   {
     accessorKey: "id",
-    header: "Id",
+    header: "ID",
   },
   {
     accessorKey: "name",
@@ -18,7 +15,7 @@ export const columns: ColumnDef<Location>[] = [
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-2 cursor-pointer select-none hover:text-foreground"
         >
-          Name
+          Название
           <ArrowUpDown className="h-4 w-4" />
         </div>
       );
@@ -26,16 +23,16 @@ export const columns: ColumnDef<Location>[] = [
   },
   {
     accessorKey: "address",
-    header: "Address",
+    header: "Адрес",
     cell: ({ row }) => formatAddress(row.original.address),
   },
   {
     accessorKey: "timezone",
-    header: "Timezone",
+    header: "Часовой пояс",
   },
   {
     accessorKey: "isActive",
-    header: "Is Active",
+    header: "Активна",
   },
   {
     accessorKey: "createdAt",
@@ -45,13 +42,13 @@ export const columns: ColumnDef<Location>[] = [
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-2 cursor-pointer select-none hover:text-foreground"
         >
-          Created At
+          Создана
           <ArrowUpDown className="h-4 w-4" />
         </div>
       );
     },
     cell: ({ row }) =>
-      new Date(row.original.createdAt).toLocaleString("en-US", {
+      new Date(row.original.createdAt).toLocaleString("ru-RU", {
         timeZone: "UTC",
       }),
   },
@@ -63,13 +60,13 @@ export const columns: ColumnDef<Location>[] = [
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-2 cursor-pointer select-none hover:text-foreground"
         >
-          Updated At
+          Обновлена
           <ArrowUpDown className="h-4 w-4" />
         </div>
       );
     },
     cell: ({ row }) =>
-      new Date(row.original.updatedAt).toLocaleString("en-US", {
+      new Date(row.original.updatedAt).toLocaleString("ru-RU", {
         timeZone: "UTC",
       }),
   },

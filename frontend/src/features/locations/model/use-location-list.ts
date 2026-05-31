@@ -1,5 +1,4 @@
-import { locationsQueryOptions } from "@/entities/locations/api";
-import { Location } from "@/entities/locations/types";
+import { locationsQueryOptions, Location } from "@/entities/locations";
 import { Error } from "@/shared/api/errors";
 import { useQuery } from "@tanstack/react-query";
 import { SortingState } from "@tanstack/react-table";

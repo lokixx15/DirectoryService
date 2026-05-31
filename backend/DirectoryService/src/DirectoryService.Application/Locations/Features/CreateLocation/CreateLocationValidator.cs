@@ -16,7 +16,7 @@ public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCo
         RuleFor(command => command.Request.Name)
             .MustBeValueObject(LocationName.Create);
 
-        RuleFor(command => command.Request.AddressRequest)
+        RuleFor(command => command.Request.Address)
             .MustBeValueObject((addressDto) => LocationAddress.Create(
                     addressDto.Country,
                     addressDto.City,

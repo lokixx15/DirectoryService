@@ -44,13 +44,13 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
         var locationName = LocationName.Create(command.Request.Name).Value;
 
         var locationAddress = LocationAddress.Create(
-            command.Request.AddressRequest.Country,
-            command.Request.AddressRequest.City,
-            command.Request.AddressRequest.Street,
-            command.Request.AddressRequest.Building,
-            command.Request.AddressRequest.Region,
-            command.Request.AddressRequest.District,
-            command.Request.AddressRequest.Apartment).Value;
+            command.Request.Address.Country,
+            command.Request.Address.City,
+            command.Request.Address.Street,
+            command.Request.Address.Building,
+            command.Request.Address.Region,
+            command.Request.Address.District,
+            command.Request.Address.Apartment).Value;
 
         var locationTimezone = LocationTimezone.Create(command.Request.Timezone).Value;
 

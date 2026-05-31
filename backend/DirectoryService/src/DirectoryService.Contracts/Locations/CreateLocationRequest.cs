@@ -3,4 +3,4 @@
 public record CreateLocationRequest(
     string Name,
     string Timezone,
-    CreateLocationAddressRequest AddressRequest);
+    CreateLocationAddressRequest Address);

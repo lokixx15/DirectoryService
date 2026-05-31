@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { usePagination } from "@/shared/hooks/use-pagination";
-import { useLocationList } from "@/features/locations/model/use-location-list";
-import { DataTable } from "@/widgets/locations/ui/data-table";
-import { columns } from "@/widgets/locations/ui/columns";
+import { useLocationList } from "@/features/locations";
+import { DataTable, columns } from "@/widgets/locations";
 import { SkeletonTable } from "@/shared/components/skeletons/skeleton-table";
 import { ErrorCard } from "@/shared/components/errors/error-card";
 import { SortingState } from "@tanstack/react-table";

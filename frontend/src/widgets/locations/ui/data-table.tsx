@@ -23,8 +23,8 @@ import { SearchBar } from "@/shared/components/search/search-bar";
 import { memo, useState } from "react";
 
 import { ColumnsDropdown } from "@/shared/components/dropdowns/columns-dropdown";
-import { StatusFilter } from "@/features/locations/ui/status-filter";
-import { DepartmentMenu } from "../../../features/departments/ui/department-menu";
+import { StatusFilter, CreateLocationDialog } from "@/features/locations";
+import { DepartmentMenu } from "@/features/departments";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -86,6 +86,7 @@ const DataTableRaw = <TData, TValue>({
           <ColumnsDropdown table={table} />
           <StatusFilter onIsActive={onIsActive} />
           <DepartmentMenu onDepartmentIdsChange={onDepartmentIdsChange} />
+          <CreateLocationDialog />
         </div>
       </div>
 
@@ -132,7 +133,7 @@ const DataTableRaw = <TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Нет результатов.
                 </TableCell>
               </TableRow>
             )}

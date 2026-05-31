@@ -27,3 +27,9 @@ export type GetLocationsRequest = {
   orderBy?: string;
   orderDirection?: string;
 };
+
+export type CreateLocationRequest = {
+  name: string;
+  timezone: string;
+  address: LocationAddress;
+};
