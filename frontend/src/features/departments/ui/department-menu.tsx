@@ -15,7 +15,7 @@ import {
 import { useDepartmentSummaryList } from "@/features/departments/model/use-department-summary-list";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { useDebounce } from "@/shared/hooks/use-debounce";
-import { Building2, Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { DialogTitle } from "@/shared/components/ui/dialog";
 import { useDepartmentSelector } from "../model/use-department-selector";
 import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
@@ -29,7 +29,7 @@ export function DepartmentMenu({
   const [search, setSearch] = useState("");
   const debouncedValue = useDebounce(search, 300);
 
-  const { departmentsSummary, totalCount, isLoading, isError } =
+  const { departmentsSummary, totalCount } =
     useDepartmentSummaryList({
       page,
       pageSize,
@@ -55,7 +55,6 @@ export function DepartmentMenu({
         variant="outline"
         className="w-fit gap-2"
       >
-        <Building2 className="h-4 w-4" />
         Связанные отделы
         {!open && appliedDepartments.length > 0 && (
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-medium text-primary-foreground">

@@ -1,6 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -18,7 +19,10 @@ export function ColumnsDropdown<TData>({ table }: ColumnsDropdownProps<TData>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Колонки</Button>
+        <Button variant="outline" className="gap-2">
+          Колонки
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {table

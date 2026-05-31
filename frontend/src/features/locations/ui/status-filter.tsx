@@ -28,13 +28,13 @@ export function StatusFilter({ onIsActive }: StatusFilterProps) {
 
   return (
     <Select defaultValue="all" onValueChange={handleStatusChange}>
-      <SelectTrigger className="w-full max-w-48 h-8 border-border">
+      <SelectTrigger className="w-full max-w-48 h-8 border-border font-medium">
         <SelectValue placeholder={items[0].label} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           {items.map((item) => (
-            <SelectItem key={item.value} value={item.value}>
+            <SelectItem key={item.value} value={item.value} className="bold">
               {item.label}
             </SelectItem>
           ))}
