@@ -19,6 +19,7 @@ import { Check, X } from "lucide-react";
 import { DialogTitle } from "@/shared/components/ui/dialog";
 import { useDepartmentSelector } from "../model/use-department-selector";
 import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
+import { ErrorLabel } from "@/shared/components/errors/error-label";
 
 export function DepartmentMenu({
   onDepartmentIdsChange,
@@ -29,12 +30,17 @@ export function DepartmentMenu({
   const [search, setSearch] = useState("");
   const debouncedValue = useDebounce(search, 300);
 
-  const { departmentsSummary, totalCount } =
-    useDepartmentSummaryList({
-      page,
-      pageSize,
-      search: debouncedValue,
-    });
+  const {
+    departmentsSummary,
+    totalCount,
+    isFetching,
+    isError,
+    refetch,
+  } = useDepartmentSummaryList({
+    page,
+    pageSize,
+    search: debouncedValue,
+  });
 
   const {
     open,
@@ -106,51 +112,56 @@ export function DepartmentMenu({
             placeholder="Введите название отдела..."
             onValueChange={setSearch}
           />
-          <CommandList>
-            <CommandGroup forceMount>
-              {departmentsSummary?.map((dep) => {
-                const selected = selectedDepartments.some(
-                  (d) => d.id === dep.id,
-                );
+          {isError ? (
+            <ErrorLabel refetch={refetch} />
+          ) : (
+            <CommandList>
+              <CommandGroup forceMount>
+                {departmentsSummary?.map((dep) => {
+                  const selected = selectedDepartments.some(
+                    (d) => d.id === dep.id,
+                  );
 
-                return (
-                  <CommandItem
-                    key={dep.id}
-                    onSelect={() => toggleDepartment(dep)}
-                    className="data-[selected=true]:bg-background"
-                  >
-                    <div
-                      className={`mr-2 grid h-4 w-4 shrink-0 place-content-center rounded-sm border ${
-                        selected
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-input"
-                      }`}
+                  return (
+                    <CommandItem
+                      key={dep.id}
+                      onSelect={() => toggleDepartment(dep)}
+                      className="data-[selected=true]:bg-background"
                     >
-                      {selected && <Check className="h-3 w-3" />}
-                    </div>
-                    <span>{dep.name}</span>
-                    <span className="ml-1 text-xs text-muted-foreground">
-                      / {dep.identifier}
-                    </span>
-                  </CommandItem>
-                );
-              })}
-              {!departmentsSummary?.length && (
-                <CommandEmpty>Результатов не найдено</CommandEmpty>
+                      <div
+                        className={`mr-2 grid h-4 w-4 shrink-0 place-content-center rounded-sm border ${
+                          selected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-input"
+                        }`}
+                      >
+                        {selected && <Check className="h-3 w-3" />}
+                      </div>
+                      <span>{dep.name}</span>
+                      <span className="ml-1 text-xs text-muted-foreground">
+                        / {dep.identifier}
+                      </span>
+                    </CommandItem>
+                  );
+                })}
+                {!isFetching && !departmentsSummary?.length && (
+                  <CommandEmpty>Результатов не найдено</CommandEmpty>
+                )}
+              </CommandGroup>
+              {((totalCount && totalCount > 0) || isFetching) && (
+                <div className="p-2">
+                  <LoadMoreButton
+                    totalElements={totalCount ?? 0}
+                    pageSize={pageSize}
+                    onPageSizeChange={onPageSizeChange}
+                    onPointerEnter={() => setSelectedItemValue("")}
+                    className="w-full"
+                    loading={isFetching}
+                  />
+                </div>
               )}
-            </CommandGroup>
-            <div className="p-2">
-              {totalCount !== undefined && totalCount > 0 && (
-                <LoadMoreButton
-                  totalElements={totalCount}
-                  pageSize={pageSize}
-                  onPageSizeChange={onPageSizeChange}
-                  onPointerEnter={() => setSelectedItemValue("")}
-                  className="w-full"
-                />
-              )}
-            </div>
-          </CommandList>
+            </CommandList>
+          )}
         </Command>
       </CommandDialog>
     </div>
