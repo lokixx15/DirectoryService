@@ -17,9 +17,9 @@ import { Building2, Home, Map } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { href: routes.home, label: "Главная", icon: Home },
-  { href: routes.departments, label: "Отделы", icon: Building2 },
-  { href: routes.locations, label: "Локации", icon: Map },
+  { href: routes.home, label: "Home", icon: Home },
+  { href: routes.departments, label: "Departments", icon: Building2 },
+  { href: routes.locations, label: "Locations", icon: Map },
 ];
 
 export function AppSidebar() {

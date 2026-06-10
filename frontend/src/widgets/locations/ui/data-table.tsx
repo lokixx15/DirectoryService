@@ -30,8 +30,8 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   page: number;
-  totalCount: number;
   pageSize: number;
+  totalCount: number;
   totalPages: number;
   onPageIndexChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
@@ -135,7 +135,7 @@ const DataTableRaw = <TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Нет результатов.
+                  No results.
                 </TableCell>
               </TableRow>
             )}

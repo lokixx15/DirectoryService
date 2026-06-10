@@ -53,7 +53,7 @@ export function LoadMoreButton({
         className={cn(className, loading && "load-more-pulsing")}
       >
         {loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-        {loading ? "Загрузка..." : "Загрузить ещё"}
+        {loading ? "Loading..." : "Load more"}
       </Button>
     </>
   );

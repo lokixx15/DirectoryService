@@ -20,7 +20,7 @@ export function ColumnsDropdown<TData>({ table }: ColumnsDropdownProps<TData>) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="gap-2">
-          Колонки
+          Columns
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>

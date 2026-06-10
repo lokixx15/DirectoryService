@@ -29,17 +29,17 @@ const MAX_ADDRESS_LENGTH = 200;
 const createLocationSchema = z.object({
   name: z
     .string()
-    .min(1, "Название локации обязательно.")
-    .min(3, "Название локации должно содержать минимум 3 символа.")
-    .max(120, "Название локации должно содержать не более 120 символов."),
+    .min(1, "Location name is required.")
+    .min(3, "Location name must be at least 3 characters.")
+    .max(120, "Location name must not exceed 120 characters."),
   timezone: z
     .string()
-    .min(1, "Часовой пояс обязателен.")
-    .max(120, "Часовой пояс должен содержать не более 120 символов."),
-  country: z.string().min(1, "Страна обязательна."),
-  city: z.string().min(1, "Город обязателен."),
-  street: z.string().min(1, "Улица обязательна."),
-  building: z.string().min(1, "Здание обязательно."),
+    .min(1, "Timezone is required.")
+    .max(120, "Timezone must not exceed 120 characters."),
+  country: z.string().min(1, "Country is required."),
+  city: z.string().min(1, "City is required."),
+  street: z.string().min(1, "Street is required."),
+  building: z.string().min(1, "Building is required."),
   region: z.string().optional(),
   district: z.string().optional(),
   apartment: z.string().optional(),
@@ -131,14 +131,14 @@ export function CreateLocationDialog() {
     if (fullAddress.length > MAX_ADDRESS_LENGTH) {
       setError("root" as FieldPath<CreateLocationData>, {
         type: "manual",
-        message: `Полный адрес слишком длинный (${fullAddress.length}/${MAX_ADDRESS_LENGTH} символов)`,
+        message: `Full address is too long (${fullAddress.length}/${MAX_ADDRESS_LENGTH} characters)`,
       });
       return;
     }
 
     createLocation(request, {
       onSuccess: () => {
-        toast.success("Локация успешно создана");
+        toast.success("Location created successfully");
         setOpen(false);
         reset();
         clearServerErrors();
@@ -150,7 +150,7 @@ export function CreateLocationDialog() {
             toast.error(error.message);
           });
         } else {
-          toast.error("Ошибка при создании локации");
+          toast.error("Error creating location");
         }
       },
     });
@@ -164,12 +164,12 @@ export function CreateLocationDialog() {
   return (
     <Dialog open={open} onOpenChange={onDialogChange}>
       <DialogTrigger asChild>
-        <Button>Создать локацию</Button>
+        <Button>Create location</Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm min-[850px]:max-w-200">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader className="mb-5">
-            <DialogTitle>Создание локации</DialogTitle>
+            <DialogTitle>Create location</DialogTitle>
           </DialogHeader>
           {(errors.root || formServerError) && (
             <div className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2.5 mb-4">
@@ -181,11 +181,11 @@ export function CreateLocationDialog() {
           <FieldGroup>
             <div className="grid grid-cols-1 min-[850px]:grid-cols-2 gap-5 max-w-sm mx-auto min-[850px]:max-w-none min-[850px]:mx-0">
               <FormInput
-                label="Название"
+                label="Name"
                 id="name"
                 error={errors.name?.message || serverErrors.name}
                 required={true}
-                placeholder="Введите название..."
+                placeholder="Search..."
                 {...register("name", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -195,7 +195,7 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormSelect
-                label="Часовой пояс"
+                label="Timezone"
                 id="timezone"
                 options={timezones.map((t) => ({
                   key: t.code,
@@ -204,7 +204,7 @@ export function CreateLocationDialog() {
                 }))}
                 error={errors.timezone?.message || serverErrors.timezone}
                 required
-                placeholder="Выберите часовой пояс"
+                placeholder="Select timezone"
                 {...register("timezone", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -214,11 +214,11 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormInput
-                label="Страна"
+                label="Country"
                 id="country"
                 error={errors.country?.message || serverErrors.country}
                 required={true}
-                placeholder="Введите страну..."
+                placeholder="Enter country..."
                 {...register("country", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -228,11 +228,11 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormInput
-                label="Город"
+                label="City"
                 id="city"
                 error={errors.city?.message || serverErrors.city}
                 required={true}
-                placeholder="Введите город..."
+                placeholder="Enter city..."
                 {...register("city", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -242,11 +242,11 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormInput
-                label="Улица"
+                label="Street"
                 id="street"
                 error={errors.street?.message || serverErrors.street}
                 required={true}
-                placeholder="Введите улицу..."
+                placeholder="Enter street..."
                 {...register("street", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -256,11 +256,11 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormInput
-                label="Здание"
+                label="Building"
                 id="building"
                 error={errors.building?.message || serverErrors.building}
                 required={true}
-                placeholder="Введите здание..."
+                placeholder="Enter building..."
                 {...register("building", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -270,10 +270,10 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormInput
-                label="Регион"
+                label="Region"
                 id="region"
                 error={errors.region?.message || serverErrors.region}
-                placeholder="Введите регион..."
+                placeholder="Enter region..."
                 {...register("region", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -283,10 +283,10 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormInput
-                label="Район"
+                label="District"
                 id="district"
                 error={errors.district?.message || serverErrors.district}
-                placeholder="Введите район..."
+                placeholder="Enter district..."
                 {...register("district", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -296,10 +296,10 @@ export function CreateLocationDialog() {
                 })}
               />
               <FormInput
-                label="Квартира"
+                label="Apartment"
                 id="apartment"
                 error={errors.apartment?.message || serverErrors.apartment}
-                placeholder="Введите квартиру..."
+                placeholder="Enter apartment..."
                 {...register("apartment", {
                   onChange: () => {
                     if (serverErrors.name) {
@@ -313,11 +313,11 @@ export function CreateLocationDialog() {
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline" onClick={() => reset()}>
-                Отмена
+                Cancel
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isPending}>
-              Создать
+              Create
             </Button>
           </DialogFooter>
         </form>
