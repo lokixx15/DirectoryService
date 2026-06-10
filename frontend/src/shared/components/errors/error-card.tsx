@@ -13,7 +13,6 @@ import {
   HelpCircle,
   RotateCcw,
 } from "lucide-react";
-import type { Error } from "@/shared/api/errors";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -22,6 +21,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/shared/components/ui/card";
+import { Error } from "@/shared/api/errors";
 
 interface ErrorCardProps {
   errors: Error[];

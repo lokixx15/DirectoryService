@@ -1,6 +1,6 @@
 import { apiClient } from "@/shared/api/axios-instance";
 import { DepartmentSummary, GetDepartmentsSummaryRequest } from "./types";
-import { Envelope } from "@/shared/api/errors";
+import { Envelope } from "@/shared/api/envelope";
 import { PaginationResponse } from "@/shared/api/pagination-response";
 import { isAxiosError } from "axios";
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
@@ -40,7 +40,13 @@ export const departmentsQueryOptions = {
           pageSize,
           search,
         }),
-      queryKey: [departmentsQueryOptions.baseKey, "summary", page, pageSize, search],
+      queryKey: [
+        departmentsQueryOptions.baseKey,
+        "summary",
+        page,
+        pageSize,
+        search,
+      ],
       placeholderData: keepPreviousData,
     });
   },

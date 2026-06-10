@@ -63,7 +63,7 @@ public record LocationAddress
         var fullAddress = GetFullAddress(country, city, street, building, region, district, apartment);
 
         if (fullAddress.Length > Constants.MAX_LOCATION_ADDRESS_LENGTH)
-            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_LOCATION_ADDRESS_LENGTH, "Address"));
+            errors.Add(GeneralErrors.ValueLengthIsNotValid(Constants.MAX_LOCATION_ADDRESS_LENGTH));
 
         if (errors.Any())
             return Result.Failure<LocationAddress, Errors>(errors);

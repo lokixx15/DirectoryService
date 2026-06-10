@@ -8,7 +8,7 @@
     <PackageVersion Include="Dapper" Version="2.1.66" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.14" />
     <PackageVersion Include="DirectoryService.Core" Version="1.0.2" />
-    <PackageVersion Include="DirectoryService.SharedKernel" Version="1.0.0" />
+    <PackageVersion Include="DirectoryService.SharedKernel" Version="1.0.3" />
     <PackageVersion Include="DirectoryService.Framework" Version="1.0.1" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11" />

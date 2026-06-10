@@ -1,6 +1,6 @@
+import { Envelope } from "@/shared/api/envelope";
 import { CreateLocationRequest, GetLocationsRequest, Location } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
-import { Envelope } from "@/shared/api/errors";
 import { PaginationResponse } from "@/shared/api/pagination-response";
 import { queryClient } from "@/shared/api/query-client";
 import {
@@ -9,6 +9,7 @@ import {
   queryOptions,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { EnvelopeErrors } from "@/shared/api/errors";
 
 export const locationsApi = {
   getLocations: async (request: GetLocationsRequest) => {
@@ -72,7 +73,11 @@ export const locationsQueryOptions = {
         queryClient.invalidateQueries({
           queryKey: [locationsQueryOptions.baseKey],
         }),
-      onError: () => {
+      onError: (error) => {
+        if (error instanceof EnvelopeErrors) {
+          toast.error(error.firstMessage);
+          return;
+        }
         toast.error("Произошла ошибка при создании локации.");
       },
       onSuccess: () => {
