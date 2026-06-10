@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   page: number;
+  totalCount: number;
   pageSize: number;
   totalPages: number;
   onPageIndexChange: (page: number) => void;
@@ -46,6 +47,7 @@ const DataTableRaw = <TData, TValue>({
   data,
   page,
   pageSize,
+  totalCount,
   totalPages,
   onPageIndexChange,
   onPageSizeChange,
@@ -144,6 +146,7 @@ const DataTableRaw = <TData, TValue>({
       <PaginationIconsOnly
         page={page}
         pageSize={pageSize}
+        totalCount={totalCount}
         totalPages={totalPages}
         canPreviousPage={page > 0}
         canNextPage={page < totalPages - 1}
