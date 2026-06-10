@@ -51,3 +51,4 @@ export class EnvelopeErrors extends Error {
 export function isEnvelopeError(error: unknown): error is EnvelopeErrors {
   return error instanceof EnvelopeErrors;
 }
+

@@ -8,8 +8,6 @@ import {
   mutationOptions,
   queryOptions,
 } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { EnvelopeErrors } from "@/shared/api/errors";
 
 export const locationsApi = {
   getLocations: async (request: GetLocationsRequest) => {
@@ -73,16 +71,6 @@ export const locationsQueryOptions = {
         queryClient.invalidateQueries({
           queryKey: [locationsQueryOptions.baseKey],
         }),
-      onError: (error) => {
-        if (error instanceof EnvelopeErrors) {
-          toast.error(error.firstMessage);
-          return;
-        }
-        toast.error("Произошла ошибка при создании локации.");
-      },
-      onSuccess: () => {
-        toast.success("Локация успешно создана");
-      },
     });
   },
 };

@@ -7,16 +7,14 @@ export function useSetServerErrors<T>(validFields: Array<string>) {
   const [serverErrors, setServerErrors] = useState<ServerErrors<T>>({});
   const [formServerError, setFormServerError] = useState<string | null>(null);
 
-  const applyEnvelopeErrors = (error: unknown) => {
-    if (!(error instanceof EnvelopeErrors)) return;
-
+  const applyEnvelopeErrors = (error: EnvelopeErrors) => {
     const fieldErrors: ServerErrors<T> = {};
     let formError: string | null = null;
 
     error.apiErrors.forEach((apiError) => {
       if (!apiError.message) return;
 
-      if (apiError.invalidField && apiError.invalidField !== "Value") {
+      if (apiError.invalidField) {
         const field = apiError.invalidField.toLowerCase();
 
         if (validFields.includes(field)) {

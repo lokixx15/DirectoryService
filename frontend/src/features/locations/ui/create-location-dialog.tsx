@@ -21,6 +21,8 @@ import { CreateLocationRequest, formatAddress } from "@/entities/locations";
 import { FormInput } from "@/shared/components/form/form-input";
 import { FormSelect } from "@/shared/components/form/form-select";
 import { useSetServerErrors } from "@/shared/api/form-errors";
+import { toast } from "sonner";
+import { isEnvelopeError } from "@/shared/api/errors";
 
 const MAX_ADDRESS_LENGTH = 200;
 
@@ -136,12 +138,20 @@ export function CreateLocationDialog() {
 
     createLocation(request, {
       onSuccess: () => {
+        toast.success("Локация успешно создана");
         setOpen(false);
         reset();
         clearServerErrors();
       },
       onError: (errors) => {
-        applyEnvelopeErrors(errors);
+        if (isEnvelopeError(errors)) {
+          applyEnvelopeErrors(errors);
+          errors.apiErrors.forEach((error) => {
+            toast.error(error.message);
+          });
+        } else {
+          toast.error("Ошибка при создании локации");
+        }
       },
     });
   };
