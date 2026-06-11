@@ -113,7 +113,7 @@ export function DepartmentMenu({
             onValueChange={setSearch}
           />
           {isError ? (
-            <ErrorLabel refetch={refetch} />
+            <ErrorLabel refetch={refetch}>Error occured while loading</ErrorLabel>
           ) : (
             <CommandList>
               <CommandGroup forceMount>
