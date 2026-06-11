@@ -1,28 +1,18 @@
 import { apiClient } from "@/shared/api/axios-instance";
 import { DepartmentSummary, GetDepartmentsSummaryRequest } from "./types";
-import { Envelope } from "@/shared/api/errors";
+import { Envelope } from "@/shared/api/envelope";
 import { PaginationResponse } from "@/shared/api/pagination-response";
-import { isAxiosError } from "axios";
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 export const departmentsApi = {
   getDepartmentsSummary: async (request: GetDepartmentsSummaryRequest) => {
-    try {
-      const response = await apiClient.get<
-        Envelope<PaginationResponse<DepartmentSummary>>
-      >("/departments/summary", {
-        params: request,
-      });
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<DepartmentSummary>>
+    >("/departments/summary", {
+      params: request,
+    });
 
-      return response.data;
-    } catch (error) {
-      if (isAxiosError(error) && error.response?.data) {
-        return error.response.data as Envelope<
-          PaginationResponse<DepartmentSummary>
-        >;
-      }
-      throw error;
-    }
+    return response.data;
   },
 };
 
@@ -40,7 +30,13 @@ export const departmentsQueryOptions = {
           pageSize,
           search,
         }),
-      queryKey: [departmentsQueryOptions.baseKey, "summary", page, pageSize, search],
+      queryKey: [
+        departmentsQueryOptions.baseKey,
+        "summary",
+        page,
+        pageSize,
+        search,
+      ],
       placeholderData: keepPreviousData,
     });
   },

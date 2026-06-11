@@ -6,16 +6,16 @@ public static class GeneralErrors
         Error.Validation(
             "value.is.empty.or.whitespace",
             $"{name ?? "Value"} cannot be empty or whitespace",
-            name ?? "Value");
+            name);
 
     public static Error ValueLengthIsNotValid(int maxLength, string? name = null, int minLength = default) =>
         Error.Validation(
             "value.length.is.not.valid",
             $"{name ?? "Value"} can be from {minLength} to {maxLength} characters long.",
-            name ?? "Value");
+            name);
 
     public static Error ValueIsNotValid(string message, string? name = null) =>
-        Error.Validation("value.is.not.valid", message, name ?? "Value");
+        Error.Validation("value.is.not.valid", message, name);
 
     public static Error ValueAlreadyExists(string message) =>
         Error.Conflict("value.already.exists", message);
@@ -29,13 +29,13 @@ public static class GeneralErrors
         Error.Validation(
             "collection.is.empty",
             $"Collection {name ?? string.Empty} cannot be null or empty",
-            $"Collection {name ?? string.Empty}");
+            $"Collection {name}");
 
     public static Error CollectionContainsDuplicates(string? name = null) =>
         Error.Validation(
             "collection.duplicates",
             $"Collection {name ?? string.Empty} cannot contains duplicates",
-            $"Collection {name ?? string.Empty}");
+            $"Collection {name}");
 
     public static Error DatabaseReadFailed(string message, string? code = null) =>
         Error.Failure(code ?? "database.read.failed", message);

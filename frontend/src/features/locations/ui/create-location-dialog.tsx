@@ -12,85 +12,97 @@ import {
 } from "@/shared/components/ui/dialog";
 import { FieldGroup } from "@/shared/components/ui/field";
 import { z } from "zod";
-import { Controller, useForm } from "react-hook-form";
+import { FieldPath, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useCreateLocation } from "../model/use-create-location";
 import tzdb from "iana-db-timezones";
-import { CreateLocationRequest } from "@/entities/locations";
+import { CreateLocationRequest, formatAddress } from "@/entities/locations";
 import { FormInput } from "@/shared/components/form/form-input";
 import { FormSelect } from "@/shared/components/form/form-select";
+import { useSetServerErrors } from "@/shared/api/form-errors";
+import { toast } from "sonner";
+import { isEnvelopeError } from "@/shared/api/errors";
+
+const MAX_ADDRESS_LENGTH = 200;
+
+const createLocationSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Location name is required.")
+    .min(3, "Location name must be at least 3 characters.")
+    .max(120, "Location name must not exceed 120 characters."),
+  timezone: z
+    .string()
+    .min(1, "Timezone is required.")
+    .max(120, "Timezone must not exceed 120 characters."),
+  country: z.string().min(1, "Country is required."),
+  city: z.string().min(1, "City is required."),
+  street: z.string().min(1, "Street is required."),
+  building: z.string().min(1, "Building is required."),
+  region: z.string().optional(),
+  district: z.string().optional(),
+  apartment: z.string().optional(),
+});
+
+type CreateLocationData = z.infer<typeof createLocationSchema>;
 
 export function CreateLocationDialog() {
   const [open, setOpen] = useState(false);
 
-  const createLocationSchema = z.object({
-    name: z
-      .string()
-      .min(1, "Название локации обязательно.")
-      .min(3, "Название локации должно содержать минимум 3 символа.")
-      .max(120, "Название локации должно содержать не более 120 символов."),
-    timezone: z
-      .string()
-      .min(1, "Часовой пояс обязателен.")
-      .max(120, "Часовой пояс должен содержать не более 120 символов."),
-    country: z.string().min(1, "Страна обязательна."),
-    city: z.string().min(1, "Город обязателен."),
-    street: z.string().min(1, "Улица обязательна."),
-    building: z.string().min(1, "Здание обязательно."),
-    region: z.string().optional(),
-    district: z.string().optional(),
-    apartment: z.string().optional(),
-  });
-
-  type CreateLocationData = z.infer<typeof createLocationSchema>;
-
-  const initialData: CreateLocationData = {
-    name: "",
-    timezone: "",
-    country: "",
-    city: "",
-    street: "",
-    building: "",
-    region: "",
-    district: "",
-    apartment: "",
-  };
-
   const {
-    control,
+    setError,
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setError,
+    clearErrors,
   } = useForm<CreateLocationData>({
-    defaultValues: initialData,
+    defaultValues: {
+      name: "",
+      timezone: "",
+      country: "",
+      city: "",
+      street: "",
+      building: "",
+      region: "",
+      district: "",
+      apartment: "",
+    },
     resolver: zodResolver(createLocationSchema),
   });
 
   const { createLocation, isPending } = useCreateLocation();
+  const {
+    serverErrors,
+    formServerError,
+    applyEnvelopeErrors,
+    clearServerErrors,
+  } = useSetServerErrors<CreateLocationData>([
+    "name",
+    "timezone",
+    "country",
+    "city",
+    "street",
+    "building",
+    "region",
+    "district",
+    "apartment",
+  ]);
+
+  const clearAllErrors = () => {
+    clearServerErrors();
+    clearErrors();
+  };
+
+  const onDialogChange = (open: boolean) => {
+    setOpen(open);
+    clearAllErrors();
+    reset();
+  };
 
   const onSubmit = async (data: CreateLocationData) => {
-    const addressParts = [
-      data.country,
-      data.city,
-      data.street,
-      data.building,
-      data.region,
-      data.district,
-      data.apartment,
-    ].filter(Boolean);
-
-    const totalLength = addressParts.join(", ").length;
-    const MAX_ADDRESS_LENGTH = 200;
-
-    if (totalLength > MAX_ADDRESS_LENGTH) {
-      setError("root", {
-        message: `Полный адрес слишком длинный (${totalLength}/${MAX_ADDRESS_LENGTH} символов)`,
-      });
-      return;
-    }
+    clearErrors();
 
     const request: CreateLocationRequest = {
       name: data.name,
@@ -106,10 +118,40 @@ export function CreateLocationDialog() {
       },
     };
 
+    const fullAddress = formatAddress({
+      country: data.country,
+      city: data.city,
+      street: data.street,
+      building: data.building,
+      region: data.region,
+      district: data.district,
+      apartment: data.apartment,
+    });
+
+    if (fullAddress.length > MAX_ADDRESS_LENGTH) {
+      setError("root" as FieldPath<CreateLocationData>, {
+        type: "manual",
+        message: `Full address is too long (${fullAddress.length}/${MAX_ADDRESS_LENGTH} characters)`,
+      });
+      return;
+    }
+
     createLocation(request, {
       onSuccess: () => {
+        toast.success("Location created successfully");
         setOpen(false);
         reset();
+        clearServerErrors();
+      },
+      onError: (errors) => {
+        if (isEnvelopeError(errors)) {
+          applyEnvelopeErrors(errors);
+          errors.apiErrors.forEach((error) => {
+            toast.error(error.message);
+          });
+        } else {
+          toast.error("Error creating location");
+        }
       },
     });
   };
@@ -120,121 +162,162 @@ export function CreateLocationDialog() {
   }));
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(value) => {
-        setOpen(value);
-        reset();
-      }}
-    >
+    <Dialog open={open} onOpenChange={onDialogChange}>
       <DialogTrigger asChild>
-        <Button>Создать локацию</Button>
+        <Button>Create location</Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm min-[850px]:max-w-200">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader className="mb-5">
-            <DialogTitle>Создание локации</DialogTitle>
+            <DialogTitle>Create location</DialogTitle>
           </DialogHeader>
-          {errors.root && (
+          {(errors.root || formServerError) && (
             <div className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2.5 mb-4">
-              <p className="text-sm text-destructive">{errors.root.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.root?.message || formServerError}
+              </p>
             </div>
           )}
           <FieldGroup>
             <div className="grid grid-cols-1 min-[850px]:grid-cols-2 gap-5 max-w-sm mx-auto min-[850px]:max-w-none min-[850px]:mx-0">
               <FormInput
-                label="Название"
+                label="Name"
                 id="name"
-                error={errors.name?.message}
+                error={errors.name?.message || serverErrors.name}
                 required={true}
-                placeholder="Введите название..."
-                {...register("name")}
+                placeholder="Search..."
+                {...register("name", {
+                  onChange: () => {
+                    if (serverErrors.name) {
+                      clearServerErrors("name");
+                    }
+                  },
+                })}
               />
-              <Controller
-                name="timezone"
-                control={control}
-                render={({ field }) => (
-                  <FormSelect
-                    label="Часовой пояс"
-                    id="timezone"
-                    options={timezones.map((t) => ({
-                      key: t.code,
-                      value: t.code,
-                      label: t.label,
-                    }))}
-                    error={errors.timezone?.message}
-                    required
-                    placeholder="Выберите часовой пояс"
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    name={field.name}
-                  />
-                )}
+              <FormSelect
+                label="Timezone"
+                id="timezone"
+                options={timezones.map((t) => ({
+                  key: t.code,
+                  value: t.code,
+                  label: t.label,
+                }))}
+                error={errors.timezone?.message || serverErrors.timezone}
+                required
+                placeholder="Select timezone"
+                {...register("timezone", {
+                  onChange: () => {
+                    if (serverErrors.timezone) {
+                      clearServerErrors("timezone");
+                    }
+                  },
+                })}
               />
               <FormInput
-                label="Страна"
+                label="Country"
                 id="country"
-                error={errors.country?.message}
+                error={errors.country?.message || serverErrors.country}
                 required={true}
-                placeholder="Введите страну..."
-                {...register("country")}
+                placeholder="Enter country..."
+                {...register("country", {
+                  onChange: () => {
+                    if (serverErrors.country) {
+                      clearServerErrors("country");
+                    }
+                  },
+                })}
               />
               <FormInput
-                label="Город"
+                label="City"
                 id="city"
-                error={errors.city?.message}
+                error={errors.city?.message || serverErrors.city}
                 required={true}
-                placeholder="Введите город..."
-                {...register("city")}
+                placeholder="Enter city..."
+                {...register("city", {
+                  onChange: () => {
+                    if (serverErrors.city) {
+                      clearServerErrors("city");
+                    }
+                  },
+                })}
               />
               <FormInput
-                label="Улица"
+                label="Street"
                 id="street"
-                error={errors.street?.message}
+                error={errors.street?.message || serverErrors.street}
                 required={true}
-                placeholder="Введите улицу..."
-                {...register("street")}
+                placeholder="Enter street..."
+                {...register("street", {
+                  onChange: () => {
+                    if (serverErrors.street) {
+                      clearServerErrors("street");
+                    }
+                  },
+                })}
               />
               <FormInput
-                label="Здание"
+                label="Building"
                 id="building"
-                error={errors.building?.message}
+                error={errors.building?.message || serverErrors.building}
                 required={true}
-                placeholder="Введите здание..."
-                {...register("building")}
+                placeholder="Enter building..."
+                {...register("building", {
+                  onChange: () => {
+                    if (serverErrors.building) {
+                      clearServerErrors("building");
+                    }
+                  },
+                })}
               />
               <FormInput
-                label="Регион"
+                label="Region"
                 id="region"
-                error={errors.region?.message}
-                placeholder="Введите регион..."
-                {...register("region")}
+                error={errors.region?.message || serverErrors.region}
+                placeholder="Enter region..."
+                {...register("region", {
+                  onChange: () => {
+                    if (serverErrors.region) {
+                      clearServerErrors("region");
+                    }
+                  },
+                })}
               />
               <FormInput
-                label="Район"
+                label="District"
                 id="district"
-                error={errors.district?.message}
-                placeholder="Введите район..."
-                {...register("district")}
+                error={errors.district?.message || serverErrors.district}
+                placeholder="Enter district..."
+                {...register("district", {
+                  onChange: () => {
+                    if (serverErrors.district) {
+                      clearServerErrors("district");
+                    }
+                  },
+                })}
               />
               <FormInput
-                label="Квартира"
+                label="Apartment"
                 id="apartment"
-                error={errors.apartment?.message}
-                placeholder="Введите квартиру..."
-                {...register("apartment")}
+                error={errors.apartment?.message || serverErrors.apartment}
+                placeholder="Enter apartment..."
+                {...register("apartment", {
+                  onChange: () => {
+                    if (serverErrors.apartment) {
+                      clearServerErrors("apartment");
+                    }
+                  },
+                })}
               />
             </div>
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline" onClick={() => reset()}>
-                Отмена
+                Cancel
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isPending}>
-              Создать
+              Create
             </Button>
           </DialogFooter>
         </form>

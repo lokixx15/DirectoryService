@@ -16,16 +16,15 @@ export default function Home() {
   const [isActive, setIsActive] = useState<boolean>();
   const [departmentIds, setDepartmentIds] = useState<string[]>([]);
 
-  const { locations, totalPages, isPending, errors, refetch } = useLocationList(
-    {
+  const { locations, totalCount, totalPages, isPending, errors, refetch } =
+    useLocationList({
       page,
       pageSize,
       search,
       sorting,
       isActive,
       departmentIds,
-    },
-  );
+    });
 
   return (
     <div className="flex flex-col gap-2">
@@ -39,6 +38,7 @@ export default function Home() {
           columns={columns}
           page={page}
           pageSize={pageSize}
+          totalCount={totalCount ?? 0}
           totalPages={totalPages ?? 1}
           onPageIndexChange={onPageIndexChange}
           onPageSizeChange={onPageSizeChange}

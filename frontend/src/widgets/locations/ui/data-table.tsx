@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   page: number;
   pageSize: number;
+  totalCount: number;
   totalPages: number;
   onPageIndexChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
@@ -46,6 +47,7 @@ const DataTableRaw = <TData, TValue>({
   data,
   page,
   pageSize,
+  totalCount,
   totalPages,
   onPageIndexChange,
   onPageSizeChange,
@@ -133,7 +135,7 @@ const DataTableRaw = <TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Нет результатов.
+                  No results.
                 </TableCell>
               </TableRow>
             )}
@@ -144,6 +146,7 @@ const DataTableRaw = <TData, TValue>({
       <PaginationIconsOnly
         page={page}
         pageSize={pageSize}
+        totalCount={totalCount}
         totalPages={totalPages}
         canPreviousPage={page > 0}
         canNextPage={page < totalPages - 1}

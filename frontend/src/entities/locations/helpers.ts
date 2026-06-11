@@ -1,6 +1,6 @@
-import { Location } from "./types";
+import { LocationAddress } from "./types";
 
-export function formatAddress(address: Location["address"]): string {
+export function formatAddress(address: LocationAddress): string {
   const parts = [
     address.country,
     address.city,

@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "DirectoryService",
-  description: "Сервис для управления локациями и отделами",
+  description: "Service for managing locations and departments",
 };
 
 export default function RootLayout({

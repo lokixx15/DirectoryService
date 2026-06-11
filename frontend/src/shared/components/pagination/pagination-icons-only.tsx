@@ -18,6 +18,7 @@ import {
 interface PaginationIconsOnlyProps {
   page: number;
   pageSize: number;
+  totalCount: number;
   totalPages: number;
   canPreviousPage: boolean;
   canNextPage: boolean;
@@ -28,6 +29,7 @@ interface PaginationIconsOnlyProps {
 export function PaginationIconsOnly({
   page,
   pageSize,
+  totalCount,
   totalPages,
   canPreviousPage,
   canNextPage,
@@ -37,7 +39,7 @@ export function PaginationIconsOnly({
   return (
     <div className="flex items-center justify-between gap-4">
       <Field orientation="horizontal" className="w-fit">
-        <FieldLabel htmlFor="select-rows-per-page">Строк на странице</FieldLabel>
+        <FieldLabel htmlFor="select-rows-per-page">Rows per page</FieldLabel>
         <Select
           value={pageSize.toString()}
           onValueChange={(value) => onPageSizeChange(Number(value))}
@@ -58,7 +60,7 @@ export function PaginationIconsOnly({
       </Field>
       <div>
         <p className="text-sm">
-          {page + 1} из {totalPages} страниц / {Math.min(pageSize * (page + 1), pageSize * totalPages)} из {pageSize * totalPages} элементов
+          {page + 1} of {totalPages} pages / {Math.min(pageSize * (page + 1), totalCount)} of {totalCount} items
         </p>
       </div>
       <Pagination className="mx-0 w-auto">

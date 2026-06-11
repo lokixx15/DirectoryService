@@ -15,7 +15,7 @@ export const columns: ColumnDef<Location>[] = [
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-2 cursor-pointer select-none hover:text-foreground"
         >
-          Название
+          Name
           <ArrowUpDown className="h-4 w-4" />
         </div>
       );
@@ -23,16 +23,16 @@ export const columns: ColumnDef<Location>[] = [
   },
   {
     accessorKey: "address",
-    header: "Адрес",
+    header: "Address",
     cell: ({ row }) => formatAddress(row.original.address),
   },
   {
     accessorKey: "timezone",
-    header: "Часовой пояс",
+    header: "Timezone",
   },
   {
     accessorKey: "isActive",
-    header: "Активна",
+    header: "Active",
   },
   {
     accessorKey: "createdAt",
@@ -42,13 +42,13 @@ export const columns: ColumnDef<Location>[] = [
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-2 cursor-pointer select-none hover:text-foreground"
         >
-          Создана
+          Created
           <ArrowUpDown className="h-4 w-4" />
         </div>
       );
     },
     cell: ({ row }) =>
-      new Date(row.original.createdAt).toLocaleString("ru-RU", {
+      new Date(row.original.createdAt).toLocaleString("en-US", {
         timeZone: "UTC",
       }),
   },
@@ -60,13 +60,13 @@ export const columns: ColumnDef<Location>[] = [
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-2 cursor-pointer select-none hover:text-foreground"
         >
-          Обновлена
+          Updated
           <ArrowUpDown className="h-4 w-4" />
         </div>
       );
     },
     cell: ({ row }) =>
-      new Date(row.original.updatedAt).toLocaleString("ru-RU", {
+      new Date(row.original.updatedAt).toLocaleString("en-US", {
         timeZone: "UTC",
       }),
   },

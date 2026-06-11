@@ -5,6 +5,7 @@ import { SortingState } from "@tanstack/react-table";
 
 interface UseLocationListReturn {
   locations?: Location[];
+  totalCount?: number;
   totalPages?: number;
   errors?: Error[] | null;
   isPending: boolean;
@@ -42,6 +43,7 @@ export function useLocationList({
 
   return {
     locations: data?.result?.entities,
+    totalCount: data?.result?.totalCount,
     totalPages: data?.result?.totalCount
       ? Math.ceil(data?.result?.totalCount / pageSize)
       : 1,

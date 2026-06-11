@@ -13,7 +13,6 @@ import {
   HelpCircle,
   RotateCcw,
 } from "lucide-react";
-import type { Error } from "@/shared/api/errors";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -22,6 +21,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/shared/components/ui/card";
+import { Error } from "@/shared/api/errors";
 
 interface ErrorCardProps {
   errors: Error[];
@@ -43,10 +43,10 @@ const errorTypeColor = {
 } as const;
 
 const errorTypeLabel = {
-  validation: "Ошибка валидации",
-  not_found: "Не найдено",
-  failure: "Ошибка сервера",
-  conflict: "Конфликт",
+  validation: "Validation Error",
+  not_found: "Not Found",
+  failure: "Server Error",
+  conflict: "Conflict",
 } as const;
 
 function ErrorCard({ errors, refetch }: ErrorCardProps) {
@@ -75,7 +75,7 @@ function ErrorCard({ errors, refetch }: ErrorCardProps) {
               </CardTitle>
             </div>
             <Button variant="secondary" className="h-6" onClick={refetch}>
-              Повторить
+              Retry
               <RotateCcw className="h-4 w-4" />
             </Button>
           </div>
@@ -118,7 +118,7 @@ function ErrorCard({ errors, refetch }: ErrorCardProps) {
           <div className="flex flex-col gap-1.5 rounded-lg bg-muted p-3 text-sm">
             <div className="flex items-baseline gap-2">
               <span className="text-muted-foreground text-xs font-medium w-24 shrink-0">
-                Код
+                Code
               </span>
               <code className="rounded bg-muted-foreground/10 px-1.5 py-0.5 font-mono text-xs">
                 {error.code}
@@ -126,13 +126,13 @@ function ErrorCard({ errors, refetch }: ErrorCardProps) {
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-muted-foreground text-xs font-medium w-24 shrink-0">
-                Сообщение
+                Message
               </span>
               <span className="text-foreground">{error.message}</span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-muted-foreground text-xs font-medium w-24 shrink-0">
-                Тип
+                Type
               </span>
               <span className={cn("text-xs font-medium", errorTypeColor[type])}>
                 {type}
@@ -141,7 +141,7 @@ function ErrorCard({ errors, refetch }: ErrorCardProps) {
             {error.invalidField && (
               <div className="flex items-baseline gap-2">
                 <span className="text-muted-foreground text-xs font-medium w-24 shrink-0">
-                  Некорректное поле
+                  Invalid Field
                 </span>
                 <code className="rounded bg-muted-foreground/10 px-1.5 py-0.5 font-mono text-xs">
                   {error.invalidField}

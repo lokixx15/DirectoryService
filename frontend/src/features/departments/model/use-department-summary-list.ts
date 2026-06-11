@@ -4,8 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 interface UseDepartmentSummaryListReturn {
   departmentsSummary?: DepartmentSummary[];
   totalCount?: number;
-  isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
+  refetch: () => void;
 }
 
 interface UseDepartmentSummaryListProps {
@@ -19,7 +20,7 @@ export function useDepartmentSummaryList({
   pageSize,
   search,
 }: UseDepartmentSummaryListProps): UseDepartmentSummaryListReturn {
-  const { data, isLoading } = useQuery(
+  const { data, isFetching, isError, refetch } = useQuery(
     departmentsQueryOptions.getDepartmentsSummaryOptions({
       page,
       pageSize,
@@ -30,7 +31,8 @@ export function useDepartmentSummaryList({
   return {
     departmentsSummary: data?.result?.entities,
     totalCount: data?.result?.totalCount,
-    isLoading,
-    isError: data?.isError ?? false,
+    isFetching,
+    isError: data?.isError || isError,
+    refetch,
   };
 }
