@@ -207,7 +207,7 @@ export function CreateLocationDialog() {
                 placeholder="Select timezone"
                 {...register("timezone", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.timezone) {
                       clearServerErrors("timezone");
                     }
                   },
@@ -221,7 +221,7 @@ export function CreateLocationDialog() {
                 placeholder="Enter country..."
                 {...register("country", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.country) {
                       clearServerErrors("country");
                     }
                   },
@@ -235,7 +235,7 @@ export function CreateLocationDialog() {
                 placeholder="Enter city..."
                 {...register("city", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.city) {
                       clearServerErrors("city");
                     }
                   },
@@ -249,7 +249,7 @@ export function CreateLocationDialog() {
                 placeholder="Enter street..."
                 {...register("street", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.street) {
                       clearServerErrors("street");
                     }
                   },
@@ -263,7 +263,7 @@ export function CreateLocationDialog() {
                 placeholder="Enter building..."
                 {...register("building", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.building) {
                       clearServerErrors("building");
                     }
                   },
@@ -276,7 +276,7 @@ export function CreateLocationDialog() {
                 placeholder="Enter region..."
                 {...register("region", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.region) {
                       clearServerErrors("region");
                     }
                   },
@@ -289,7 +289,7 @@ export function CreateLocationDialog() {
                 placeholder="Enter district..."
                 {...register("district", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.district) {
                       clearServerErrors("district");
                     }
                   },
@@ -302,7 +302,7 @@ export function CreateLocationDialog() {
                 placeholder="Enter apartment..."
                 {...register("apartment", {
                   onChange: () => {
-                    if (serverErrors.name) {
+                    if (serverErrors.apartment) {
                       clearServerErrors("apartment");
                     }
                   },
