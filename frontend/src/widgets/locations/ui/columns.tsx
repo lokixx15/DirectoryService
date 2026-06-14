@@ -1,4 +1,5 @@
 import { Location, formatAddress } from "@/entities/locations";
+import { FormatDate } from "@/shared/lib/format-date";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
@@ -47,10 +48,7 @@ export const columns: ColumnDef<Location>[] = [
         </div>
       );
     },
-    cell: ({ row }) =>
-      new Date(row.original.createdAt).toLocaleString("en-US", {
-        timeZone: "UTC",
-      }),
+    cell: ({ row }) => FormatDate(row.original.createdAt),
   },
   {
     accessorKey: "updatedAt",
@@ -65,9 +63,6 @@ export const columns: ColumnDef<Location>[] = [
         </div>
       );
     },
-    cell: ({ row }) =>
-      new Date(row.original.updatedAt).toLocaleString("en-US", {
-        timeZone: "UTC",
-      }),
+    cell: ({ row }) => FormatDate(row.original.updatedAt),
   },
 ];
