@@ -216,6 +216,10 @@ namespace DirectoryService.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_positon_id");
 
+                    b.HasIndex("CreatedAt", "Id")
+                        .IsDescending()
+                        .HasDatabaseName("idx_positions_created_at_id");
+
                     b.ToTable("positions", (string)null);
                 });
 

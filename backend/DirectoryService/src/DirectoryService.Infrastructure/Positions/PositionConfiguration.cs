@@ -55,5 +55,10 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
             .Property(d => d.DeletedAt)
             .HasColumnName("deleted_at")
             .HasColumnType("timestamp with time zone");
+
+        builder
+            .HasIndex(p => new { p.CreatedAt, p.Id })
+            .HasDatabaseName("idx_positions_created_at_id")
+            .IsDescending(true, true);
     }
 }

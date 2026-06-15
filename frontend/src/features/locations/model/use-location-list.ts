@@ -36,7 +36,7 @@ export function useLocationList({
       search: search || undefined,
       orderBy: sorting?.[0]?.id,
       orderDirection: sorting?.[0]?.desc ? "desc" : "asc",
-      isActive: isActive,
+      isActive: isActive || undefined,
       departmentIds: departmentIds.length ? departmentIds : undefined,
     }),
   );

@@ -13,13 +13,14 @@ import {
   useSidebar,
 } from "../../shared/components/ui/sidebar";
 import { routes } from "@/shared/routes";
-import { Building2, Home, Map } from "lucide-react";
+import { Building2, Home, Map, UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
   { href: routes.home, label: "Home", icon: Home },
   { href: routes.departments, label: "Departments", icon: Building2 },
   { href: routes.locations, label: "Locations", icon: Map },
+  { href: routes.positions, label: "Positions", icon: UsersRound },
 ];
 
 export function AppSidebar() {
