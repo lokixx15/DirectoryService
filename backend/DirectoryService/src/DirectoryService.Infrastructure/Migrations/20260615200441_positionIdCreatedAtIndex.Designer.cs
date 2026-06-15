@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20260614192340_FixPositionIndexCreatedAtId")]
-    partial class FixPositionIndexCreatedAtId
+    [Migration("20260615200441_positionIdCreatedAtIndex")]
+    partial class positionIdCreatedAtIndex
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -148,9 +148,10 @@ namespace DirectoryService.Infrastructure.Migrations
                 column: "parent_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_position_id_created_at",
+                name: "idx_positions_created_at_id",
                 table: "positions",
-                columns: ["id", "created_at"]);
+                columns: new[] { "created_at", "id" },
+                descending: Array.Empty<bool>());
         }
 
         /// <inheritdoc />

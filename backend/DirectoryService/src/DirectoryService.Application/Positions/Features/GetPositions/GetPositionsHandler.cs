@@ -115,8 +115,8 @@ public sealed class GetPositionsHandler
 
         var nextCursor = hasNextPage
             ? Cursor.Encode(
-                positions[positions.Count - 1].Id,
-                positions[positions.Count - 1].CreatedAt)
+                items[^1].Id,
+                items[^1].CreatedAt)
             : null;
 
         return new CursorPaginationResponse<PositionDto>(items, nextCursor);
