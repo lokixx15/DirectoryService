@@ -1,11 +1,11 @@
 import { locationsQueryOptions } from "@/entities/locations";
 import { useMutation } from "@tanstack/react-query";
 
-export function useCreateLocation() {
-  const mutation = useMutation(locationsQueryOptions.createLocationOptions());
+export function useEditLocation() {
+  const mutation = useMutation(locationsQueryOptions.editLocationOptions());
 
   return {
-    createLocation: mutation.mutateAsync,
+    editLocation: mutation.mutateAsync,
     isPending: mutation.isPending,
   };
 }

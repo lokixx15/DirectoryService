@@ -3,7 +3,6 @@
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -14,19 +13,19 @@ import { FieldGroup } from "@/shared/components/ui/field";
 import { z } from "zod";
 import { FieldPath, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useCreateLocation } from "../model/use-create-location";
 import tzdb from "iana-db-timezones";
-import { CreateLocationRequest, formatAddress } from "@/entities/locations";
+import { formatAddress } from "@/entities/locations";
 import { FormInput } from "@/shared/components/form/form-input";
 import { FormSelect } from "@/shared/components/form/form-select";
 import { useSetServerErrors } from "@/shared/api/form-errors";
 import { toast } from "sonner";
 import { isEnvelopeError } from "@/shared/api/errors";
+import { useEditLocation } from "../model/use-edit-location";
+import { EditLocationRequest, Location } from "@/entities/locations/types";
 
 const MAX_ADDRESS_LENGTH = 200;
 
-const createLocationSchema = z.object({
+const editLocationSchema = z.object({
   name: z
     .string()
     .min(1, "Location name is required.")
@@ -45,11 +44,19 @@ const createLocationSchema = z.object({
   apartment: z.string().optional(),
 });
 
-type CreateLocationData = z.infer<typeof createLocationSchema>;
+type EditLocationData = z.infer<typeof editLocationSchema>;
 
-export function CreateLocationDialog() {
-  const [open, setOpen] = useState(false);
+interface EditLocationDialogProps {
+  location: Location;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
+export function EditLocationDialog({
+  location,
+  open,
+  onOpenChange,
+}: EditLocationDialogProps) {
   const {
     setError,
     register,
@@ -57,28 +64,28 @@ export function CreateLocationDialog() {
     formState: { errors },
     reset,
     clearErrors,
-  } = useForm<CreateLocationData>({
+  } = useForm<EditLocationData>({
     defaultValues: {
-      name: "",
-      timezone: "",
-      country: "",
-      city: "",
-      street: "",
-      building: "",
-      region: "",
-      district: "",
-      apartment: "",
+      name: location.name,
+      timezone: location.timezone,
+      country: location.address.country,
+      city: location.address.city,
+      street: location.address.street,
+      building: location.address.building,
+      region: location.address.region || "",
+      district: location.address.district || "",
+      apartment: location.address.apartment || "",
     },
-    resolver: zodResolver(createLocationSchema),
+    resolver: zodResolver(editLocationSchema),
   });
 
-  const { createLocation, isPending } = useCreateLocation();
+  const { editLocation, isPending } = useEditLocation();
   const {
     serverErrors,
     formServerError,
     applyEnvelopeErrors,
     clearServerErrors,
-  } = useSetServerErrors<CreateLocationData>([
+  } = useSetServerErrors<EditLocationData>([
     "name",
     "timezone",
     "country",
@@ -96,15 +103,16 @@ export function CreateLocationDialog() {
   };
 
   const onDialogChange = (open: boolean) => {
-    setOpen(open);
+    onOpenChange(open);
     clearAllErrors();
     reset();
   };
 
-  const onSubmit = async (data: CreateLocationData) => {
+  const onSubmit = async (data: EditLocationData) => {
     clearErrors();
 
-    const request: CreateLocationRequest = {
+    const request: EditLocationRequest = {
+      id: location.id,
       name: data.name,
       timezone: data.timezone,
       address: {
@@ -129,17 +137,17 @@ export function CreateLocationDialog() {
     });
 
     if (fullAddress.length > MAX_ADDRESS_LENGTH) {
-      setError("root" as FieldPath<CreateLocationData>, {
+      setError("root" as FieldPath<EditLocationData>, {
         type: "manual",
         message: `Full address is too long (${fullAddress.length}/${MAX_ADDRESS_LENGTH} characters)`,
       });
       return;
     }
 
-    await createLocation(request, {
+    await editLocation(request, {
       onSuccess: () => {
-        toast.success("Location created successfully");
-        setOpen(false);
+        toast.success("Location edited successfully");
+        onOpenChange(false);
         reset();
         clearServerErrors();
       },
@@ -150,7 +158,7 @@ export function CreateLocationDialog() {
             toast.error(error.message);
           });
         } else {
-          toast.error("Failed to create location");
+          toast.error("Failed to edit location");
         }
       },
     });
@@ -163,13 +171,10 @@ export function CreateLocationDialog() {
 
   return (
     <Dialog open={open} onOpenChange={onDialogChange}>
-      <DialogTrigger asChild>
-        <Button>Create location</Button>
-      </DialogTrigger>
       <DialogContent className="max-w-sm min-[850px]:max-w-200">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader className="mb-5">
-            <DialogTitle>Create location</DialogTitle>
+            <DialogTitle>Edit location</DialogTitle>
           </DialogHeader>
           {(errors.root || formServerError) && (
             <div className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2.5 mb-4">
@@ -317,7 +322,7 @@ export function CreateLocationDialog() {
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isPending}>
-              Create
+              Edit
             </Button>
           </DialogFooter>
         </form>

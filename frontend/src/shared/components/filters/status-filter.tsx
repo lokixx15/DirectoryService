@@ -27,7 +27,7 @@ export function StatusFilter({ onIsActive }: StatusFilterProps) {
   };
 
   return (
-    <Select defaultValue="all" onValueChange={handleStatusChange}>
+    <Select defaultValue={items[0].value} onValueChange={handleStatusChange}>
       <SelectTrigger className="w-full max-w-48 h-8 border-border font-medium">
         <SelectValue placeholder={items[0].label} />
       </SelectTrigger>

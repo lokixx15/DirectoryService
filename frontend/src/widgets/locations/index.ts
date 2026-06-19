@@ -1,2 +1,1 @@
-export { DataTable } from "./ui/data-table";
-export { columns } from "./ui/columns";
+export { LocationTable } from "./ui/location-table";

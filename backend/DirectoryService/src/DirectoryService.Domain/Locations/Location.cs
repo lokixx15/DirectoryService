@@ -58,4 +58,15 @@ public class Location
 
         return Result.Success<Location, Errors>(location);
     }
+
+    public void Update(
+        LocationName name,
+        LocationAddress address,
+        LocationTimezone timezone)
+    {
+        Name = name;
+        Address = address;
+        Timezone = timezone;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

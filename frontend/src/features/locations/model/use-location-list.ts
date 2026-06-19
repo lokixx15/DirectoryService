@@ -5,8 +5,8 @@ import { SortingState } from "@tanstack/react-table";
 
 interface UseLocationListReturn {
   locations?: Location[];
-  totalCount?: number;
-  totalPages?: number;
+  totalCount: number;
+  totalPages: number;
   errors?: Error[] | null;
   isPending: boolean;
   refetch: () => void;
@@ -29,26 +29,26 @@ export function useLocationList({
   isActive,
   departmentIds,
 }: UseLocationListProps): UseLocationListReturn {
-  const { data, isPending, refetch } = useQuery(
-    locationsQueryOptions.getLocationsOptions({
-      page: page,
-      pageSize: pageSize,
-      search: search || undefined,
-      orderBy: sorting?.[0]?.id,
-      orderDirection: sorting?.[0]?.desc ? "desc" : "asc",
-      isActive: isActive || undefined,
-      departmentIds: departmentIds.length ? departmentIds : undefined,
-    }),
-  );
+  const queryOptions = locationsQueryOptions.getLocationsOptions({
+    page: page,
+    pageSize: pageSize,
+    search: search || undefined,
+    orderBy: sorting?.[0]?.id,
+    orderDirection: sorting?.[0]?.desc ? "desc" : "asc",
+    isActive: isActive,
+    departmentIds: departmentIds.length > 0 ? departmentIds : undefined,
+  });
+
+  const { data, isPending, refetch } = useQuery(queryOptions);
 
   return {
     locations: data?.result?.entities,
-    totalCount: data?.result?.totalCount,
+    totalCount: data?.result?.totalCount || 0,
     totalPages: data?.result?.totalCount
       ? Math.ceil(data?.result?.totalCount / pageSize)
-      : 1,
+      : 0,
     errors: data?.errorList,
-    isPending,
-    refetch,
+    isPending: isPending,
+    refetch: refetch,
   };
 }

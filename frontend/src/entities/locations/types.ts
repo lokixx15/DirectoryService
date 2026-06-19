@@ -33,3 +33,10 @@ export type CreateLocationRequest = {
   timezone: string;
   address: LocationAddress;
 };
+
+export type EditLocationRequest = {
+  id: string;
+  name: string;
+  timezone: string;
+  address: LocationAddress;
+};

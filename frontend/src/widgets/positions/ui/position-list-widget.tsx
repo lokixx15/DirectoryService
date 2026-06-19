@@ -1,10 +1,10 @@
 "use client";
 
 import { DepartmentMenu } from "@/features/departments";
-import { StatusFilter } from "@/features/locations";
 import { usePositionList } from "@/features/positions/model/use-position-list";
 import { PositionList } from "@/features/positions/ui/position-list";
 import { ErrorCard } from "@/shared/components/errors/error-card";
+import { StatusFilter } from "@/shared/components/filters/status-filter";
 import { SearchBar } from "@/shared/components/search/search-bar";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -34,8 +34,8 @@ export function PositionListWidget() {
     isActive: isActive,
   });
 
-  if (isError && errors) {
-    return <ErrorCard errors={errors} refetch={refetch} />;
+  if (isError) {
+    return <ErrorCard errors={errors ?? []} refetch={refetch} />;
   }
 
   if (isPending && !positions) {
