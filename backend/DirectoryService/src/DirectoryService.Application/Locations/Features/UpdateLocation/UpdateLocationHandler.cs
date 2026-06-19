@@ -73,7 +73,7 @@ public sealed class UpdateLocationHandler : ICommandHandler<UpdateLocationComman
             return saveChangesResult.Error.ToErrors();
         }
 
-        _logger.LogInformation("The location has been inserted into database");
+        _logger.LogInformation("The location has been updated in database");
 
         return UnitResult.Success<Errors>();
     }
