@@ -123,7 +123,7 @@ public sealed class UpdateDepartmentLocationsHadnler : ICommandHandler<UpdateDep
         if (commitResult.IsFailure)
         {
             _logger.LogError("Errors occurred when committing transaction");
-            return saveChangesResult.Error.ToErrors();
+            return commitResult.Error.ToErrors();
         }
 
         await _cache.RemoveByTagAsync(CacheConstants.DEPARTMENTS_CACHE_TAG, cancellationToken);

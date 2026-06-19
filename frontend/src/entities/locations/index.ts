@@ -1,3 +1,3 @@
-export type { Location, CreateLocationRequest } from "./types";
+export type { Location, CreateLocationRequest, EditLocationRequest } from "./types";
 export { locationsQueryOptions } from "./api";
 export { formatAddress } from "./helpers";

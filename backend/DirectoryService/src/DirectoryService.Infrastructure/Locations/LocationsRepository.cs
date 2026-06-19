@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,36 @@ public sealed class LocationsRepository : ILocationsRepository
     {
         _dbContext = dbContext;
         _logger = logger;
+    }
+
+    public async Task<Result<Location, Error>> GetByAsync(
+        Expression<Func<Location, bool>> predicate,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var location = await _dbContext.Locations
+                .FirstOrDefaultAsync(predicate, cancellationToken);
+
+            if (location == null)
+            {
+                _logger.LogError("Location was not found in the database");
+                return GeneralErrors.EntityNotFound("Location");
+            }
+
+            _logger.LogInformation("Location was obtained from the database");
+            return location;
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled while reading Location");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error when reading location");
+            return GeneralErrors.DatabaseReadFailed(ex.Message);
+        }
     }
 
     public async Task<UnitResult<Error>> ExistsAsync(
@@ -120,6 +151,56 @@ public sealed class LocationsRepository : ILocationsRepository
         {
             _logger.LogError(ex, "Failed to delete locations without active departments");
             return GeneralErrors.DatabaseDeleteFailed("Failed to delete locations without active departments");
+        }
+    }
+
+    public async Task<UnitResult<Error>> DeleteDepartmentLocationsByLocationIdAsync(
+        Guid locationId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _dbContext.DepartmentLocations
+                .Where(d => d.LocationId == locationId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            _logger.LogInformation("Department locations were deleted from the database");
+
+            return UnitResult.Success<Error>();
+        }
+        catch(OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when deleting department locations by location id");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete department locations by location id");
+            return GeneralErrors.DatabaseDeleteFailed("Failed to delete department locations by location id");
+        }
+    }
+
+    public async Task<UnitResult<Error>> DeleteByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _dbContext.Locations
+                .Where(l => l.Id == id)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when deletion location {LocationId}", id);
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete location {LocationId}", id);
+            return GeneralErrors.DatabaseDeleteFailed("Failed to delete location");
         }
     }
 }

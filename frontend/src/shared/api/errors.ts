@@ -16,7 +16,7 @@ export class EnvelopeErrors extends Error {
   public readonly apiErrors: Error[];
 
   constructor(apiErrors: Error[]) {
-    const firstMessage = apiErrors[0].message ?? "Unknown error";
+    const firstMessage = apiErrors[0]?.message ?? "Unknown error";
     super(firstMessage);
     this.apiErrors = apiErrors;
 
@@ -51,4 +51,3 @@ export class EnvelopeErrors extends Error {
 export function isEnvelopeError(error: unknown): error is EnvelopeErrors {
   return error instanceof EnvelopeErrors;
 }
-

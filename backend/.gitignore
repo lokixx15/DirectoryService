@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# NuGet config
+nuget.config
+
 # dotenv files
 .env
 .env.*
