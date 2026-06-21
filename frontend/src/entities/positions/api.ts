@@ -8,7 +8,7 @@ export const positionsApi = {
   getAllPositions: async (request: GetPositionsRequest) => {
     const response = await apiClient.get<
       Envelope<CursorPaginationResponse<Position>>
-    >("/positions", {
+    >("directory/positions", {
       params: request,
     });
 

@@ -16,7 +16,7 @@ using SharedService.Framework.Endpoints;
 namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]
-[Route("api/departments")]
+[Route("directory/departments")]
 public sealed class DepartmentsController : ControllerBase
 {
     [HttpGet]

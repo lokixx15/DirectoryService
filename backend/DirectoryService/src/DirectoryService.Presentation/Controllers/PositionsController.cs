@@ -8,7 +8,7 @@ using SharedService.Framework.Endpoints;
 namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]
-[Route("api/positions")]
+[Route("directory/positions")]
 public sealed class PositionsController : ControllerBase
 {
     [HttpGet]

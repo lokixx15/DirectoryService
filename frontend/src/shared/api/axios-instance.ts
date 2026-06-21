@@ -2,8 +2,10 @@ import axios from "axios";
 import { EnvelopeErrors } from "./errors";
 import { Envelope } from "./envelope";
 
+const URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const apiClient = axios.create({
-  baseURL: "http://localhost:5218/api",
+  baseURL: URL,
   headers: {
     "Content-Type": "application/json",
   },

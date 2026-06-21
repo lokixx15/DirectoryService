@@ -8,7 +8,7 @@ export const departmentsApi = {
   getDepartmentsSummary: async (request: GetDepartmentsSummaryRequest) => {
     const response = await apiClient.get<
       Envelope<PaginationResponse<DepartmentSummary>>
-    >("/departments/summary", {
+    >("directory/departments/summary", {
       params: request,
     });
 
