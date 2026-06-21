@@ -4,43 +4,132 @@
     build:
       context: ./backend/DirectoryService
       dockerfile: Dockerfile
-      args:
-        NUGET_USERNAME: ${NUGET_USERNAME}
-        NUGET_PASSWORD: ${NUGET_PASSWORD}
+      secrets:
+        - nuget_username
+        - nuget_password
     env_file:
       - .env
     ports:
       - "9001:9001"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_URLS=http://s+:9001
+      - ASPNETCORE_URLS=http://+:9001
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/9001"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      directory-service-migrations:
+        condition: service_completed_successfully
     restart: always
+
+  directory-service-migrations:
+    container_name: directory-service-migrations
+    build:
+      context: ./backend/DirectoryService
+      dockerfile: Dockerfile
+      secrets:
+        - nuget_username
+        - nuget_password
+    env_file:
+      - .env
+    environment:
+      - DIRECTORY_SERVICE_CONNECTION=${DIRECTORY_SERVICE_CONNECTION}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: no
+    entrypoint: [
+      "/bin/sh", 
+      "-c", 
+      './efbundle --connection "$DIRECTORY_SERVICE_CONNECTION"']
 
   file-service:
     container_name: file-service
     build:
       context: ./backend/FileService
       dockerfile: Dockerfile
-      args:
-        NUGET_USERNAME: ${NUGET_USERNAME}
-        NUGET_PASSWORD: ${NUGET_PASSWORD}
+      secrets:
+        - nuget_username
+        - nuget_password
     env_file:
       - .env
     ports:
-      - "9002:9001"
+      - "9002:9002"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_URLS=http://s+:9001
+      - ASPNETCORE_URLS=http://+:9002
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/9002"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+      file-service-migrations:
+        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
+    restart: always
+
+
+  file-service-migrations:
+    container_name: file-service-migrations
+    build:
+      context: ./backend/FileService
+      dockerfile: Dockerfile
+      secrets:
+        - nuget_username
+        - nuget_password
+    env_file:
+      - .env
+    environment:
+      - FILE_SERVICE_CONNECTION=${FILE_SERVICE_CONNECTION}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: no
+    entrypoint: [
+      "/bin/sh", 
+      "-c", 
+      './efbundle --connection "$FILE_SERVICE_CONNECTION"']
+
+  frontend:
+    container_name: frontend-directory-service
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8080/api
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    restart: always
+
+  nginx:
+    container_name: nginx-directory-service
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      directory-service:
+        condition: service_healthy
+      file-service:
+        condition: service_healthy
     restart: always
 
   postgres:
     container_name: postgres
-    image: postgres
+    image: postgres:16
     environment:
       POSTGRES_DB: directory_service_db
       POSTGRES_USER: postgres
@@ -48,7 +137,12 @@
     ports:
       - "5435:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
 
   seq:
@@ -81,8 +175,19 @@
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server --console-address ":9001" /data
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/9000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
 
 volumes:
   postgres-data:
   redis_data:
+
+secrets:
+  nuget_username:
+    environment: NUGET_USERNAME
+  nuget_password:
+    environment: NUGET_PASSWORD

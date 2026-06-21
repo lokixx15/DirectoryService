@@ -10,7 +10,7 @@ using SharedService.Framework.Endpoints;
 namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]
-[Route("api/locations")]
+[Route("directory/locations")]
 public sealed class LocationsController : ControllerBase
 {
     [HttpGet]

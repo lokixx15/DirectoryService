@@ -25,7 +25,7 @@ public static class AppExtensions
         app.UseRouting();
         app.UseCrystalQuartz(() => app.Services.GetRequiredService<ISchedulerFactory>().GetScheduler());
 
-        var filesApiGroup = app.MapGroup("api/files");
+        var filesApiGroup = app.MapGroup("files");
         app.UseEndpoints(filesApiGroup);
 
         return app;

@@ -14,7 +14,7 @@ export const locationsApi = {
   getLocations: async (request: GetLocationsRequest) => {
     const response = await apiClient.get<
       Envelope<PaginationResponse<Location>>
-    >("/locations", {
+    >("directory/locations", {
       params: request,
     });
 
@@ -22,7 +22,7 @@ export const locationsApi = {
   },
   createLocation: async (request: CreateLocationRequest) => {
     const response = await apiClient.post<Envelope<string>>(
-      "/locations",
+      "directory/locations",
       request,
     );
 
@@ -30,14 +30,14 @@ export const locationsApi = {
   },
   editLocation: async (request: EditLocationRequest) => {
     const response = await apiClient.put<Envelope>(
-      `/locations/${request.id}`,
+      `directory/locations/${request.id}`,
       request,
     );
 
     return response.data;
   },
   deleteLocation: async (id: string) => {
-    const response = await apiClient.delete<Envelope>(`/locations/${id}`);
+    const response = await apiClient.delete<Envelope>(`directory/locations/${id}`);
 
     return response.data;
   },
