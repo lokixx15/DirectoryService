@@ -7,27 +7,43 @@
     <PackageVersion Include="AWSSDK.S3" Version="4.0.19.1" />
     <PackageVersion Include="CrystalQuartz.AspNetCore" Version="7.3.0" />
     <PackageVersion Include="CSharpFunctionalExtensions" Version="3.7.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="Dapper" Version="2.1.66" />
+    <PackageVersion Include="DirectoryService.Core" Version="1.0.2" />
+    <PackageVersion Include="DirectoryService.FileService.Communication" Version="1.0.2" />
+    <PackageVersion Include="DirectoryService.Framework" Version="1.0.2" />
+    <PackageVersion Include="DirectoryService.SharedKernel" Version="1.0.3" />
+    <PackageVersion Include="FluentValidation" Version="12.1.1" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Http" Version="2.3.9" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity" Version="2.3.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.10.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.13" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.14" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="Quartz" Version="3.18.1" />
     <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.18.1" />
     <PackageVersion Include="Quartz.Serialization.Json" Version="3.18.1" />
     <PackageVersion Include="Respawn" Version="7.0.0" />
+    <PackageVersion Include="Scrutor" Version="6.1.0" />
+    <PackageVersion Include="Serilog" Version="4.3.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
-    <PackageVersion Include="DirectoryService.Core" Version="1.0.2" />
-    <PackageVersion Include="DirectoryService.SharedKernel" Version="1.0.3" />
-    <PackageVersion Include="DirectoryService.Framework" Version="1.0.2" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.0" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="Testcontainers.Minio" Version="4.11.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.11.0" />
     <PackageVersion Include="xunit" Version="2.9.2" />

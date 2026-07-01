@@ -8,6 +8,7 @@ WORKDIR /src
 
 COPY ["Directory.Packages.props", "."]
 COPY ["Directory.Build.props", "."]
+COPY [".editorconfig", "FileService/"]
 
 RUN --mount=type=secret,id=nuget_username \
     --mount=type=secret,id=nuget_password \
@@ -17,27 +18,27 @@ RUN --mount=type=secret,id=nuget_username \
         --password $(cat /run/secrets/nuget_password) \
         --store-password-in-clear-text
 
-COPY ["src/FileService.Web/FileService.Web.csproj", "src/FileService.Web/"]
-COPY ["src/FileService.Contracts/FileService.Contracts.csproj", "src/FileService.Contracts/"]
-COPY ["src/FileService.Core/FileService.Core.csproj", "src/FileService.Core/"]
-COPY ["src/FileService.Domain/FileService.Domain.csproj", "src/FileService.Domain/"]
-COPY ["src/FileService.Infrastructure.Postgres/FileService.Infrastructure.Postgres.csproj", "src/FileService.Infrastructure.Postgres/"]
-COPY ["src/FileService.Infrastructure.S3/FileService.Infrastructure.S3.csproj", "src/FileService.Infrastructure.S3/"]
-RUN dotnet restore "./src/FileService.Web/FileService.Web.csproj"
-COPY . .
+COPY ["FileService/src/FileService.Web/FileService.Web.csproj", "FileService/src/FileService.Web/"]
+COPY ["FileService/src/FileService.Contracts/FileService.Contracts.csproj", "FileService/src/FileService.Contracts/"]
+COPY ["FileService/src/FileService.Core/FileService.Core.csproj", "FileService/src/FileService.Core/"]
+COPY ["FileService/src/FileService.Domain/FileService.Domain.csproj", "FileService/src/FileService.Domain/"]
+COPY ["FileService/src/FileService.Infrastructure.Postgres/FileService.Infrastructure.Postgres.csproj", "FileService/src/FileService.Infrastructure.Postgres/"]
+COPY ["FileService/src/FileService.Infrastructure.S3/FileService.Infrastructure.S3.csproj", "FileService/src/FileService.Infrastructure.S3/"]
+RUN dotnet restore "./FileService/src/FileService.Web/FileService.Web.csproj"
+COPY ["FileService", "FileService/"]
 
 RUN dotnet tool install --global dotnet-ef --version 9.0.0
 ENV PATH="/root/.dotnet/tools:${PATH}"
 
 RUN dotnet ef migrations bundle \
-    --project "src/FileService.Infrastructure.Postgres/FileService.Infrastructure.Postgres.csproj" \
-    --startup-project "src/FileService.Web/FileService.Web.csproj" \
+    --project "FileService/src/FileService.Infrastructure.Postgres/FileService.Infrastructure.Postgres.csproj" \
+    --startup-project "FileService/src/FileService.Web/FileService.Web.csproj" \
     --output /app/efbundle \
     --configuration Release \
     --verbose \
     --self-contained
 
-WORKDIR "/src/src/FileService.Web"
+WORKDIR "/src/FileService/src/FileService.Web"
 RUN dotnet build "./FileService.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
