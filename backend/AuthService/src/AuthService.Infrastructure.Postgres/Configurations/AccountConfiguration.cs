@@ -10,9 +10,10 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
     {
         builder.ToTable("accounts");
 
-        builder.Property(a => a.Id).HasColumnName("id");
+        builder.Property(a => a.Id).HasColumnName("id").ValueGeneratedNever();
         builder.Property(a => a.Email).HasColumnName("email");
         builder.Property(a => a.UserName).HasColumnName("user_name");
+        builder.Property(a => a.NormalizedUserName).HasColumnName("normalized_user_name");
         builder.Property(a => a.AccessFailedCount).HasColumnName("access_failed_count");
         builder.Property(a => a.ConcurrencyStamp).HasColumnName("concurrency_stamp");
         builder.Property(a => a.EmailConfirmed).HasColumnName("email_confirmed");
