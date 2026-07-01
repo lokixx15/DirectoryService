@@ -2,8 +2,8 @@
   directory-service:
     container_name: directory-service
     build:
-      context: ./backend/DirectoryService
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: DirectoryService/Dockerfile
       secrets:
         - nuget_username
         - nuget_password
@@ -30,8 +30,8 @@
   directory-service-migrations:
     container_name: directory-service-migrations
     build:
-      context: ./backend/DirectoryService
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: DirectoryService/Dockerfile
       secrets:
         - nuget_username
         - nuget_password
@@ -43,16 +43,18 @@
       postgres:
         condition: service_healthy
     restart: no
-    entrypoint: [
-      "/bin/sh", 
-      "-c", 
-      './efbundle --connection "$DIRECTORY_SERVICE_CONNECTION"']
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        './efbundle --connection "$DIRECTORY_SERVICE_CONNECTION"',
+      ]
 
   file-service:
     container_name: file-service
     build:
-      context: ./backend/FileService
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: FileService/Dockerfile
       secrets:
         - nuget_username
         - nuget_password
@@ -78,12 +80,11 @@
         condition: service_healthy
     restart: always
 
-
   file-service-migrations:
     container_name: file-service-migrations
     build:
-      context: ./backend/FileService
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: FileService/Dockerfile
       secrets:
         - nuget_username
         - nuget_password
@@ -95,10 +96,57 @@
       postgres:
         condition: service_healthy
     restart: no
-    entrypoint: [
-      "/bin/sh", 
-      "-c", 
-      './efbundle --connection "$FILE_SERVICE_CONNECTION"']
+    entrypoint:
+      ["/bin/sh", "-c", './efbundle --connection "$FILE_SERVICE_CONNECTION"']
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./backend
+      dockerfile: AuthService/Dockerfile
+      secrets:
+        - nuget_username
+        - nuget_password
+    env_file:
+      - .env
+    ports:
+      - "9004:9004"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:9004
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/9004"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service-migrations:
+        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
+    restart: always
+
+  auth-service-migrations:
+    container_name: auth-service-migrations
+    build:
+      context: ./backend
+      dockerfile: AuthService/Dockerfile
+      secrets:
+        - nuget_username
+        - nuget_password
+    env_file:
+      - .env
+    environment:
+      - AUTH_SERVICE_CONNECTION=${AUTH_SERVICE_CONNECTION}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: no
+    entrypoint:
+      ["/bin/sh", "-c", './efbundle --connection "$AUTH_SERVICE_CONNECTION"']
 
   frontend:
     container_name: frontend-directory-service

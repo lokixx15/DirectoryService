@@ -140,18 +140,18 @@ csharp_indent_labels = one_less_than_current
 csharp_preferred_modifier_order = public, private, protected, internal, static, extern, new, virtual, abstract, sealed, override, readonly, unsafe, volatile, async:suggestion
 
 # Code style defaults
-csharp_using_directive_placement = outside_namespace:silent
+csharp_using_directive_placement = outside_namespace:error
 csharp_prefer_braces = true:silent
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = false
 csharp_prefer_static_local_function = true:suggestion
-csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_simple_using_statement = false:none
 csharp_style_prefer_switch_expression = true:suggestion
 
 # Expression-bodied members
-csharp_style_expression_bodied_methods = false:silent
-csharp_style_expression_bodied_constructors = false:silent
-csharp_style_expression_bodied_operators = false:silent
+csharp_style_expression_bodied_methods = true:silent
+csharp_style_expression_bodied_constructors = true:silent
+csharp_style_expression_bodied_operators = true:silent
 csharp_style_expression_bodied_properties = true:silent
 csharp_style_expression_bodied_indexers = true:silent
 csharp_style_expression_bodied_accessors = true:silent
@@ -310,9 +310,36 @@ dotnet_diagnostic.CA1001.severity = none
 dotnet_diagnostic.CA2234.severity = none
 dotnet_diagnostic.CA1812.severity = none
 dotnet_diagnostic.SA1519.severity = none
+dotnet_diagnostic.CA1716.severity = none
+dotnet_diagnostic.CA1036.severity = none
+dotnet_diagnostic.CA1008.severity = none
+dotnet_diagnostic.SA1516.severity = none
+dotnet_diagnostic.SA1615.severity = none
+dotnet_diagnostic.SA1015.severity = none
+dotnet_diagnostic.CA1034.severity = none
+dotnet_diagnostic.CA1303.severity = none
+dotnet_diagnostic.CA1000.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1063.severity = none
+dotnet_diagnostic.ASP0020.severity = none
+dotnet_diagnostic.CA1040.severity = none
+dotnet_diagnostic.CA1024.severity = none
+dotnet_diagnostic.CA1721.severity = none
+dotnet_diagnostic.CA1860.severity = none
+dotnet_diagnostic.CA1310.severity = none
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1307.severity = none
+dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.CA1819.severity = none
+dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1503.severity = none
+dotnet_diagnostic.SA1502.severity = none
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.CA1861.severity = none
 
 # Отключаем или меняем уровень серьезности предупреждения SA1310, чтобы не конфликтовало с новыми правилами.
 dotnet_diagnostic.SA1310.severity = none
+dotnet_diagnostic.SA1202.severity = none
 
 # Определяем символы для публичных констант
 dotnet_naming_symbols.public_constants.applicable_kinds = field
