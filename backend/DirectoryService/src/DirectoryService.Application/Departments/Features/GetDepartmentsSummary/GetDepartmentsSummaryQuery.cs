@@ -3,5 +3,5 @@ using SharedService.Core.Abstractions;
 
 namespace DirectoryService.Application.Locations.Features.GetLocations;
 
-public record GetDepartmentsQuery(GetDepartmentsRequest Request)
+public record GetDepartmentsSummaryQuery(GetDepartmentsSummaryRequest Request)
     : IQuery;

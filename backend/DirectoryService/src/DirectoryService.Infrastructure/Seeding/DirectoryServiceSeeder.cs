@@ -202,7 +202,7 @@ public sealed class DirectoryServiceSeeder : ISeeder
                 id: positionId,
                 name: positionName,
                 description: description,
-                departments: [DepartmentPosition.Create(departments[i].Id,  positionId).Value]).Value;
+                departments: [DepartmentPosition.Create(departments[i].Id, positionId).Value]).Value;
 
             await _dbContext.Positions.AddAsync(position, cancellationToken);
         }

@@ -1,8 +1,9 @@
-﻿using DirectoryService.Application.Departments.Features.CreateDepartment;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Departments.Features.CreateDepartment;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
@@ -24,7 +25,7 @@ public class CreateDepartmentTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<CreateDepartmentHandler, Result<Guid, Errors>>(sut =>
         {
             var command = new CreateDepartmentCommand(new CreateDepartmentRequest(
                 "Regional",
@@ -56,7 +57,7 @@ public class CreateDepartmentTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<CreateDepartmentHandler, Result<Guid, Errors>>(sut =>
         {
             var command = new CreateDepartmentCommand(new CreateDepartmentRequest(
                 "Re",
@@ -84,7 +85,7 @@ public class CreateDepartmentTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<CreateDepartmentHandler, Result<Guid, Errors>>(sut =>
         {
             var command = new CreateDepartmentCommand(new CreateDepartmentRequest(
                 "Regional",
@@ -104,13 +105,5 @@ public class CreateDepartmentTests : DirectoryBaseTests
             Assert.True(result.IsSuccess);
             Assert.NotEqual(Guid.Empty, result.Value);
         });
-    }
-
-    private async Task<T> ExecuteHandler<T>(Func<CreateDepartmentHandler, Task<T>> action)
-    {
-        await using var scope = Services.CreateAsyncScope();
-        var sut = scope.ServiceProvider.GetRequiredService<CreateDepartmentHandler>();
-
-        return await action(sut);
     }
 }

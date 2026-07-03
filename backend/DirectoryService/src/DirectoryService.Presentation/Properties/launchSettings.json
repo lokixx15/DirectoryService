@@ -4,7 +4,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "launchUrl": "http://localhost:8001/swagger",
+      "launchUrl": "http://localhost:8002/swagger",
       "applicationUrl": "http://localhost:8002",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -16,7 +16,7 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ASPNETCORE_HTTPS_PORTS": "9001",
+        "ASPNETCORE_HTTPS_PORTS": "9001"
       },
       "publishAllPorts": true,
       "useSSL": true

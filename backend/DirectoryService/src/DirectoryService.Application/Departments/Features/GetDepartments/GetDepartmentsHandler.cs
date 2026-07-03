@@ -1,5 +1,4 @@
-﻿using System.Text;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Locations.Features.GetLocations;
@@ -13,25 +12,24 @@ using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Departments.Features.GetDepartments;
 
-public sealed class GetDepartmentsSummaryHandler : IQueryHandler<Result<PaginationResponse<DepartmentSummaryDto>, Errors>, GetDepartmentsSummaryQuery>
+public sealed class GetDepartmentsHandler : IQueryHandler<Result<PaginationResponse<DepartmentStandardDto>, Errors>, GetDepartmentsQuery>
 {
     private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IValidator<GetDepartmentsQuery> _validator;
+    private readonly ILogger<GetDepartmentsHandler> _logger;
 
-    private readonly IValidator<GetDepartmentsSummaryQuery> _validator;
-    private readonly ILogger<GetDepartmentsSummaryHandler> _logger;
-
-    public GetDepartmentsSummaryHandler(
+    public GetDepartmentsHandler(
         IDbConnectionFactory connectionFactory,
-        IValidator<GetDepartmentsSummaryQuery> validator,
-        ILogger<GetDepartmentsSummaryHandler> logger)
+        IValidator<GetDepartmentsQuery> validator,
+        ILogger<GetDepartmentsHandler> logger)
     {
         _connectionFactory = connectionFactory;
         _validator = validator;
         _logger = logger;
     }
 
-    public async Task<Result<PaginationResponse<DepartmentSummaryDto>, Errors>> Handle(
-        GetDepartmentsSummaryQuery query,
+    public async Task<Result<PaginationResponse<DepartmentStandardDto>, Errors>> Handle(
+        GetDepartmentsQuery query,
         CancellationToken cancellationToken)
     {
         var queryValidationResult = await _validator.ValidateAsync(query, cancellationToken);
@@ -48,24 +46,67 @@ public sealed class GetDepartmentsSummaryHandler : IQueryHandler<Result<Paginati
         parameters.Add("page_size", query.Request.pageSize);
         parameters.Add("offset", (query.Request.Page - 1) * query.Request.pageSize);
 
-        string whereCondition = string.Empty;
+        var whereConditions = new List<string>();
 
         if (!string.IsNullOrEmpty(query.Request.Search))
         {
             parameters.Add("search", query.Request.Search);
-            whereCondition = "WHERE name ILIKE '%' || @search || '%'";
+            whereConditions.Add("name ILIKE '%' || @search || '%'");
         }
+
+        if (query.Request.ParentId != null)
+        {
+            parameters.Add("parentId", query.Request.ParentId);
+            whereConditions.Add("parent_id = @parentId");
+        }
+
+        if (query.Request.LocationIds != null)
+        {
+            parameters.Add("locationIds", query.Request.LocationIds);
+            whereConditions.Add("""
+                                EXISTS(
+                                    SELECT 1
+                                    FROM department_location AS dl
+                                    WHERE dl.department_id = d.id AND 
+                                        dl.location_id = ANY(@locationIds))
+                                """);
+        }
+
+        if (query.Request.ExcludeDepartmentIds != null)
+        {
+            parameters.Add("excludeIds", query.Request.ExcludeDepartmentIds);
+            whereConditions.Add("d.id != ALL(@excludeIds)");
+        }
+
+        var orderBy = query.Request.OrderBy switch
+        {
+            "name" => "d.name",
+            "createdDate" => "d.created_at",
+            "updatedDate" => "d.updated_at",
+            _ => "d.created_at"
+        };
+
+        var orderDirection = query.Request.OrderDirection.ToUpper() == "ASC" ? "ASC" : "DESC";
+
+        var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
+        var orderByClause = $"ORDER BY {orderBy} {orderDirection}";
 
         long? totalCount = null;
 
-        var departmentDtos = await connection.QueryAsync<DepartmentSummaryDto, long, DepartmentSummaryDto>(
+        var departmentDtos = await connection.QueryAsync<DepartmentStandardDto, long, DepartmentStandardDto>(
             $"""
-                SELECT id,
-                       name,
-                       identifier,
+                SELECT d.id,
+                       d.name,
+                       d.identifier,
+                       d.path,
+                       d.is_active,
+                       d.created_at,
+                       d.updated_at,
+                       d.deleted_at,
                        COUNT(*) OVER() AS total_count
-                FROM departments
-                {whereCondition}
+                FROM departments AS d
+                {whereClause}
+                {orderByClause}
                 LIMIT @page_size OFFSET @offset
              """,
             map: (dSD, l) =>
@@ -76,6 +117,6 @@ public sealed class GetDepartmentsSummaryHandler : IQueryHandler<Result<Paginati
             parameters,
             splitOn: "total_count");
 
-        return new PaginationResponse<DepartmentSummaryDto>(departmentDtos.ToList(), totalCount ?? 0);
+        return new PaginationResponse<DepartmentStandardDto>(departmentDtos.ToList(), totalCount ?? 0);
     }
 }
