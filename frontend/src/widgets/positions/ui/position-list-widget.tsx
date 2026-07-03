@@ -42,8 +42,6 @@ export function PositionListWidget() {
     return <SkeletonCard quantity={6} />;
   }
 
-  console.log(positions?.length);
-
   return (
     <div>
       <div className="flex justify-between mb-3">
