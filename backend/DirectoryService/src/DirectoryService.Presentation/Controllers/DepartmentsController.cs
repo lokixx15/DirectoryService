@@ -20,6 +20,16 @@ namespace DirectoryService.Presentation.Controllers;
 public sealed class DepartmentsController : ControllerBase
 {
     [HttpGet]
+    public async Task<EndpointResult<PaginationResponse<DepartmentStandardDto>>> GetDepartmentsSummary(
+        [FromQuery] GetDepartmentsRequest request,
+        [FromServices] GetDepartmentsHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetDepartmentsQuery(request);
+        return await handler.Handle(query, cancellationToken);
+    }
+
+    [HttpGet]
     [Route("summary")]
     public async Task<EndpointResult<PaginationResponse<DepartmentSummaryDto>>> GetDepartmentsSummary(
         [FromQuery] GetDepartmentsSummaryRequest request,

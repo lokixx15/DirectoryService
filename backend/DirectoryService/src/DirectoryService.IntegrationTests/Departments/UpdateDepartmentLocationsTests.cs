@@ -1,8 +1,9 @@
-﻿using DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
@@ -28,7 +29,7 @@ public class UpdateDepartmentLocationsTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<UpdateDepartmentLocationsHadnler, UnitResult<Errors>>(sut =>
         {
             var command = new UpdateDepartmentLocationsCommand(
                 department.Id,
@@ -54,7 +55,7 @@ public class UpdateDepartmentLocationsTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<UpdateDepartmentLocationsHadnler, UnitResult<Errors>>(sut =>
         {
             var command = new UpdateDepartmentLocationsCommand(
                 Guid.NewGuid(),
@@ -78,7 +79,7 @@ public class UpdateDepartmentLocationsTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<UpdateDepartmentLocationsHadnler, UnitResult<Errors>>(sut =>
         {
             var command = new UpdateDepartmentLocationsCommand(
                 department.Id,
@@ -89,13 +90,5 @@ public class UpdateDepartmentLocationsTests : DirectoryBaseTests
 
         Assert.NotNull(result.Error);
         Assert.False(result.IsSuccess);
-    }
-
-    private async Task<T> ExecuteHandler<T>(Func<UpdateDepartmentLocationsHadnler, Task<T>> action)
-    {
-        await using var scope = Services.CreateAsyncScope();
-        var sut = scope.ServiceProvider.GetRequiredService<UpdateDepartmentLocationsHadnler>();
-
-        return await action(sut);
     }
 }

@@ -4,9 +4,9 @@ using SharedService.SharedKernel;
 
 namespace DirectoryService.Application.Locations.Features.GetLocations;
 
-public class GetDepartmentsQueryValidator : AbstractValidator<GetDepartmentsQuery>
+public class GetDepartmentsSummaryQueryValidator : AbstractValidator<GetDepartmentsSummaryQuery>
 {
-    public GetDepartmentsQueryValidator()
+    public GetDepartmentsSummaryQueryValidator()
     {
         RuleFor(query => query.Request.Search)
             .MaximumLength(1000)

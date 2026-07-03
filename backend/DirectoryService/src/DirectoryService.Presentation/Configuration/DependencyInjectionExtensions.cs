@@ -10,8 +10,8 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddProgramDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddSerilogLogging(configuration)
-            .AddApplication(configuration)
             .AddInfrastructure(configuration)
+            .AddApplication(configuration)
             .AddWeb();
 
     private static IServiceCollection AddWeb(this IServiceCollection services)
@@ -21,7 +21,7 @@ public static class DependencyInjectionExtensions
         services.AddControllers();
 
         services.Configure<ApiBehaviorOptions>(options =>
-        options.SuppressModelStateInvalidFilter = true);
+            options.SuppressModelStateInvalidFilter = true);
 
         services.AddOpenApi();
 

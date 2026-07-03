@@ -92,8 +92,7 @@ public sealed class ClearingInactiveDepartmentsService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex, "Critical error during clearing inactive departments");
-                throw;
+                _logger.LogError(ex, "Critical error during clearing inactive departments");
             }
 
             await Task.Delay(cleaningInterval, stoppingToken);

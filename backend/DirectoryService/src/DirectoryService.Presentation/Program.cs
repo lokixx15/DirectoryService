@@ -30,7 +30,4 @@ finally
     Log.CloseAndFlush();
 }
 
-namespace DirectoryService.Presentation
-{
-    public partial class Program;
-}
+public partial class Program;

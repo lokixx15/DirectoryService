@@ -1,8 +1,9 @@
-﻿using DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using SharedService.SharedKernel;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
@@ -26,7 +27,7 @@ public class UpdateDepartmentParentTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<UpdateDepartmentParentHandler, UnitResult<Errors>>(sut =>
         {
             var command = new UpdateDepartmentParentCommand(
                 department.Id,
@@ -50,7 +51,7 @@ public class UpdateDepartmentParentTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<UpdateDepartmentParentHandler, UnitResult<Errors>>(sut =>
         {
             var command = new UpdateDepartmentParentCommand(
                 department.Id,
@@ -74,7 +75,7 @@ public class UpdateDepartmentParentTests : DirectoryBaseTests
 
         var cancellationToken = CancellationToken.None;
 
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<UpdateDepartmentParentHandler, UnitResult<Errors>>(sut =>
         {
             var command = new UpdateDepartmentParentCommand(
                 department.Id,
@@ -85,13 +86,5 @@ public class UpdateDepartmentParentTests : DirectoryBaseTests
 
         Assert.NotNull(result.Error);
         Assert.False(result.IsSuccess);
-    }
-
-    private async Task<T> ExecuteHandler<T>(Func<UpdateDepartmentParentHandler, Task<T>> action)
-    {
-        await using var scope = Services.CreateAsyncScope();
-        var sut = scope.ServiceProvider.GetRequiredService<UpdateDepartmentParentHandler>();
-
-        return await action(sut);
     }
 }

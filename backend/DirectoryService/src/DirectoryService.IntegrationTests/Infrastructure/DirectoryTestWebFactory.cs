@@ -1,13 +1,15 @@
-﻿using System.Data.Common;
+﻿using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Infrastructure;
-using DirectoryService.Presentation;
+using DirectoryService.Infrastructure.BackgroundTasks.ClearingInactiveDepartments;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using Respawn;
+using System.Data.Common;
 using Testcontainers.PostgreSql;
 
 namespace DirectoryService.IntegrationTests.Infrastructure;
@@ -58,9 +60,14 @@ public class DirectoryTestWebFactory : WebApplicationFactory<Program>, IAsyncLif
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<DirectoryServiceDbContext>();
+            services.RemoveAll<IDbConnectionFactory>();
+            services.RemoveAll<ClearingInactiveDepartmentsService>();
+            services.RemoveAll<IDistributedCache>();
 
+            services.AddDistributedMemoryCache();
             services.TryAddScoped(_ =>
                 new DirectoryServiceDbContext(_dbContainer.GetConnectionString()));
+            services.AddScoped<IDbConnectionFactory>(sp => sp.GetRequiredService<DirectoryServiceDbContext>());
         });
     }
 
