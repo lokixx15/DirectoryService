@@ -24,6 +24,18 @@ public sealed class LocationsController : ControllerBase
         return await handler.Handle(query, cancellationToken);
     }
 
+    [HttpGet]
+    [Route("summary")]
+    public async Task<EndpointResult<PaginationResponse<LocationSummaryDto>>> GetLocations(
+        [FromServices] GetLocationsSummaryHandler handler,
+        [FromQuery] GetLocationsSummaryRequest request,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetLocationsSummaryQuery(request);
+
+        return await handler.Handle(query, cancellationToken);
+    }
+
     [HttpPost]
     public async Task<EndpointResult<Guid>> CreateLocation(
         [FromServices] CreateLocationHandler handler,

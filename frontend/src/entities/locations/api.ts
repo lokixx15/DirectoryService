@@ -3,18 +3,32 @@ import {
   CreateLocationRequest,
   EditLocationRequest,
   GetLocationsRequest,
+  GetLocationsSummaryRequest,
   Location,
 } from "./types";
 import { apiClient } from "@/shared/api/axios-instance";
 import { PaginationResponse } from "@/shared/api/pagination-response";
 import { queryClient } from "@/shared/api/query-client";
-import { keepPreviousData, mutationOptions, queryOptions } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  mutationOptions,
+  queryOptions,
+} from "@tanstack/react-query";
 
 export const locationsApi = {
   getLocations: async (request: GetLocationsRequest) => {
     const response = await apiClient.get<
       Envelope<PaginationResponse<Location>>
     >("directory/locations", {
+      params: request,
+    });
+
+    return response.data;
+  },
+  getLocationsSummary: async (request: GetLocationsSummaryRequest) => {
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Location>>
+    >("directory/locations/summary", {
       params: request,
     });
 
@@ -37,7 +51,9 @@ export const locationsApi = {
     return response.data;
   },
   deleteLocation: async (id: string) => {
-    const response = await apiClient.delete<Envelope>(`directory/locations/${id}`);
+    const response = await apiClient.delete<Envelope>(
+      `directory/locations/${id}`,
+    );
 
     return response.data;
   },
@@ -75,6 +91,22 @@ export const locationsQueryOptions = {
         isActive,
         departmentIds,
       ],
+      placeholderData: keepPreviousData,
+    });
+  },
+  getLocationsSummaryOptions: ({
+    page,
+    pageSize,
+    search,
+  }: GetLocationsSummaryRequest) => {
+    return queryOptions({
+      queryFn: async () =>
+        await locationsApi.getLocationsSummary({
+          page: page + 1,
+          pageSize,
+          search,
+        }),
+      queryKey: [locationsQueryOptions.baseKey, page, pageSize, search],
       placeholderData: keepPreviousData,
     });
   },

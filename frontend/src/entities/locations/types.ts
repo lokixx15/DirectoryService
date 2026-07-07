@@ -8,6 +8,13 @@ export type Location = {
   updatedAt: Date;
 };
 
+export type LocationSummary = {
+  id: string;
+  name: string;
+  address: LocationAddress;
+  timezone: string;
+};
+
 export type LocationAddress = {
   country: string;
   city: string;
@@ -26,6 +33,12 @@ export type GetLocationsRequest = {
   isActive?: boolean;
   orderBy?: string;
   orderDirection?: string;
+};
+
+export type GetLocationsSummaryRequest = {
+  page: number;
+  pageSize: number;
+  search?: string;
 };
 
 export type CreateLocationRequest = {

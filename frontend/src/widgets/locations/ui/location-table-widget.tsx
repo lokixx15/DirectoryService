@@ -35,7 +35,7 @@ import {
 } from "@/shared/components/ui/table";
 import { StatusFilter } from "@/shared/components/filters/status-filter";
 
-export function LocationTable() {
+export function LocationTableWidget() {
   const { page, pageSize, onPageIndexChange, onPageSizeChange } =
     usePagination(10);
   const [search, setSearch] = useState("");
@@ -78,6 +78,7 @@ export function LocationTable() {
     [],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: locations || [],
     columns,
@@ -104,7 +105,7 @@ export function LocationTable() {
         <div className="flex flex-row items-center gap-2">
           <ColumnsDropdown table={table} />
           <StatusFilter onIsActive={setIsActive} />
-          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds} />
+          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>Related departments</DepartmentMenu>
           <CreateLocationDialog />
         </div>
       </div>
@@ -174,8 +175,6 @@ export function LocationTable() {
         pageSize={pageSize}
         totalCount={totalCount}
         totalPages={totalPages}
-        canPreviousPage={page > 0}
-        canNextPage={page < totalPages - 1}
         onPageIndexChange={onPageIndexChange}
         onPageSizeChange={onPageSizeChange}
       />
