@@ -27,19 +27,23 @@ import { DepartmentActions } from "./department-actions";
 import { useDebounce } from "@/shared/hooks/use-debounce";
 
 interface DepartmentSelectProps {
+  addedDepartmentIds: string[];
+  excludedDepartmentIds: string[];
+  onAddedDepartmentIdsChange: (ids: string[]) => void;
+  onExcludedDepartmentIdsChange: (ids: string[]) => void;
   locationIds: string[];
   filterActions?: ReactNode;
 }
 
 export function DepartmentSelect({
+  addedDepartmentIds,
+  excludedDepartmentIds,
+  onAddedDepartmentIdsChange,
+  onExcludedDepartmentIdsChange,
   locationIds,
   filterActions,
 }: DepartmentSelectProps) {
   const { page, pageSize, onPageSizeChange } = usePagination(10);
-  const [departmentIds, setDepartmentIds] = useState<string[]>([]);
-  const [excludeDepartmentIds, setExcludeDepartmentIds] = useState<string[]>(
-    [],
-  );
   const [search, setSearch] = useState<string>();
   const debouncedSearch = useDebounce(search, 400);
 
@@ -58,8 +62,8 @@ export function DepartmentSelect({
     applySelectedAddedDepartments,
     applySelectedExcludedDepartments,
   } = useDepartmentSelect({
-    onAddedChange: setDepartmentIds,
-    onExcludeChange: setExcludeDepartmentIds,
+    onAddedChange: onAddedDepartmentIdsChange,
+    onExcludeChange: onExcludedDepartmentIdsChange,
   });
 
   const {
@@ -72,9 +76,7 @@ export function DepartmentSelect({
     refetch,
   } = useDepartments({
     search: debouncedSearch,
-    departmentIds,
     locationIds,
-    excludeDepartmentIds,
     isActive,
     page,
     pageSize,
@@ -92,8 +94,8 @@ export function DepartmentSelect({
   const hasPendingSelections =
     selectedAddedDepartments.length > 0 ||
     selectedExcludedDepartments.length > 0 ||
-    departmentIds.length > 0 ||
-    excludeDepartmentIds.length > 0;
+    addedDepartmentIds.length > 0 ||
+    excludedDepartmentIds.length > 0;
 
   return (
     <DropdownMenu>

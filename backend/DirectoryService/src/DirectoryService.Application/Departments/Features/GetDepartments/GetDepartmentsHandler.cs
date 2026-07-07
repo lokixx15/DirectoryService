@@ -72,18 +72,6 @@ public sealed class GetDepartmentsHandler : IQueryHandler<Result<PaginationRespo
                                 """);
         }
 
-        if (query.Request.DepartmentIds is { Length: > 0 })
-        {
-            parameters.Add("departmentIds", query.Request.DepartmentIds);
-            whereConditions.Add("d.id = ANY(@departmentIds)");
-        }
-
-        if (query.Request.ExcludeDepartmentIds is { Length: > 0 })
-        {
-            parameters.Add("excludeIds", query.Request.ExcludeDepartmentIds);
-            whereConditions.Add("d.id != ALL(@excludeIds)");
-        }
-
         var orderBy = query.Request.OrderBy switch
         {
             "name" => "d.name",

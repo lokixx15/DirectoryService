@@ -24,8 +24,6 @@ export type DepartmentStandard = {
 export type GetDepartmentsRequest = {
   search?: string;
   locationIds?: string[];
-  departmentIds?: string[]; 
-  excludeDepartmentIds?: string[];
   isActive?: boolean;
   page: number;
   pageSize: number;

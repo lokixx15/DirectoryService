@@ -5,8 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 interface UseDepartmentsProps {
   search?: string;
   locationIds?: string[];
-  departmentIds: string[];
-  excludeDepartmentIds?: string[];
   isActive?: boolean;
   page: number;
   pageSize: number;
@@ -16,8 +14,6 @@ interface UseDepartmentsProps {
 export function useDepartments({
   search,
   locationIds,
-  departmentIds,
-  excludeDepartmentIds,
   isActive,
   page,
   pageSize,
@@ -26,9 +22,7 @@ export function useDepartments({
   const { data, isFetching, isPending, isError, refetch } = useQuery(
     departmentsQueryOptions.getDepartmentsOptions({
       search: search || undefined,
-      departmentIds: departmentIds || undefined,
       locationIds: locationIds || undefined,
-      excludeDepartmentIds: excludeDepartmentIds || undefined,
       isActive: isActive,
       page: page,
       pageSize: pageSize,

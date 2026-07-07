@@ -57,8 +57,6 @@ export const departmentsQueryOptions = {
   getDepartmentsOptions: ({
     search,
     locationIds,
-    departmentIds,
-    excludeDepartmentIds,
     isActive,
     page,
     pageSize,
@@ -70,8 +68,6 @@ export const departmentsQueryOptions = {
         await departmentsApi.getDepartments({
           search,
           locationIds,
-          departmentIds,
-          excludeDepartmentIds,
           isActive,
           page: page + 1,
           pageSize,
@@ -82,8 +78,6 @@ export const departmentsQueryOptions = {
         departmentsQueryOptions.baseKey,
         search,
         locationIds,
-        departmentIds,
-        excludeDepartmentIds,
         isActive,
         page,
         pageSize,
