@@ -48,19 +48,19 @@ public sealed class GetDepartmentsHandler : IQueryHandler<Result<PaginationRespo
 
         var whereConditions = new List<string>();
 
+        if (query.Request.IsActive.HasValue)
+        {
+            parameters.Add("is_active", query.Request.IsActive);
+            whereConditions.Add("d.is_active = @is_active");
+        }
+
         if (!string.IsNullOrEmpty(query.Request.Search))
         {
             parameters.Add("search", query.Request.Search);
             whereConditions.Add("name ILIKE '%' || @search || '%'");
         }
 
-        if (query.Request.ParentId != null)
-        {
-            parameters.Add("parentId", query.Request.ParentId);
-            whereConditions.Add("parent_id = @parentId");
-        }
-
-        if (query.Request.LocationIds != null)
+        if (query.Request.LocationIds is { Length: > 0 })
         {
             parameters.Add("locationIds", query.Request.LocationIds);
             whereConditions.Add("""
@@ -72,7 +72,13 @@ public sealed class GetDepartmentsHandler : IQueryHandler<Result<PaginationRespo
                                 """);
         }
 
-        if (query.Request.ExcludeDepartmentIds != null)
+        if (query.Request.DepartmentIds is { Length: > 0 })
+        {
+            parameters.Add("departmentIds", query.Request.DepartmentIds);
+            whereConditions.Add("d.id = ANY(@departmentIds)");
+        }
+
+        if (query.Request.ExcludeDepartmentIds is { Length: > 0 })
         {
             parameters.Add("excludeIds", query.Request.ExcludeDepartmentIds);
             whereConditions.Add("d.id != ALL(@excludeIds)");

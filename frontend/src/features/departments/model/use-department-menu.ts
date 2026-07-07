@@ -1,7 +1,7 @@
 import { DepartmentSummary } from "@/entities/departments";
 import { useState } from "react";
 
-interface UseDepartmentSelectorReturn {
+interface UseDepartmentMenuReturn {
   open: boolean;
   selectedDepartments: DepartmentSummary[];
   appliedDepartments: DepartmentSummary[];
@@ -12,9 +12,9 @@ interface UseDepartmentSelectorReturn {
   clearSelectedDepartments: () => void;
 }
 
-export function useDepartmentSelector(
+export function useDepartmentMenu(
   onChange: (ids: string[]) => void,
-): UseDepartmentSelectorReturn {
+): UseDepartmentMenuReturn {
   const [open, setOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<DepartmentSummary[]>([]);
   const [applied, setApplied] = useState<DepartmentSummary[]>([]);

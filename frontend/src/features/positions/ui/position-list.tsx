@@ -1,4 +1,5 @@
 import { Position } from "@/entities/positions/types";
+import { Badge } from "@/shared/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -62,16 +63,9 @@ export function PositionList({
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle>{p.name}</CardTitle>
-                  <span
-                    className={cn(
-                      "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium",
-                      p.isActive
-                        ? "bg-primary/10 text-primary"
-                        : "bg-muted text-muted-foreground",
-                    )}
-                  >
+                  <Badge variant={p.isActive ? "success" : "destructive"}>
                     {p.isActive ? "Active" : "Inactive"}
-                  </span>
+                  </Badge>
                 </div>
                 {p.description && (
                   <p className="text-sm text-muted-foreground line-clamp-2">

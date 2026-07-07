@@ -2,9 +2,10 @@
 
 public record GetDepartmentsRequest(
     string? Search,
-    Guid? ParentId,
     Guid[]? LocationIds,
+    Guid[]? DepartmentIds,
     Guid[]? ExcludeDepartmentIds,
+    bool? IsActive,
     int Page = 1,
     int pageSize = 20,
     string OrderBy = "createdDate",

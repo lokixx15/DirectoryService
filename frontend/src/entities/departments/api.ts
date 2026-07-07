@@ -1,5 +1,10 @@
 import { apiClient } from "@/shared/api/axios-instance";
-import { DepartmentSummary, GetDepartmentsSummaryRequest } from "./types";
+import {
+  DepartmentStandard,
+  DepartmentSummary,
+  GetDepartmentsRequest,
+  GetDepartmentsSummaryRequest,
+} from "./types";
 import { Envelope } from "@/shared/api/envelope";
 import { PaginationResponse } from "@/shared/api/pagination-response";
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
@@ -9,6 +14,15 @@ export const departmentsApi = {
     const response = await apiClient.get<
       Envelope<PaginationResponse<DepartmentSummary>>
     >("directory/departments/summary", {
+      params: request,
+    });
+
+    return response.data;
+  },
+  getDepartments: async (request: GetDepartmentsRequest) => {
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<DepartmentStandard>>
+    >("directory/departments", {
       params: request,
     });
 
@@ -36,6 +50,45 @@ export const departmentsQueryOptions = {
         page,
         pageSize,
         search,
+      ],
+      placeholderData: keepPreviousData,
+    });
+  },
+  getDepartmentsOptions: ({
+    search,
+    locationIds,
+    departmentIds,
+    excludeDepartmentIds,
+    isActive,
+    page,
+    pageSize,
+    orderBy,
+    orderDirection,
+  }: GetDepartmentsRequest) => {
+    return queryOptions({
+      queryFn: async () =>
+        await departmentsApi.getDepartments({
+          search,
+          locationIds,
+          departmentIds,
+          excludeDepartmentIds,
+          isActive,
+          page: page + 1,
+          pageSize,
+          orderBy,
+          orderDirection,
+        }),
+      queryKey: [
+        departmentsQueryOptions.baseKey,
+        search,
+        locationIds,
+        departmentIds,
+        excludeDepartmentIds,
+        isActive,
+        page,
+        pageSize,
+        orderBy,
+        orderDirection,
       ],
       placeholderData: keepPreviousData,
     });

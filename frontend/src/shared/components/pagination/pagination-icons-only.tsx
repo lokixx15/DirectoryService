@@ -20,8 +20,6 @@ interface PaginationIconsOnlyProps {
   pageSize: number;
   totalCount: number;
   totalPages: number;
-  canPreviousPage: boolean;
-  canNextPage: boolean;
   onPageIndexChange: (pageIndex: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 }
@@ -31,11 +29,12 @@ export function PaginationIconsOnly({
   pageSize,
   totalCount,
   totalPages,
-  canPreviousPage,
-  canNextPage,
   onPageIndexChange,
   onPageSizeChange,
 }: PaginationIconsOnlyProps) {
+  const canNextPage = page < totalPages - 1;
+  const canPreviousPage = page > 0;
+
   return (
     <div className="flex items-center justify-between gap-4">
       <Field orientation="horizontal" className="w-fit">
@@ -60,7 +59,8 @@ export function PaginationIconsOnly({
       </Field>
       <div>
         <p className="text-sm">
-          {page + 1} of {totalPages} pages / {Math.min(pageSize * (page + 1), totalCount)} of {totalCount} items
+          {page + 1} of {totalPages} pages /{" "}
+          {Math.min(pageSize * (page + 1), totalCount)} of {totalCount} items
         </p>
       </div>
       <Pagination className="mx-0 w-auto">
@@ -73,7 +73,9 @@ export function PaginationIconsOnly({
               }}
               href="#"
               aria-disabled={!canPreviousPage}
-              className={!canPreviousPage ? "pointer-events-none opacity-50" : ""}
+              className={
+                !canPreviousPage ? "pointer-events-none opacity-50" : ""
+              }
             />
           </PaginationItem>
           <PaginationItem>

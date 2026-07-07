@@ -3,6 +3,7 @@
 import { DepartmentMenu } from "@/features/departments";
 import { usePositionList } from "@/features/positions/model/use-position-list";
 import { PositionList } from "@/features/positions/ui/position-list";
+import { NotFoundCard } from "@/shared/components/cards/not-found-card";
 import { ErrorCard } from "@/shared/components/errors/error-card";
 import { StatusFilter } from "@/shared/components/filters/status-filter";
 import { SearchBar } from "@/shared/components/search/search-bar";
@@ -48,7 +49,7 @@ export function PositionListWidget() {
         <SearchBar onSearch={setSearch} />
         <div className="flex gap-2">
           <StatusFilter onIsActive={setIsActive} />
-          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds} />
+          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>Related departments</DepartmentMenu>
         </div>
       </div>
       {positions?.length ? (
@@ -59,17 +60,7 @@ export function PositionListWidget() {
           fetchNextPage={fetchNextPage}
         />
       ) : (
-        <Card className="border-muted-foreground/20">
-          <CardContent className="flex flex-col items-center justify-center gap-2 py-16">
-            <SearchX className="size-12 text-muted-foreground/50" />
-            <p className="text-lg font-medium text-muted-foreground">
-              No positions found
-            </p>
-            <p className="text-sm text-muted-foreground/60">
-              Try adjusting your search or filters
-            </p>
-          </CardContent>
-        </Card>
+        <NotFoundCard title="Not found positions" description="Try adjusting your search or filters"/>
       )}
     </div>
   );

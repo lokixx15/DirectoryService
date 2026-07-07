@@ -8,4 +8,4 @@ public record DepartmentStandardDto(
     bool IsActive,
     DateTime CreatedAt,
     DateTime UpdatedAt,
-    DateTime DeletedAt);
+    DateTime? DeletedAt);

@@ -1,4 +1,5 @@
-﻿using DirectoryService.Application.Abstractions.Database;
+﻿using System.Data.Common;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.BackgroundTasks.ClearingInactiveDepartments;
 using Microsoft.AspNetCore.Hosting;
@@ -9,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using Respawn;
-using System.Data.Common;
 using Testcontainers.PostgreSql;
 
 namespace DirectoryService.IntegrationTests.Infrastructure;

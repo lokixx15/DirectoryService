@@ -1,1 +1,1 @@
-export { LocationTable } from "./ui/location-table";
+export { LocationTableWidget } from "./ui/location-table-widget";

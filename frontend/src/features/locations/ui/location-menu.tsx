@@ -12,30 +12,30 @@ import {
   CommandItem,
   CommandList,
 } from "@/shared/components/ui/command";
-import { useDepartmentSummaryList } from "@/features/departments/model/use-department-summary-list";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { useDebounce } from "@/shared/hooks/use-debounce";
 import { Check, X } from "lucide-react";
 import { DialogTitle } from "@/shared/components/ui/dialog";
-import { useDepartmentMenu } from "../model/use-department-menu";
 import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
 import { ErrorLabel } from "@/shared/components/errors/error-label";
+import { useLocationSummaryList } from "../model/use-location-summary-list";
+import { useLocationMenu } from "../model/use-location-menu";
 
-interface DepartmentMenuProps {
-  onDepartmentIdsChange: (departmentIds: string[]) => void;
+interface LocationMenuProps {
+  onLocationIdsChange: (locationIds: string[]) => void;
   children: ReactNode;
 }
 
-export function DepartmentMenu({
-  onDepartmentIdsChange,
+export function LocationMenu({
+  onLocationIdsChange,
   children,
-}: DepartmentMenuProps) {
+}: LocationMenuProps) {
   const { page, pageSize, onPageSizeChange } = usePagination(10);
   const [search, setSearch] = useState("");
   const debouncedValue = useDebounce(search, 300);
 
-  const { departmentsSummary, totalCount, isFetching, isError, refetch } =
-    useDepartmentSummaryList({
+  const { locationsSummary, totalCount, isFetching, isError, refetch } =
+    useLocationSummaryList({
       page,
       pageSize,
       search: debouncedValue,
@@ -43,14 +43,14 @@ export function DepartmentMenu({
 
   const {
     open,
-    selectedDepartments,
-    appliedDepartments,
-    removeDepartment,
-    clearSelectedDepartments,
-    applySelectedDepartments,
+    selectedLocations,
+    appliedLocations,
+    removeLocation,
+    clearSelectedLocations,
+    applySelectedLocations,
     onOpenDialogChange,
-    toggleDepartment,
-  } = useDepartmentMenu(onDepartmentIdsChange);
+    toggleLocation,
+  } = useLocationMenu(onLocationIdsChange);
   const [selectedItemValue, setSelectedItemValue] = useState("");
 
   return (
@@ -61,9 +61,9 @@ export function DepartmentMenu({
         className="w-fit gap-2"
       >
         {children}
-        {!open && appliedDepartments.length > 0 && (
+        {!open && appliedLocations.length > 0 && (
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-medium text-primary-foreground">
-            {appliedDepartments.length}
+            {appliedLocations.length}
           </span>
         )}
       </Button>
@@ -72,14 +72,14 @@ export function DepartmentMenu({
         <DialogTitle />
         <Command value={selectedItemValue} onValueChange={setSelectedItemValue}>
           <div className="flex flex-wrap items-center gap-1.5 border-b px-3 py-2 pr-10">
-            {selectedDepartments.map((dep) => (
+            {selectedLocations.map((dep) => (
               <span
                 key={dep.id}
                 className="flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground"
               >
                 {dep.name}
                 <Button
-                  onClick={() => removeDepartment(dep.id)}
+                  onClick={() => removeLocation(dep.id)}
                   variant="secondary"
                   className="rounded-sm opacity-60 transition-opacity hover:opacity-100 h-auto w-2"
                 >
@@ -87,9 +87,9 @@ export function DepartmentMenu({
                 </Button>
               </span>
             ))}
-            {selectedDepartments?.length > 0 && (
+            {selectedLocations?.length > 0 && (
               <Button
-                onClick={clearSelectedDepartments}
+                onClick={clearSelectedLocations}
                 variant="destructive"
                 size="xs"
                 className="text-xs"
@@ -98,7 +98,7 @@ export function DepartmentMenu({
               </Button>
             )}
             <Button
-              onClick={applySelectedDepartments}
+              onClick={applySelectedLocations}
               variant="creative"
               size="xs"
               className="text-xs"
@@ -108,7 +108,7 @@ export function DepartmentMenu({
           </div>
 
           <CommandInput
-            placeholder="Search departments..."
+            placeholder="Search locations..."
             onValueChange={setSearch}
           />
           {isError ? (
@@ -118,15 +118,15 @@ export function DepartmentMenu({
           ) : (
             <CommandList>
               <CommandGroup forceMount>
-                {departmentsSummary?.map((dep) => {
-                  const selected = selectedDepartments.some(
+                {locationsSummary?.map((dep) => {
+                  const selected = selectedLocations.some(
                     (d) => d.id === dep.id,
                   );
 
                   return (
                     <CommandItem
                       key={dep.id}
-                      onSelect={() => toggleDepartment(dep)}
+                      onSelect={() => toggleLocation(dep)}
                       className="data-[selected=true]:bg-background"
                     >
                       <div
@@ -140,16 +140,16 @@ export function DepartmentMenu({
                       </div>
                       <span>{dep.name}</span>
                       <span className="ml-1 text-xs text-muted-foreground">
-                        / {dep.identifier}
+                        / {dep.timezone}
                       </span>
                     </CommandItem>
                   );
                 })}
-                {!isFetching && !departmentsSummary?.length && (
+                {!isFetching && !locationsSummary?.length && (
                   <CommandEmpty>No results found</CommandEmpty>
                 )}
               </CommandGroup>
-              {totalCount && totalCount > pageSize && (
+              {((totalCount && totalCount > 0) || isFetching) && (
                 <div className="p-2">
                   <LoadMoreButton
                     totalElements={totalCount ?? 0}

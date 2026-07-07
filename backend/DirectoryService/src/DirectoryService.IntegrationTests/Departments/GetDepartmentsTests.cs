@@ -83,7 +83,8 @@ public class GetDepartmentsTests : DirectoryBaseTests
                     "dep",
                     parentDepartmentId,
                     [locationIds[0]],
-                    [departmentIds[3]]));
+                    [departmentIds[3]],
+                    true));
 
             return sut.Handle(query, cancellationToken);
         });
