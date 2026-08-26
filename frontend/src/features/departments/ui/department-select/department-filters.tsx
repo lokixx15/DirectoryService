@@ -20,13 +20,18 @@ export function DepartmentFilters({
   actions,
 }: DepartmentFiltersProps) {
   return (
-    <div className="flex flex-row items-center justify-between gap-2 w-full">
-      <SearchBar onSearch={onSearch} />
-      <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-wrap items-center gap-3 w-full">
+        <SearchBar onSearch={onSearch} />
+
+      <div className="flex-initial">
         <OrderFilter onOrderChange={onOrder} />
-        <StatusFilter onIsActive={onStatus} />
-        {actions}
       </div>
+
+      <div className="flex-initial">
+        <StatusFilter onIsActive={onStatus} />
+      </div>
+
+      {actions && <div className="flex-initial">{actions}</div>}
     </div>
   );
 }

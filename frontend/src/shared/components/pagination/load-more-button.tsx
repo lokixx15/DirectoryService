@@ -1,6 +1,7 @@
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "../ui/button";
+import { ReactNode } from "react";
 
 const styles = `
 @keyframes load-more-pulse {
@@ -19,41 +20,62 @@ const styles = `
 `;
 
 interface LoadMoreButtonProps {
-  totalElements: number;
+  totalElements?: number;
+  hasMore?: boolean;
   pageSize: number;
   onPageSizeChange: (pageSize: number) => void;
   onPointerEnter?: () => void;
-  className?: string;
   loading?: boolean;
+  className?: string;
+  size?: "xxs" | "xs" | "sm" | "default" | "lg";
+  children?: ReactNode;
 }
 
 export function LoadMoreButton({
   totalElements,
+  hasMore,
   pageSize,
   onPageSizeChange,
   onPointerEnter,
   className,
   loading,
+  size = "default",
+  children,
 }: LoadMoreButtonProps) {
   const handleClick = () => {
-    if (!loading && totalElements && pageSize < totalElements) {
-      const newPageSize = Math.min(pageSize + 10, totalElements);
+    if (!loading) {
+      const nextPageSize = pageSize + 5;
+      const newPageSize =
+        totalElements !== undefined
+          ? Math.min(nextPageSize, totalElements)
+          : nextPageSize;
       onPageSizeChange(newPageSize);
     }
   };
+
+  const shouldRender = loading
+    ? true
+    : totalElements !== undefined
+      ? pageSize < totalElements
+      : (hasMore ?? true);
+
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <>
       {loading && <style>{styles}</style>}
       <Button
         variant="secondary"
+        size={size}
         onPointerEnter={onPointerEnter}
         onClick={handleClick}
         disabled={loading}
         className={cn(className, loading && "load-more-pulsing")}
       >
-        {loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-        {loading ? "Loading..." : "Load more"}
+        {loading && <LoaderCircle className="h-4 w-4 animate-spin mr-2" />}
+        {loading ? "Loading..." : children ? children : "Load more"}
       </Button>
     </>
   );

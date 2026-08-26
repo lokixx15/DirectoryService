@@ -8,8 +8,6 @@ import { ErrorCard } from "@/shared/components/errors/error-card";
 import { StatusFilter } from "@/shared/components/filters/status-filter";
 import { SearchBar } from "@/shared/components/search/search-bar";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { SearchX } from "lucide-react";
 import { useState } from "react";
 
 const PAGE_SIZE = 10;
@@ -49,7 +47,9 @@ export function PositionListWidget() {
         <SearchBar onSearch={setSearch} />
         <div className="flex gap-2">
           <StatusFilter onIsActive={setIsActive} />
-          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>Related departments</DepartmentMenu>
+          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>
+            Related departments
+          </DepartmentMenu>
         </div>
       </div>
       {positions?.length ? (
@@ -60,7 +60,10 @@ export function PositionListWidget() {
           fetchNextPage={fetchNextPage}
         />
       ) : (
-        <NotFoundCard title="Not found positions" description="Try adjusting your search or filters"/>
+        <NotFoundCard
+          title="Not found positions"
+          description="Try adjusting your search or filters"
+        />
       )}
     </div>
   );

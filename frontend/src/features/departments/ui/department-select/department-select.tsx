@@ -51,6 +51,8 @@ export function DepartmentSelect({
   const [isActive, setIsActive] = useState<boolean>();
 
   const {
+    open,
+    onOpenDropdown,
     selectedAddedDepartments,
     selectedExcludedDepartments,
     addDepartment,
@@ -98,7 +100,7 @@ export function DepartmentSelect({
     excludedDepartmentIds.length > 0;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenDropdown}>
       <DropdownMenuTrigger asChild>
         <Button className="group flex items-center justify-between gap-2 w-full">
           <span>Choose departments</span>

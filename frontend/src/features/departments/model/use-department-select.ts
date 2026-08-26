@@ -2,6 +2,9 @@ import { DepartmentStandard } from "@/entities/departments/types";
 import { useState } from "react";
 
 interface UseDepartmentselectReturn {
+  open: boolean;
+  onOpenDropdown: (open: boolean) => void;
+
   selectedAddedDepartments: DepartmentStandard[];
   addedDepartments: DepartmentStandard[];
   selectedExcludedDepartments: DepartmentStandard[];
@@ -27,6 +30,8 @@ export function useDepartmentSelect({
   onAddedChange,
   onExcludeChange,
 }: UseDepartmentSelectProps): UseDepartmentselectReturn {
+  const [open, setOpen] = useState(false);
+
   const [selectedAddedDepartments, setSelectedAddedDepartments] = useState<
     DepartmentStandard[]
   >([]);
@@ -96,11 +101,14 @@ export function useDepartmentSelect({
   const applyExcluded = () => {
     onExcludeChange(selectedExcludedDepartments.map((sD) => sD.id));
     setExcludedDepartments(selectedExcludedDepartments);
+    setOpen(false);
   };
 
   const clearExcluded = () => setSelectedExcludedDepartments([]);
 
   return {
+    open,
+    onOpenDropdown: setOpen,
     selectedAddedDepartments,
     addedDepartments,
     selectedExcludedDepartments,

@@ -8,12 +8,14 @@ interface UsePositionsListProps {
   departmentIds?: string[];
   search?: string;
   isActive?: boolean;
+  enabled?: boolean;
 }
 
 interface UsePositionsListReturn {
   positions?: Position[];
   errors?: Error[];
   isError: boolean;
+  isFetching: boolean;
   isPending: boolean;
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
@@ -26,28 +28,32 @@ export function usePositionList({
   departmentIds,
   search,
   isActive,
+  enabled,
 }: UsePositionsListProps): UsePositionsListReturn {
   const {
     data,
+    isFetching,
     isPending,
     isError,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
     refetch,
-  } = useInfiniteQuery(
-    positionsQueryOptions.getAllPositionsInfinityQueryOptions({
+  } = useInfiniteQuery({
+    ...positionsQueryOptions.getAllPositionsInfinityQueryOptions({
       pageSize,
       departmentIds: departmentIds?.length ? departmentIds : undefined,
       search: search || undefined,
       isActive: isActive,
     }),
-  );
+    enabled,
+  });
 
   return {
     positions: data?.result?.entities,
     errors: data?.errorList ?? undefined,
     isError: data?.isError || isError,
+    isFetching,
     isPending,
     isFetchingNextPage,
     hasNextPage: hasNextPage ?? false,

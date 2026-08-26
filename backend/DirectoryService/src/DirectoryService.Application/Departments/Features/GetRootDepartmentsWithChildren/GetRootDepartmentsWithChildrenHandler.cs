@@ -27,7 +27,7 @@ public sealed class GetRootDepartmentsWithChildrenHandler
                  					   d.created_at,
                  					   d.updated_at
                  			    FROM departments AS d
-                 				WHERE d.parent_id IS NULL AND d.is_active = true 
+                 				{whereClause}
                  				LIMIT @root_limit OFFSET @offset
                  )
                  SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = roots.id OFFSET @children_limit)) AS has_more_children
@@ -87,7 +87,28 @@ public sealed class GetRootDepartmentsWithChildrenHandler
         parameters.Add("offset", (query.Request.Page - 1) * query.Request.Size);
         parameters.Add("children_limit", query.Request.Prefetch);
 
-        var key = $"{CacheConstants.ROOT_DEPARTMENTS_WITH_CHILDREN_CACHE_KEY}_page_{query.Request.Page}_pagesize_{query.Request.Size}_prefetch_{query.Request.Prefetch}";
+        var whereConditions = new List<string>() { "d.parent_id IS NULL", "d.is_active = true" };
+
+        if (query.Request.DepartmentIds != null && query.Request.DepartmentIds.Any())
+        {
+            parameters.Add("department_ids", query.Request.DepartmentIds);
+            whereConditions.Add("d.id = ANY(@department_ids)");
+        }
+
+        if (query.Request.ExcludedDepartmentIds != null && query.Request.ExcludedDepartmentIds.Any())
+        {
+            parameters.Add("excluded_department_ids", query.Request.ExcludedDepartmentIds);
+            whereConditions.Add("NOT (d.id = ANY(@excluded_department_ids))");
+        }
+
+        var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
+
+        var deptIdsKey = query.Request.DepartmentIds != null ? string.Join(",", query.Request.DepartmentIds) : "all";
+        var exclIdsKey = query.Request.ExcludedDepartmentIds != null ? string.Join(",", query.Request.ExcludedDepartmentIds) : "none";
+
+        var key = $"{CacheConstants.ROOT_DEPARTMENTS_WITH_CHILDREN_CACHE_KEY}_page_{query.Request.Page}_size_{query.Request.Size}_prefetch_{query.Request.Prefetch}_ids_{deptIdsKey}_excl_{exclIdsKey}";
+
+        var finalSql = SQL.Replace("{whereClause}", whereClause);
 
         var departmentDtos = await _cache.GetOrCreateAsync(
             key,
@@ -96,7 +117,7 @@ public sealed class GetRootDepartmentsWithChildrenHandler
                 using var connection = _connectionFactory.GetDbConnection();
 
                 var departmentDtos = await connection.QueryAsync<DepartmentDto>(
-                    SQL,
+                    finalSql,
                     parameters);
 
                 return departmentDtos.ToList();
