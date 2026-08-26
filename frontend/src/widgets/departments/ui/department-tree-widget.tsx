@@ -73,9 +73,7 @@ export function DepartmentTreeWidget() {
     );
   }
 
-  const hasMore = departments
-    ? departments.length >= pageSize * DEFAULT_CHILDREN_LIMIT
-    : false;
+  const hasMore = departments?.length === pageSize;
 
   return (
     <div className="grid grid-cols-2 gap-10">
