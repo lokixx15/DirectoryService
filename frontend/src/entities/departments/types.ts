@@ -30,3 +30,30 @@ export type GetDepartmentsRequest = {
   orderBy?: "createdDate" | "updatedDate" | "name";
   orderDirection?: "asc" | "desc";
 };
+
+export type Department = {
+  id: string;
+  name: string;
+  identifier: string;
+  parentId: string | null;
+  path: string;
+  depth: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  hasMoreChildren: boolean;
+};
+
+export type GetRootDepartmentsRequest = {
+  page: number;
+  size: number;
+  prefetch: number;
+  departmentIds: string[];
+  excludedDepartmentIds: string[];
+};
+
+export type GetChildrenDepartmentsRequest = {
+  page: number;
+  size: number;
+  parentId: string;
+};

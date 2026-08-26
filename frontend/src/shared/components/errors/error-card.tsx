@@ -53,7 +53,7 @@ function ErrorCard({ errors, refetch }: ErrorCardProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expanded, setExpanded] = useState(true);
 
-  if (!errors?.length) return null;
+  if (errors?.length === 0) return null;
 
   const error = errors[currentIndex];
   const type = error.type.toLowerCase() as keyof typeof errorTypeColor;

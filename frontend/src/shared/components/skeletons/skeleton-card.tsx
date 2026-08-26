@@ -1,9 +1,20 @@
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { cn } from "@/shared/lib/utils";
 
-export function SkeletonCard({ quantity } : {quantity: number}) {
+interface SkeletonCardProps {
+  quantity: number;
+  layoutClassName?: string;
+}
+
+export function SkeletonCard({ quantity, layoutClassName }: SkeletonCardProps) {
   return (
-    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div
+      className={cn(
+        layoutClassName ??
+          "grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
+      )}
+    >
       {Array.from({ length: quantity }).map((_, index) => (
         <Card key={index} className="w-full">
           <CardHeader>

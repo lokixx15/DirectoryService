@@ -16,6 +16,7 @@ interface PositionListProps {
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
   fetchNextPage: () => void;
+  layoutClassName?: string;
 }
 
 export function PositionList({
@@ -23,6 +24,7 @@ export function PositionList({
   isFetchingNextPage,
   hasNextPage,
   fetchNextPage,
+  layoutClassName,
 }: PositionListProps) {
   const cursorRef: RefCallback<HTMLDivElement> = useCallback(
     (el) => {
@@ -48,7 +50,12 @@ export function PositionList({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-3 lg:grid-cols-3">
+      <div
+        className={cn(
+          layoutClassName ??
+            "grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3",
+        )}
+      >
         {positions?.map((p) => {
           return (
             <Card
