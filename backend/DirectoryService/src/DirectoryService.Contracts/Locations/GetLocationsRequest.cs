@@ -1,7 +1,8 @@
 ﻿namespace DirectoryService.Contracts.Locations;
 
 public record GetLocationsRequest(
-    Guid[]? DepartmentIds,
+    Guid[]? SelectedDepartmentIds,
+    Guid[]? ExcludedDepartmentIds,
     string? Search,
     bool? IsActive,
     int Page = 1,

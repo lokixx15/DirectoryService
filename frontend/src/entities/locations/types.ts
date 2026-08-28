@@ -28,7 +28,8 @@ export type LocationAddress = {
 export type GetLocationsRequest = {
   page: number;
   pageSize: number;
-  departmentIds?: string[];
+  selectedDepartmentIds?: string[];
+  excludedDepartmentIds?: string[];
   search?: string;
   isActive?: boolean;
   orderBy?: string;

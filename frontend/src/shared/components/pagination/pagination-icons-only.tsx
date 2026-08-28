@@ -59,7 +59,7 @@ export function PaginationIconsOnly({
       </Field>
       <div>
         <p className="text-sm">
-          {page + 1} of {totalPages} pages /{" "}
+          {totalPages ? page + 1 : 0} of {totalPages} pages /{" "}
           {Math.min(pageSize * (page + 1), totalCount)} of {totalCount} items
         </p>
       </div>

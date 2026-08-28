@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-
 import { Button } from "@/shared/components/ui/button";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { ChevronDown } from "lucide-react";
@@ -14,11 +13,9 @@ import { OrderState } from "@/shared/types/ordering";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import {
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { DepartmentSelectItem } from "./department-select-item";
 import { DepartmentFilters } from "./department-filters";
@@ -31,7 +28,7 @@ interface DepartmentSelectProps {
   excludedDepartmentIds: string[];
   onAddedDepartmentIdsChange: (ids: string[]) => void;
   onExcludedDepartmentIdsChange: (ids: string[]) => void;
-  locationIds: string[];
+  locationIds?: string[];
   filterActions?: ReactNode;
 }
 
@@ -51,6 +48,23 @@ export function DepartmentSelect({
   const [isActive, setIsActive] = useState<boolean>();
 
   const {
+    departments,
+    isError,
+    totalCount,
+    errors,
+    isFetching,
+    isPending,
+    refetch,
+  } = useDepartments({
+    search: debouncedSearch,
+    locationIds,
+    isActive,
+    page,
+    pageSize,
+    order,
+  });
+
+  const {
     open,
     onOpenDropdown,
     selectedAddedDepartments,
@@ -66,23 +80,8 @@ export function DepartmentSelect({
   } = useDepartmentSelect({
     onAddedChange: onAddedDepartmentIdsChange,
     onExcludeChange: onExcludedDepartmentIdsChange,
-  });
-
-  const {
-    departments,
-    isError,
-    totalCount,
-    errors,
-    isFetching,
-    isPending,
-    refetch,
-  } = useDepartments({
-    search: debouncedSearch,
-    locationIds,
-    isActive,
-    page,
-    pageSize,
-    order,
+    initialAdded: addedDepartmentIds,
+    initialExcluded: excludedDepartmentIds,
   });
 
   if (isError) {
@@ -102,7 +101,10 @@ export function DepartmentSelect({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenDropdown}>
       <DropdownMenuTrigger asChild>
-        <Button className="group flex items-center justify-between gap-2 w-full">
+        <Button
+          variant="outline"
+          className="group flex items-center max-w-100 justify-between gap-2 w-full min-w-100 h-9"
+        >
           <span>Choose departments</span>
           <ChevronDown className="h-4 w-4 opacity-50 transition-transform duration-200 rotate-180 group-data-[state=open]:rotate-0" />
         </Button>
@@ -121,10 +123,10 @@ export function DepartmentSelect({
             <DropdownMenuGroup className="w-full max-h-60 overflow-y-auto">
               {departments.map((department) => {
                 const isAdded = selectedAddedDepartments.some(
-                  (d) => d.id === department.id,
+                  (id) => id === department.id,
                 );
                 const isExcluded = selectedExcludedDepartments.some(
-                  (d) => d.id === department.id,
+                  (id) => id === department.id,
                 );
 
                 return (
@@ -158,7 +160,11 @@ export function DepartmentSelect({
 
           <div className="grid grid-cols-[1fr_auto_1fr] items-start w-full gap-2 pt-2 border-t border-border">
             <DepartmentBadgeSection
-              departments={selectedAddedDepartments}
+              departments={
+                departments?.filter((d) =>
+                  new Set(selectedAddedDepartments).has(d.id),
+                ) || []
+              }
               onRemove={removeAddedDepartment}
               onClear={clearSelectedAddedDepartments}
               variant="added"
@@ -177,7 +183,11 @@ export function DepartmentSelect({
             />
 
             <DepartmentBadgeSection
-              departments={selectedExcludedDepartments}
+              departments={
+                departments?.filter((d) =>
+                  new Set(selectedExcludedDepartments).has(d.id),
+                ) || []
+              }
               onRemove={removeExcludedDepartment}
               onClear={clearExcludedDepartments}
               variant="excluded"

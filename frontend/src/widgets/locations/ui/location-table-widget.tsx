@@ -20,7 +20,6 @@ import {
   useLocationList,
   createLocationColumns,
 } from "@/features/locations";
-import { DepartmentMenu } from "@/features/departments";
 import { Location } from "@/entities/locations";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { SkeletonTable } from "@/shared/components/skeletons/skeleton-table";
@@ -34,6 +33,10 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { StatusFilter } from "@/shared/components/filters/status-filter";
+import { DepartmentSelect } from "@/features/departments/ui/department-select/department-select";
+import { Button } from "@/shared/components/ui/button";
+import { useLocationFilters } from "@/features/locations/model/use-location-filters";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 export function LocationTableWidget() {
   const { page, pageSize, onPageIndexChange, onPageSizeChange } =
@@ -41,7 +44,13 @@ export function LocationTableWidget() {
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isActive, setIsActive] = useState<boolean>();
-  const [departmentIds, setDepartmentIds] = useState<string[]>([]);
+
+  const {
+    addedDepartmentIds,
+    excludedDepartmentIds,
+    setAddedDepartmentIdsHandler,
+    setExcludedDepartmentIdsHandler,
+  } = useLocationFilters();
 
   const [editingLocation, setEditingLocation] = useState<Location>();
   const [editOpen, setEditOpen] = useState<boolean>(false);
@@ -56,7 +65,8 @@ export function LocationTableWidget() {
       search,
       sorting,
       isActive,
-      departmentIds,
+      selectedDepartmentIds: addedDepartmentIds,
+      excludedDepartmentIds,
     });
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -98,77 +108,102 @@ export function LocationTableWidget() {
     },
   });
 
+  if (isPending) {
+    return (
+      <div>
+        <Skeleton className="h-10 w-full bg-primary/10 mb-5" />
+        <SkeletonTable />
+      </div>
+    );
+  }
+
+  if (errors?.length) {
+    return <ErrorCard errors={errors} refetch={refetch} />;
+  }
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row items-center justify-between gap-2">
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center w-full gap-2 flex-wrap">
         <SearchBar onSearch={setSearch} />
-        <div className="flex flex-row items-center gap-2">
-          <ColumnsDropdown table={table} />
-          <StatusFilter onIsActive={setIsActive} />
-          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>Related departments</DepartmentMenu>
-          <CreateLocationDialog />
-        </div>
+        <ColumnsDropdown table={table} />
+        <StatusFilter onIsActive={setIsActive} />
+        <DepartmentSelect
+          key={addedDepartmentIds.join(",") + excludedDepartmentIds.join(",")}
+          addedDepartmentIds={addedDepartmentIds}
+          onAddedDepartmentIdsChange={setAddedDepartmentIdsHandler}
+          excludedDepartmentIds={excludedDepartmentIds}
+          onExcludedDepartmentIdsChange={setExcludedDepartmentIdsHandler}
+        />
+        <CreateLocationDialog />
       </div>
 
-      {errors?.length ? (
-        <ErrorCard errors={errors} refetch={refetch} />
-      ) : isPending ? (
-        <SkeletonTable />
-      ) : (
-        <div className="overflow-hidden rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="border-b-foreground/50">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={headerGroup.id}
-                  className="border-b-foreground/50"
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
                 >
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    );
-                  })}
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={table.getAllColumns().length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={table.getAllColumns().length}
+                  className="h-24 text-center"
+                >
+                  <div className="flex flex-col items-center justify-center gap-3 w-full h-full">
+                    <span className="text-muted-foreground font-medium text-sm">
+                      No results.
+                    </span>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        setSearch("");
+                        setIsActive(undefined);
+                        setAddedDepartmentIdsHandler([]);
+                        setExcludedDepartmentIdsHandler([]);
+                        onPageIndexChange(0);
+                      }}
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       <PaginationIconsOnly
         page={page}
