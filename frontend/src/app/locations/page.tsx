@@ -1,5 +1,10 @@
 import { LocationTableWidget } from "@/widgets/locations";
+import { Suspense } from "react";
 
 export default function Home() {
-  return <LocationTableWidget />;
+  return (
+    <Suspense>
+      <LocationTableWidget />
+    </Suspense>
+  );
 }
