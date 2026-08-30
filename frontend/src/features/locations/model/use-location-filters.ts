@@ -6,6 +6,9 @@ export function useLocationFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const rawPage = Number(searchParams.get("page")) || 1;
+  const pageIndex = Math.max(0, rawPage - 1);
+
   const addedDepartmentIds = searchParams.getAll("selectedDepartmentIds");
   const excludedDepartmentIds = searchParams.getAll("excludedDepartmentIds");
 
@@ -13,7 +16,7 @@ export function useLocationFilters() {
   const microtaskScheduledRef = useRef(false);
 
   const updateQueryParams = useCallback(
-    (updater: (params: URLSearchParams) => void) => {
+    (updater: (params: URLSearchParams) => void, resetPage: boolean = true) => {
       if (!pendingParamsRef.current) {
         const currentSearch =
           typeof window !== "undefined"
@@ -24,7 +27,9 @@ export function useLocationFilters() {
       }
 
       updater(pendingParamsRef.current);
-      pendingParamsRef.current.set("page", "1");
+      if (resetPage) {
+        pendingParamsRef.current.set("page", "1");
+      }
 
       if (!microtaskScheduledRef.current) {
         microtaskScheduledRef.current = true;
@@ -48,6 +53,15 @@ export function useLocationFilters() {
     [pathname, router, searchParams],
   );
 
+  const setPage = useCallback(
+    (pageIndex: number) => {
+      updateQueryParams((params) => {
+        params.set("page", String(pageIndex + 1));
+      }, false);
+    },
+    [updateQueryParams],
+  );
+
   const setAddedDepartmentIdsHandler = useCallback(
     (ids: string[]) => {
       updateQueryParams((params) => {
@@ -69,6 +83,8 @@ export function useLocationFilters() {
   );
 
   return {
+    pageIndex,
+    setPage,
     addedDepartmentIds,
     excludedDepartmentIds,
     setAddedDepartmentIdsHandler,

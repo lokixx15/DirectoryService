@@ -39,13 +39,15 @@ import { useLocationFilters } from "@/features/locations/model/use-location-filt
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 export function LocationTableWidget() {
-  const { page, pageSize, onPageIndexChange, onPageSizeChange } =
+  const { pageSize, onPageSizeChange } =
     usePagination(10);
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isActive, setIsActive] = useState<boolean>();
 
   const {
+    pageIndex,
+    setPage,
     addedDepartmentIds,
     excludedDepartmentIds,
     setAddedDepartmentIdsHandler,
@@ -60,7 +62,7 @@ export function LocationTableWidget() {
 
   const { locations, totalCount, totalPages, isPending, errors, refetch } =
     useLocationList({
-      page,
+      page: pageIndex,
       pageSize,
       search,
       sorting,
@@ -100,7 +102,7 @@ export function LocationTableWidget() {
     onSortingChange: setSorting,
     state: {
       pagination: {
-        pageIndex: page,
+        pageIndex,
         pageSize: pageSize,
       },
       columnVisibility,
@@ -192,7 +194,7 @@ export function LocationTableWidget() {
                         setIsActive(undefined);
                         setAddedDepartmentIdsHandler([]);
                         setExcludedDepartmentIdsHandler([]);
-                        onPageIndexChange(0);
+                        setPage(0);
                       }}
                     >
                       Clear Filters
@@ -206,11 +208,11 @@ export function LocationTableWidget() {
       </div>
 
       <PaginationIconsOnly
-        page={page}
+        page={pageIndex}
         pageSize={pageSize}
         totalCount={totalCount}
         totalPages={totalPages}
-        onPageIndexChange={onPageIndexChange}
+        onPageIndexChange={setPage}
         onPageSizeChange={onPageSizeChange}
       />
 
