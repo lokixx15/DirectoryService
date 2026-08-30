@@ -1,21 +1,17 @@
-import { DepartmentStandard } from "@/entities/departments/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface UseDepartmentselectReturn {
   open: boolean;
   onOpenDropdown: (open: boolean) => void;
-
-  selectedAddedDepartments: DepartmentStandard[];
-  addedDepartments: DepartmentStandard[];
-  selectedExcludedDepartments: DepartmentStandard[];
-  excludedDepartments: DepartmentStandard[];
-
-  addDepartment: (department: DepartmentStandard) => void;
+  selectedAddedDepartments: string[];
+  addedDepartments: string[];
+  selectedExcludedDepartments: string[];
+  excludedDepartments: string[];
+  addDepartment: (department: string) => void;
   removeAddedDepartment: (id: string) => void;
   applySelectedAddedDepartments: () => void;
   clearSelectedAddedDepartments: () => void;
-
-  addExcludedDepartment: (department: DepartmentStandard) => void;
+  addExcludedDepartment: (department: string) => void;
   removeExcludedDepartment: (id: string) => void;
   applySelectedExcludedDepartments: () => void;
   clearExcludedDepartments: () => void;
@@ -24,82 +20,89 @@ interface UseDepartmentselectReturn {
 interface UseDepartmentSelectProps {
   onAddedChange: (ids: string[]) => void;
   onExcludeChange: (ids: string[]) => void;
+  initialAdded?: string[];
+  initialExcluded?: string[];
 }
 
 export function useDepartmentSelect({
   onAddedChange,
   onExcludeChange,
+  initialAdded = [],
+  initialExcluded = [],
 }: UseDepartmentSelectProps): UseDepartmentselectReturn {
   const [open, setOpen] = useState(false);
 
-  const [selectedAddedDepartments, setSelectedAddedDepartments] = useState<
-    DepartmentStandard[]
-  >([]);
-  const [addedDepartments, setAddedDepartments] = useState<
-    DepartmentStandard[]
-  >([]);
+  const [selectedAddedDepartments, setSelectedAddedDepartments] =
+    useState<string[]>(initialAdded);
+
+  const [addedDepartments, setAddedDepartments] =
+    useState<string[]>(initialAdded);
 
   const [selectedExcludedDepartments, setSelectedExcludedDepartments] =
-    useState<DepartmentStandard[]>([]);
-  const [excludedDepartments, setExcludedDepartments] = useState<
-    DepartmentStandard[]
-  >([]);
+    useState<string[]>(initialExcluded);
 
-  const addDepartments = (department: DepartmentStandard) => {
+  const [excludedDepartments, setExcludedDepartments] =
+    useState<string[]>(initialExcluded);
+
+  const addDepartments = (departmentId: string) => {
     if (
-      addedDepartments.some((d) => d.id === department.id) ||
-      excludedDepartments.some((d) => d.id === department.id)
+      addedDepartments.some((id) => id === departmentId) ||
+      excludedDepartments.some((id) => id === departmentId)
     ) {
       return;
     }
 
-    if (selectedExcludedDepartments.some((d) => d.id === department.id)) {
+    if (selectedExcludedDepartments.some((id) => id === departmentId)) {
       setSelectedExcludedDepartments((prev) =>
-        prev.filter((d) => d.id !== department.id),
+        prev.filter((id) => id !== departmentId),
       );
     }
 
     setSelectedAddedDepartments((prev) =>
-      prev.some((d) => d.id === department.id) ? prev : [...prev, department],
+      prev.some((id) => id === departmentId) ? prev : [...prev, departmentId],
     );
   };
 
-  const removeAdded = (id: string) => {
-    setSelectedAddedDepartments((prev) => prev.filter((d) => d.id !== id));
+  const removeAdded = (departmentId: string) => {
+    setSelectedAddedDepartments((prev) =>
+      prev.filter((id) => id !== departmentId),
+    );
   };
 
   const applyAdded = () => {
-    onAddedChange(selectedAddedDepartments.map((sD) => sD.id));
+    onAddedChange(selectedAddedDepartments.map((id) => id));
     setAddedDepartments(selectedAddedDepartments);
   };
 
   const clearAdded = () => setSelectedAddedDepartments([]);
 
-  const addExcluded = (department: DepartmentStandard) => {
+  const addExcluded = (departmentId: string) => {
     if (
-      addedDepartments.some((d) => d.id === department.id) ||
-      excludedDepartments.some((d) => d.id === department.id)
+      addedDepartments.some((id) => id === departmentId) ||
+      excludedDepartments.some((id) => id === departmentId)
     ) {
       return;
     }
 
-    if (selectedAddedDepartments.some((d) => d.id === department.id)) {
+    if (selectedAddedDepartments.some((id) => id === departmentId)) {
       setSelectedAddedDepartments((prev) =>
-        prev.filter((d) => d.id !== department.id),
+        prev.filter((id) => id !== departmentId),
       );
     }
 
     setSelectedExcludedDepartments((prev) =>
-      prev.some((d) => d.id === department.id) ? prev : [...prev, department],
+      prev.some((id) => id === departmentId) ? prev : [...prev, departmentId],
     );
   };
 
-  const removeExcluded = (id: string) => {
-    setSelectedExcludedDepartments((prev) => prev.filter((d) => d.id !== id));
+  const removeExcluded = (departmentId: string) => {
+    setSelectedExcludedDepartments((prev) =>
+      prev.filter((id) => id !== departmentId),
+    );
   };
 
   const applyExcluded = () => {
-    onExcludeChange(selectedExcludedDepartments.map((sD) => sD.id));
+    onExcludeChange(selectedExcludedDepartments.map((id) => id));
     setExcludedDepartments(selectedExcludedDepartments);
     setOpen(false);
   };

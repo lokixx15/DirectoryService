@@ -46,17 +46,28 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
         var parameters = new DynamicParameters();
         var whereConditions = new List<string>();
 
-        if (query.Request.DepartmentIds != null)
+        if (query.Request.SelectedDepartmentIds != null)
         {
-            parameters.Add("department_ids", query.Request.DepartmentIds);
+            parameters.Add("department_ids", query.Request.SelectedDepartmentIds);
             whereConditions.Add("""
                                 EXISTS(
-                                SELECT 1
-                                FROM department_location AS dl
-                                WHERE dl.location_id = l.id AND 
-                                dl.department_id = ANY(@department_ids))
+                                    SELECT 1
+                                    FROM department_location AS dl
+                                    WHERE dl.location_id = l.id AND 
+                                    dl.department_id = ANY(@department_ids))
                                 """);
+        }
 
+        if (query.Request.ExcludedDepartmentIds != null)
+        {
+            parameters.Add("excluded_department_ids", query.Request.ExcludedDepartmentIds);
+            whereConditions.Add("""
+                        NOT EXISTS(
+                            SELECT 1
+                            FROM department_location AS dl
+                            WHERE dl.location_id = l.id AND 
+                            dl.department_id = ANY(@excluded_department_ids))
+                        """);
         }
 
         if (!string.IsNullOrEmpty(query.Request.Search))

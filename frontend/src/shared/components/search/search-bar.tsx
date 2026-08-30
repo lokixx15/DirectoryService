@@ -22,7 +22,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
       value={value}
       onChange={(e) => setValue(e.target.value)}
       placeholder="Search..."
-      className="w-[25%] min-w-62.5 rounded-md border-border"
+      className="flex-1 min-w-50 max-w-100 rounded-md border-border"
     />
   );
-};
+}

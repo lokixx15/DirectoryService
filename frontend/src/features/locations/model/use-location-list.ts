@@ -18,7 +18,8 @@ interface UseLocationListProps {
   search: string;
   sorting?: SortingState;
   isActive?: boolean;
-  departmentIds: string[];
+  selectedDepartmentIds: string[];
+  excludedDepartmentIds: string[];
 }
 
 export function useLocationList({
@@ -27,7 +28,8 @@ export function useLocationList({
   search,
   sorting,
   isActive,
-  departmentIds,
+  selectedDepartmentIds,
+  excludedDepartmentIds,
 }: UseLocationListProps): UseLocationListReturn {
   const queryOptions = locationsQueryOptions.getLocationsOptions({
     page: page,
@@ -36,7 +38,10 @@ export function useLocationList({
     orderBy: sorting?.[0]?.id,
     orderDirection: sorting?.[0]?.desc ? "desc" : "asc",
     isActive: isActive,
-    departmentIds: departmentIds.length > 0 ? departmentIds : undefined,
+    selectedDepartmentIds:
+      selectedDepartmentIds.length > 0 ? selectedDepartmentIds : undefined,
+    excludedDepartmentIds:
+      excludedDepartmentIds.length > 0 ? excludedDepartmentIds : undefined,
   });
 
   const { data, isPending, refetch } = useQuery(queryOptions);

@@ -9,8 +9,8 @@ import { useState } from "react";
 
 interface DepartmentSelectItemProps {
   department: DepartmentStandard;
-  onAddClick: (department: DepartmentStandard) => void;
-  onExcludeClick: (department: DepartmentStandard) => void;
+  onAddClick: (departmentId: string) => void;
+  onExcludeClick: (departmentId: string) => void;
 }
 
 export function DepartmentSelectItem({
@@ -47,7 +47,7 @@ export function DepartmentSelectItem({
           variant="ghost"
           size="icon"
           className="rounded-full hover:bg-green-100 text-green-600 hover:text-green-700"
-          onClick={() => onAddClick(department)}
+          onClick={() => onAddClick(department.id)}
         >
           <CirclePlus className="h-7 w-7" />
         </Button>
@@ -56,7 +56,7 @@ export function DepartmentSelectItem({
           variant="ghost"
           size="icon"
           className="rounded-full hover:bg-red-100 text-red-600 hover:text-red-700"
-          onClick={() => onExcludeClick(department)}
+          onClick={() => onExcludeClick(department.id)}
         >
           <CircleMinus className="h-7 w-7" />
         </Button>
