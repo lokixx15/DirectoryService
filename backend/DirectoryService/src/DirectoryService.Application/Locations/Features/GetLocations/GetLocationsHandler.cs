@@ -62,11 +62,11 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
         {
             parameters.Add("excluded_department_ids", query.Request.ExcludedDepartmentIds);
             whereConditions.Add("""
-                        EXISTS(
+                        NOT EXISTS(
                             SELECT 1
                             FROM department_location AS dl
                             WHERE dl.location_id = l.id AND 
-                            dl.department_id != ALL(@excluded_department_ids))
+                            dl.department_id = ANY(@excluded_department_ids))
                         """);
         }
 
