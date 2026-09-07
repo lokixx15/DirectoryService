@@ -4,6 +4,7 @@ using DirectoryService.Application.Departments.Features.GetChildrenDepartmentsBy
 using DirectoryService.Application.Departments.Features.GetDepartments;
 using DirectoryService.Application.Departments.Features.GetDepartmentsWithMostPositions;
 using DirectoryService.Application.Departments.Features.GetRootDepartmentsWithChildren;
+using DirectoryService.Application.Departments.Features.RestoreDepartment;
 using DirectoryService.Application.Departments.Features.SoftDeleteDepartment;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentLocations;
 using DirectoryService.Application.Departments.Features.UpdateDepartmentParent;
@@ -116,6 +117,17 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new AttachDepartmentVideoCommand(departmentId, request);
+
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpPatch("{departmentId:guid}/restore")]
+    public async Task<EndpointResult> RestoreDepartment(
+        [FromRoute] Guid departmentId,
+        [FromServices] RestoreDepartmentHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new RestoreDepartmentCommand(departmentId);
 
         return await handler.Handle(command, cancellationToken);
     }

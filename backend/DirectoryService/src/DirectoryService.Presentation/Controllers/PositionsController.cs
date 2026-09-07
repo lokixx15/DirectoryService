@@ -1,5 +1,7 @@
-﻿using DirectoryService.Application.Positions.Features.CreatePosition;
+﻿using DirectoryService.Application.Departments.Features.RestoreDepartment;
+using DirectoryService.Application.Positions.Features.CreatePosition;
 using DirectoryService.Application.Positions.Features.GetPositions;
+using DirectoryService.Application.Positions.Features.RestorePosition;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Positions;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +31,17 @@ public sealed class PositionsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new CreatePositionCommand(request);
+
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpPatch("{positionId:guid}/restore")]
+    public async Task<EndpointResult> RestoreDepartment(
+        [FromRoute] Guid positionId,
+        [FromServices] RestorePositionHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new RestorePositionCommand(positionId);
 
         return await handler.Handle(command, cancellationToken);
     }

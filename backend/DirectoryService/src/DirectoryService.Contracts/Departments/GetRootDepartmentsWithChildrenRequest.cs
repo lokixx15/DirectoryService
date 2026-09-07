@@ -5,4 +5,5 @@ public record GetRootDepartmentsWithChildrenRequest(
     Guid[]? ExcludedDepartmentIds,
     int Page = 1,
     int Size = 20,
-    int Prefetch = 3);
+    int Prefetch = 3,
+    bool IsActive = true);

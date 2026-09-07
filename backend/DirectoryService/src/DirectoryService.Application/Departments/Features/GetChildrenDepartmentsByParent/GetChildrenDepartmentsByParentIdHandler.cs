@@ -29,7 +29,7 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
              				   	      d.updated_at,
                                       COUNT(*) OVER() AS total_count
              				   FROM departments AS d 
-             				   WHERE d.parent_id = @parent_id
+             				   WHERE d.parent_id = @parent_id AND d.is_active = @is_active
              				   LIMIT @children_limit OFFSET @offset
              )
              SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id))
@@ -72,6 +72,7 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
         parameters.Add("parent_id", query.ParentId);
         parameters.Add("children_limit", query.Size);
         parameters.Add("offset", (query.Page - 1) * query.Size);
+        parameters.Add("is_active", query.IsActive);
 
         long? totalCount = null!;
 

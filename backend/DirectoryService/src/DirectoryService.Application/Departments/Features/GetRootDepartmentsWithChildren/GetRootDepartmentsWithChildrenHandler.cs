@@ -48,7 +48,7 @@ public sealed class GetRootDepartmentsWithChildrenHandler
                  					 	    d.created_at,
                  					        d.updated_at	    
                  					 FROM departments AS d
-                 					 WHERE r.id = d.parent_id
+                 					 WHERE r.id = d.parent_id AND d.is_active = @is_active
                  					 LIMIT @children_limit) AS c;
                  """;
 
@@ -86,8 +86,9 @@ public sealed class GetRootDepartmentsWithChildrenHandler
         parameters.Add("root_limit", query.Request.Size);
         parameters.Add("offset", (query.Request.Page - 1) * query.Request.Size);
         parameters.Add("children_limit", query.Request.Prefetch);
+        parameters.Add("is_active", query.Request.IsActive);
 
-        var whereConditions = new List<string>() { "d.parent_id IS NULL", "d.is_active = true" };
+        var whereConditions = new List<string>() { "d.parent_id IS NULL", "d.is_active = @is_active" };
 
         if (query.Request.DepartmentIds != null && query.Request.DepartmentIds.Any())
         {

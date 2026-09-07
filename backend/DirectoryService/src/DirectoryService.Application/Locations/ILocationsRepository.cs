@@ -18,4 +18,6 @@ public interface ILocationsRepository
     Task<UnitResult<Error>> DeleteDepartmentLocationsByLocationIdAsync(Guid locationId, CancellationToken cancellationToken);
 
     Task<UnitResult<Error>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    Task<UnitResult<Error>> RestoreLocationByIdAsync(Guid locationId, CancellationToken cancellationToken);
 }

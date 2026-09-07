@@ -6,5 +6,6 @@ namespace DirectoryService.Application.Departments.Features.GetChildrenDepartmen
 public record GetChildrenDepartmentsByParentIdQuery(
     Guid ParentId,
     int Page,
-    int Size)
+    int Size,
+    bool IsActive = true)
     : IQuery;
