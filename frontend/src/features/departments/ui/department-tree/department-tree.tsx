@@ -5,12 +5,14 @@ interface DepartmentTreeProps {
   departments: Department[];
   selectedId?: string;
   onSelectedId: (id: string) => void;
+  isActive: boolean;
 }
 
 export function DepartmentTree({
   departments,
   selectedId,
   onSelectedId,
+  isActive,
 }: DepartmentTreeProps) {
   const rootDepartments = departments.filter((d) => d.parentId === null);
 
@@ -33,6 +35,7 @@ export function DepartmentTree({
           prefetchedChildren={childrenByParentId.get(item.id) ?? []}
           selectedId={selectedId}
           onSelectId={onSelectedId}
+          isActive={isActive}
         />
       ))}
     </div>

@@ -115,6 +115,7 @@ export const departmentsQueryOptions = {
     prefetch,
     departmentIds,
     excludedDepartmentIds,
+    isActive,
   }: GetRootDepartmentsRequest) => {
     return queryOptions({
       queryFn: async () =>
@@ -124,6 +125,7 @@ export const departmentsQueryOptions = {
           prefetch,
           departmentIds,
           excludedDepartmentIds,
+          isActive,
         }),
       queryKey: [
         departmentsQueryOptions.baseKey,
@@ -132,21 +134,32 @@ export const departmentsQueryOptions = {
         prefetch,
         departmentIds,
         excludedDepartmentIds,
+        isActive,
       ],
       placeholderData: keepPreviousData,
     });
   },
-  getChildrenDepartments: (
-    { page, size, parentId }: GetChildrenDepartmentsRequest,
-  ) => {
+  getChildrenDepartments: ({
+    page,
+    size,
+    parentId,
+    isActive,
+  }: GetChildrenDepartmentsRequest) => {
     return queryOptions({
       queryFn: async () =>
         await departmentsApi.getChildrenDepartments({
           page: page + 1,
           size,
           parentId,
+          isActive,
         }),
-      queryKey: [departmentsQueryOptions.baseKey, page, size, parentId],
+      queryKey: [
+        departmentsQueryOptions.baseKey,
+        page,
+        size,
+        parentId,
+        isActive,
+      ],
       placeholderData: keepPreviousData,
     });
   },

@@ -50,10 +50,12 @@ export type GetRootDepartmentsRequest = {
   prefetch: number;
   departmentIds: string[];
   excludedDepartmentIds: string[];
+  isActive: boolean;
 };
 
 export type GetChildrenDepartmentsRequest = {
   page: number;
   size: number;
   parentId: string;
+  isActive: boolean;
 };

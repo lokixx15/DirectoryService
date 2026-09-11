@@ -1,6 +1,7 @@
 "use client";
 
-import { DepartmentMenu } from "@/features/departments";
+import { DepartmentMenu } from "@/features/departments/ui/department-menu";
+import { usePositionFilters } from "@/features/positions/model/use-position-filters";
 import { usePositionList } from "@/features/positions/model/use-position-list";
 import { PositionList } from "@/features/positions/ui/position-list";
 import { NotFoundCard } from "@/shared/components/cards/not-found-card";
@@ -8,14 +9,16 @@ import { ErrorCard } from "@/shared/components/errors/error-card";
 import { StatusFilter } from "@/shared/components/filters/status-filter";
 import { SearchBar } from "@/shared/components/search/search-bar";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
+import { IsActiveToggle } from "@/shared/components/toggles/is-active-toggle";
 import { useState } from "react";
 
 const PAGE_SIZE = 10;
 
 export function PositionListWidget() {
   const [search, setSearch] = useState("");
-  const [isActive, setIsActive] = useState<boolean>();
   const [departmentIds, setDepartmentIds] = useState<string[]>([]);
+
+  const { isActive, setIsActive } = usePositionFilters();
 
   const {
     positions,
@@ -50,6 +53,7 @@ export function PositionListWidget() {
           <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>
             Related departments
           </DepartmentMenu>
+          <IsActiveToggle isActive={isActive} onIsActiveChange={setIsActive} />
         </div>
       </div>
       {positions?.length ? (

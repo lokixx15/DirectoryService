@@ -13,13 +13,6 @@ import { SearchBar } from "@/shared/components/search/search-bar";
 import { useMemo, useState } from "react";
 
 import { ColumnsDropdown } from "@/shared/components/dropdowns/columns-dropdown";
-import {
-  CreateLocationDialog,
-  EditLocationDialog,
-  DeleteLocationDialog,
-  useLocationList,
-  createLocationColumns,
-} from "@/features/locations";
 import { Location } from "@/entities/locations";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { SkeletonTable } from "@/shared/components/skeletons/skeleton-table";
@@ -37,17 +30,23 @@ import { DepartmentSelect } from "@/features/departments/ui/department-select/de
 import { Button } from "@/shared/components/ui/button";
 import { useLocationFilters } from "@/features/locations/model/use-location-filters";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { IsActiveToggle } from "@/shared/components/toggles/is-active-toggle";
+import { useLocationList } from "@/features/locations/model/use-location-list";
+import { createLocationColumns } from "@/features/locations/model/location-columns";
+import { CreateLocationDialog } from "@/features/locations/ui/create-location-dialog";
+import { EditLocationDialog } from "@/features/locations/ui/edit-location-dialog";
+import { DeleteLocationDialog } from "@/features/locations/ui/delete-location-dialog";
 
 export function LocationTableWidget() {
-  const { pageSize, onPageSizeChange } =
-    usePagination(10);
+  const { pageSize, onPageSizeChange } = usePagination(10);
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [isActive, setIsActive] = useState<boolean>();
 
   const {
     pageIndex,
     setPage,
+    isActive,
+    setIsActive,
     addedDepartmentIds,
     excludedDepartmentIds,
     setAddedDepartmentIdsHandler,
@@ -136,6 +135,7 @@ export function LocationTableWidget() {
           excludedDepartmentIds={excludedDepartmentIds}
           onExcludedDepartmentIdsChange={setExcludedDepartmentIdsHandler}
         />
+        <IsActiveToggle isActive={isActive} onIsActiveChange={setIsActive} />
         <CreateLocationDialog />
       </div>
 

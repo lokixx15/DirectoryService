@@ -1,24 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { DepartmentSelect } from "@/features/departments/ui/department-select/department-select";
-import { LocationMenu } from "@/features/locations/ui/location-menu";
+import { useDepartmentFilters } from "@/features/departments/model/use-department-filters";
 import { useRootDepartments } from "@/features/departments/model/use-root-departments";
-import { usePagination } from "@/shared/hooks/use-pagination";
+import { DepartmentSelect } from "@/features/departments/ui/department-select/department-select";
 import { DepartmentTree } from "@/features/departments/ui/department-tree/department-tree";
 import { DepartmentTreeSkeleton } from "@/features/departments/ui/department-tree/department-tree-skeleton";
-import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
-import { ErrorCard } from "@/shared/components/errors/error-card";
-import { PositionList } from "@/features/positions/ui/position-list";
+import { LocationMenu } from "@/features/locations/ui/location-menu";
 import { usePositionList } from "@/features/positions/model/use-position-list";
-import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
+import { PositionList } from "@/features/positions/ui/position-list";
 import { NotFoundCard } from "@/shared/components/cards/not-found-card";
+import { ErrorCard } from "@/shared/components/errors/error-card";
+import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
+import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
+import { IsActiveToggle } from "@/shared/components/toggles/is-active-toggle";
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from "@/shared/components/ui/alert";
+import { usePagination } from "@/shared/hooks/use-pagination";
 import { Info } from "lucide-react";
+import { useState } from "react";
 
 const DEFAULT_CHILDREN_LIMIT = 3;
 
@@ -30,6 +32,8 @@ export function DepartmentTreeWidget() {
   const [locationIds, setLocationIds] = useState<string[]>([]);
 
   const { page, pageSize, onPageSizeChange } = usePagination(5);
+
+  const { isActive, setIsActive } = useDepartmentFilters();
 
   const {
     departments,
@@ -44,6 +48,7 @@ export function DepartmentTreeWidget() {
     prefetch: DEFAULT_CHILDREN_LIMIT,
     departmentIds,
     excludedDepartmentIds,
+    isActive,
   });
 
   const [selectedId, setSelectedId] = useState("");
@@ -91,8 +96,11 @@ export function DepartmentTreeWidget() {
           }
         />
 
+        <IsActiveToggle isActive={isActive} onIsActiveChange={setIsActive} />
+
         {departments && (
           <DepartmentTree
+            isActive={isActive}
             departments={departments}
             selectedId={selectedId}
             onSelectedId={setSelectedId}
@@ -117,10 +125,10 @@ export function DepartmentTreeWidget() {
             </AlertDescription>
           </Alert>
         ) : isPositionFetching ? (
-          <SkeletonCard quantity={5} layoutClassName="grid grid-cols-1 gap-2"/>
+          <SkeletonCard quantity={5} layoutClassName="grid grid-cols-1 gap-2" />
         ) : isPositionError || (positionErrors && positionErrors.length > 0) ? (
           <ErrorCard errors={positionErrors ?? []} refetch={positionRefetch} />
-        ) : positions?.length ? (
+        ) : (positions?.length && departments?.length) ? (
           <PositionList
             positions={positions}
             isFetchingNextPage={isFetchingNextPage}

@@ -107,7 +107,7 @@ public sealed class GetRootDepartmentsWithChildrenHandler
         var deptIdsKey = query.Request.DepartmentIds != null ? string.Join(",", query.Request.DepartmentIds) : "all";
         var exclIdsKey = query.Request.ExcludedDepartmentIds != null ? string.Join(",", query.Request.ExcludedDepartmentIds) : "none";
 
-        var key = $"{CacheConstants.ROOT_DEPARTMENTS_WITH_CHILDREN_CACHE_KEY}_page_{query.Request.Page}_size_{query.Request.Size}_prefetch_{query.Request.Prefetch}_ids_{deptIdsKey}_excl_{exclIdsKey}";
+        var key = $"{CacheConstants.ROOT_DEPARTMENTS_WITH_CHILDREN_CACHE_KEY}_page_{query.Request.Page}_size_{query.Request.Size}_prefetch_{query.Request.Prefetch}_ids_{deptIdsKey}_excl_{exclIdsKey}_isActive_{query.Request.IsActive}";
 
         var finalSql = SQL.Replace("{whereClause}", whereClause);
 
