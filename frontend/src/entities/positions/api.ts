@@ -41,15 +41,22 @@ export const positionsQueryOptions = {
     pageSize,
     departmentIds,
     search,
+    isActiveOnly,
   }: GetPositionsRequest) => {
     return infiniteQueryOptions({
-      queryKey: [positionsQueryOptions.baseKey, departmentIds, search],
+      queryKey: [
+        positionsQueryOptions.baseKey,
+        departmentIds,
+        search,
+        isActiveOnly,
+      ],
       queryFn: async ({ pageParam }) => {
         return await positionsApi.getAllPositions({
           cursor: pageParam ?? undefined,
           departmentIds,
           search,
           pageSize,
+          isActiveOnly,
         });
       },
       initialPageParam: null as string | null,

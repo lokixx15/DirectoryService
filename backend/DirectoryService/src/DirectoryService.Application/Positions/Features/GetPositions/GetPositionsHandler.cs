@@ -81,6 +81,12 @@ public sealed class GetPositionsHandler
 
         parameters.Add("page_size", query.Request.PageSize + 1);
 
+        if (query.Request.IsActiveOnly != false)
+        {
+            parameters.Add("is_active", query.Request.IsActiveOnly);
+            whereConditions.Add("p.is_active = @is_active");
+        }
+
         var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
 
         var postionDtos = await connection.QueryAsync<PositionDto>(

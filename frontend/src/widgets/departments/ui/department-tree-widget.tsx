@@ -11,12 +11,12 @@ import { NotFoundCard } from "@/shared/components/cards/not-found-card";
 import { ErrorCard } from "@/shared/components/errors/error-card";
 import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
+import { ActiveToggle } from "@/shared/components/toggles/active-toggle";
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from "@/shared/components/ui/alert";
-import { Toggle } from "@/shared/components/ui/toggle";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { cn } from "@/shared/lib/utils";
 import { Info } from "lucide-react";
@@ -33,7 +33,11 @@ export function DepartmentTreeWidget() {
 
   const { page, pageSize, onPageSizeChange } = usePagination(5);
 
-  const [isActiveOnly, setIsActiveOnly] = useState<boolean>(false);
+  const [isActiveDepartmentsOnly, setIsActiveDepartmentsOnly] =
+    useState<boolean>(false);
+
+  const [isActivePositionsOnly, setIsActivePositionsOnly] =
+    useState<boolean>(false);
 
   const {
     departments,
@@ -49,7 +53,7 @@ export function DepartmentTreeWidget() {
     prefetch: DEFAULT_CHILDREN_LIMIT,
     departmentIds,
     excludedDepartmentIds,
-    isActiveOnly,
+    isActiveOnly: isActiveDepartmentsOnly,
   });
 
   const [selectedId, setSelectedId] = useState("");
@@ -67,6 +71,7 @@ export function DepartmentTreeWidget() {
     pageSize,
     departmentIds: [selectedId],
     enabled: !!selectedId,
+    isActiveOnly: isActivePositionsOnly,
   });
 
   if (isDepartmentPending) {
@@ -95,15 +100,13 @@ export function DepartmentTreeWidget() {
               </LocationMenu>
             }
           />
-          <Toggle
-            size="sm"
-            variant="outline"
-            pressed={isActiveOnly}
-            onPressedChange={setIsActiveOnly}
-            className={cn("min-w-10", isActiveOnly && "w-25")}
-          >
-            <span>{isActiveOnly ? "Only active" : "All"}</span>
-          </Toggle>
+          <ActiveToggle
+            isActive={isActiveDepartmentsOnly}
+            onIsActiveChange={setIsActiveDepartmentsOnly}
+            className={cn("min-w-10", isActiveDepartmentsOnly && "w-25")}
+            activeText="Only active"
+            inActiveText="All"
+          />
         </div>
 
         {departments && (
@@ -111,7 +114,7 @@ export function DepartmentTreeWidget() {
             departments={departments}
             selectedId={selectedId}
             onSelectedId={setSelectedId}
-            isActiveOnly={isActiveOnly}
+            isActiveOnly={isActivePositionsOnly}
           />
         )}
 
@@ -124,6 +127,15 @@ export function DepartmentTreeWidget() {
       </div>
 
       <div className="flex flex-col gap-3 w-[50%]">
+        {selectedId && (
+          <ActiveToggle
+            isActive={isActivePositionsOnly}
+            onIsActiveChange={setIsActivePositionsOnly}
+            className="h-6"
+            activeText="Only active"
+            inActiveText="All"
+          />
+        )}
         {!selectedId ? (
           <Alert className="bg-muted/40 w-fit pr-5 mx-auto">
             <Info className="h-4 w-4 text-muted-foreground" />
@@ -137,13 +149,15 @@ export function DepartmentTreeWidget() {
         ) : isPositionError || (positionErrors && positionErrors.length > 0) ? (
           <ErrorCard errors={positionErrors ?? []} refetch={positionRefetch} />
         ) : positions?.length && departments?.length ? (
-          <PositionList
-            positions={positions}
-            isFetchingNextPage={isFetchingNextPage}
-            hasNextPage={hasNextPage}
-            fetchNextPage={fetchNextPage}
-            layoutClassName="flex flex-col gap-3"
-          />
+          <div className="flex flex-col gap-2">
+            <PositionList
+              positions={positions}
+              isFetchingNextPage={isFetchingNextPage}
+              hasNextPage={hasNextPage}
+              fetchNextPage={fetchNextPage}
+              layoutClassName="flex flex-col gap-3"
+            />
+          </div>
         ) : (
           <NotFoundCard title="Not found positions" />
         )}
