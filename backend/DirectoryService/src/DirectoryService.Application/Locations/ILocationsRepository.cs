@@ -15,9 +15,7 @@ public interface ILocationsRepository
 
     Task<UnitResult<Error>> SoftDeleteLocationsWithoutActiveDepartments(Guid departmentId, CancellationToken cancellationToken);
 
-    Task<UnitResult<Error>> DeleteDepartmentLocationsByLocationIdAsync(Guid locationId, CancellationToken cancellationToken);
-
-    Task<UnitResult<Error>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task<UnitResult<Error>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken);
 
     Task<UnitResult<Error>> RestoreLocationByIdAsync(Guid locationId, CancellationToken cancellationToken);
 }

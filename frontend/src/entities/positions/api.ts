@@ -1,8 +1,13 @@
-import { infiniteQueryOptions, keepPreviousData } from "@tanstack/react-query";
+import {
+  infiniteQueryOptions,
+  keepPreviousData,
+  mutationOptions,
+} from "@tanstack/react-query";
 import { apiClient } from "@/shared/api/axios-instance";
 import { Envelope } from "@/shared/api/envelope";
 import { CursorPaginationResponse } from "@/shared/api/pagination-response";
 import { GetPositionsRequest, Position } from "./types";
+import { queryClient } from "@/shared/api/query-client";
 
 export const positionsApi = {
   getAllPositions: async (request: GetPositionsRequest) => {
@@ -14,6 +19,20 @@ export const positionsApi = {
 
     return response.data;
   },
+  deletePosition: async (id: string) => {
+    const response = await apiClient.delete<Envelope>(
+      `directory/positions/${id}`,
+    );
+
+    return response.data;
+  },
+  restorePosition: async (id: string) => {
+    const response = await apiClient.patch<Envelope>(
+      `directory/positions/${id}/restore`,
+    );
+
+    return response.data;
+  },
 };
 
 export const positionsQueryOptions = {
@@ -22,21 +41,14 @@ export const positionsQueryOptions = {
     pageSize,
     departmentIds,
     search,
-    isActive,
   }: GetPositionsRequest) => {
     return infiniteQueryOptions({
-      queryKey: [
-        positionsQueryOptions.baseKey,
-        departmentIds,
-        search,
-        isActive,
-      ],
+      queryKey: [positionsQueryOptions.baseKey, departmentIds, search],
       queryFn: async ({ pageParam }) => {
         return await positionsApi.getAllPositions({
           cursor: pageParam ?? undefined,
           departmentIds,
           search,
-          isActive,
           pageSize,
         });
       },
@@ -57,6 +69,24 @@ export const positionsQueryOptions = {
           timeGenerated: data.pages[0].timeGenerated,
         };
       },
+    });
+  },
+  deletePositionOptions: () => {
+    return mutationOptions({
+      mutationFn: positionsApi.deletePosition,
+      onSettled: () =>
+        queryClient.invalidateQueries({
+          queryKey: [positionsQueryOptions.baseKey],
+        }),
+    });
+  },
+  restoreLocationOptions: () => {
+    return mutationOptions({
+      mutationFn: positionsApi.restorePosition,
+      onSettled: () =>
+        queryClient.invalidateQueries({
+          queryKey: [positionsQueryOptions.baseKey],
+        }),
     });
   },
 };

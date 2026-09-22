@@ -92,6 +92,33 @@ public sealed class PositionsRepository : IPositionsRepository
         }
     }
 
+    public async Task<UnitResult<Error>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _dbContext.Positions
+                .Where(d => d.Id == id)
+                .ExecuteUpdateAsync(l => l
+                    .SetProperty(p => p.IsActive, false)
+                    .SetProperty(p => p.DeletedAt, DateTime.UtcNow),
+                    cancellationToken);
+
+            _logger.LogInformation("Position was soft deleted");
+
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when soft deleting position");
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to soft delete position");
+            return GeneralErrors.DatabaseDeleteFailed("Failed to soft delete position");
+        }
+    }
+
     public async Task<UnitResult<Error>> RestorePositionByIdAsync(Guid positionId, CancellationToken cancellationToken)
     {
         try

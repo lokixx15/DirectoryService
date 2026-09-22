@@ -6,7 +6,7 @@ interface UseChildrenDepartments {
   size: number;
   parentId: string;
   enabled?: boolean;
-  isActive: boolean;
+  isActiveOnly: boolean;
 }
 
 export function useChildrenDepartments({
@@ -14,14 +14,14 @@ export function useChildrenDepartments({
   size,
   parentId,
   enabled,
-  isActive,
+  isActiveOnly,
 }: UseChildrenDepartments) {
   const { data, isFetching, isError, refetch } = useQuery({
     ...departmentsQueryOptions.getChildrenDepartments({
       page,
       size,
       parentId,
-      isActive,
+      isActiveOnly,
     }),
     enabled: enabled && size > 0 && !!parentId,
   });

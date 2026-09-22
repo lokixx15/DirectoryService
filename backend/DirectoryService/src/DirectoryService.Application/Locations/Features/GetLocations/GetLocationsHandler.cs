@@ -106,6 +106,7 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
                        l.timezone,
                        l.created_at,
                        l.updated_at,
+                       l.deleted_at,
                        l.address,
                        COUNT(*) OVER() AS total_count
                 FROM locations AS l

@@ -7,7 +7,7 @@ interface UseRootDepartments {
   prefetch: number;
   departmentIds: string[];
   excludedDepartmentIds: string[];
-  isActive: boolean;
+  isActiveOnly: boolean;
 }
 
 export function useRootDepartments({
@@ -16,7 +16,7 @@ export function useRootDepartments({
   prefetch,
   departmentIds,
   excludedDepartmentIds,
-  isActive,
+  isActiveOnly,
 }: UseRootDepartments) {
   const { data, isFetching, isPending, isError, refetch } = useQuery(
     departmentsQueryOptions.getRootDepartments({
@@ -25,12 +25,13 @@ export function useRootDepartments({
       prefetch,
       departmentIds,
       excludedDepartmentIds,
-      isActive,
+      isActiveOnly,
     }),
   );
 
   return {
-    departments: data?.result,
+    departments: data?.result?.entities,
+    totalElements: data?.result?.totalCount,
     isError: data?.isError || isError,
     errors: data?.errorList,
     isFetching,

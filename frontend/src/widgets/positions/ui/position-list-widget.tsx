@@ -9,7 +9,6 @@ import { ErrorCard } from "@/shared/components/errors/error-card";
 import { StatusFilter } from "@/shared/components/filters/status-filter";
 import { SearchBar } from "@/shared/components/search/search-bar";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
-import { IsActiveToggle } from "@/shared/components/toggles/is-active-toggle";
 import { useState } from "react";
 
 const PAGE_SIZE = 10;
@@ -18,7 +17,7 @@ export function PositionListWidget() {
   const [search, setSearch] = useState("");
   const [departmentIds, setDepartmentIds] = useState<string[]>([]);
 
-  const { isActive, setIsActive } = usePositionFilters();
+  const { setIsActive } = usePositionFilters();
 
   const {
     positions,
@@ -33,7 +32,6 @@ export function PositionListWidget() {
     pageSize: PAGE_SIZE,
     departmentIds: departmentIds,
     search: search,
-    isActive: isActive,
   });
 
   if (isError) {
@@ -53,7 +51,6 @@ export function PositionListWidget() {
           <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>
             Related departments
           </DepartmentMenu>
-          <IsActiveToggle isActive={isActive} onIsActiveChange={setIsActive} />
         </div>
       </div>
       {positions?.length ? (

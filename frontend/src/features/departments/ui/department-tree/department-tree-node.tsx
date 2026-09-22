@@ -18,7 +18,7 @@ interface DepartmentTreeNodeProps {
   prefetchedChildren?: Department[];
   selectedId?: string;
   onSelectId: (id: string) => void;
-  isActive: boolean;
+  isActiveOnly: boolean;
 }
 
 export function DepartmentTreeNode({
@@ -26,7 +26,7 @@ export function DepartmentTreeNode({
   prefetchedChildren = [],
   selectedId,
   onSelectId,
-  isActive,
+  isActiveOnly,
 }: DepartmentTreeNodeProps) {
   const { page, pageSize, onPageSizeChange } = usePagination(3);
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +43,7 @@ export function DepartmentTreeNode({
     size: pageSize,
     parentId: department.id,
     enabled: isOpen,
-    isActive,
+    isActiveOnly
   });
 
   const displayChildren = useMemo(() => {
@@ -102,7 +102,7 @@ export function DepartmentTreeNode({
               department={child}
               selectedId={selectedId}
               onSelectId={onSelectId}
-              isActive={isActive}
+              isActiveOnly={isActiveOnly}
             />
           ))}
         </div>

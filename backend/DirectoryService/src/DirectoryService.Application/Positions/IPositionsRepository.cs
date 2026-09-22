@@ -11,4 +11,6 @@ public interface IPositionsRepository
     Task<UnitResult<Error>> SoftDeletePositionsWithoutActiveDepartments(Guid departmentId, CancellationToken cancellationToken);
 
     Task<UnitResult<Error>> RestorePositionByIdAsync(Guid positionId, CancellationToken cancellationToken);
+
+    Task<UnitResult<Error>> SoftDeleteByIdAsync(Guid positionId, CancellationToken cancellationToken);
 }

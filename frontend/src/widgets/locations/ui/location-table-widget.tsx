@@ -10,9 +10,8 @@ import {
 
 import { PaginationIconsOnly } from "@/shared/components/pagination/pagination-icons-only";
 import { SearchBar } from "@/shared/components/search/search-bar";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { ColumnsDropdown } from "@/shared/components/dropdowns/columns-dropdown";
 import { Location } from "@/entities/locations";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { SkeletonTable } from "@/shared/components/skeletons/skeleton-table";
@@ -30,12 +29,15 @@ import { DepartmentSelect } from "@/features/departments/ui/department-select/de
 import { Button } from "@/shared/components/ui/button";
 import { useLocationFilters } from "@/features/locations/model/use-location-filters";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { IsActiveToggle } from "@/shared/components/toggles/is-active-toggle";
 import { useLocationList } from "@/features/locations/model/use-location-list";
 import { createLocationColumns } from "@/features/locations/model/location-columns";
 import { CreateLocationDialog } from "@/features/locations/ui/create-location-dialog";
 import { EditLocationDialog } from "@/features/locations/ui/edit-location-dialog";
-import { DeleteLocationDialog } from "@/features/locations/ui/delete-location-dialog";
+import { DeleteDialog } from "@/shared/components/dialogs/delete-dialog";
+import { RestoreDialog } from "@/shared/components/dialogs/restore-dialog";
+import { useDeleteLocation } from "@/features/locations/model/use-delete-location";
+import { useRestoreLocation } from "@/features/locations/model/use-restore-location";
+import { Toggle } from "@/shared/components/ui/toggle";
 
 export function LocationTableWidget() {
   const { pageSize, onPageSizeChange } = usePagination(10);
@@ -58,6 +60,13 @@ export function LocationTableWidget() {
 
   const [deletingLocation, setDeletingLocation] = useState<Location>();
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
+  const { deleteLocation, isPending: isDeleteLocationPending } =
+    useDeleteLocation();
+
+  const [restoringLocation, setRestoringLocation] = useState<Location>();
+  const [restoreOpen, setRestoreOpen] = useState<boolean>(false);
+  const { restoreLocation, isPending: isRestoreLocationPending } =
+    useRestoreLocation();
 
   const { locations, totalCount, totalPages, isPending, errors, refetch } =
     useLocationList({
@@ -85,9 +94,43 @@ export function LocationTableWidget() {
           setDeletingLocation(location);
           setDeleteOpen(true);
         },
+        (location) => {
+          setRestoringLocation(location);
+          setRestoreOpen(true);
+        },
       ),
     [],
   );
+
+  useEffect(() => {
+    if (isActive === false) {
+      setColumnVisibility({
+        name: true,
+        deletedAt: true,
+        id: false,
+        address: false,
+        timezone: false,
+        isActive: false,
+        createdAt: false,
+        updatedAt: false,
+        actions: false,
+        restoreAction: true,
+      });
+    } else {
+      setColumnVisibility({
+        id: false,
+        name: true,
+        address: true,
+        timezone: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        actions: true,
+        deletedAt: false,
+        restoreAction: false,
+      });
+    }
+  }, [isActive]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -126,7 +169,6 @@ export function LocationTableWidget() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center w-full gap-2 flex-wrap">
         <SearchBar onSearch={setSearch} />
-        <ColumnsDropdown table={table} />
         <StatusFilter onIsActive={setIsActive} />
         <DepartmentSelect
           key={addedDepartmentIds.join(",") + excludedDepartmentIds.join(",")}
@@ -135,7 +177,14 @@ export function LocationTableWidget() {
           excludedDepartmentIds={excludedDepartmentIds}
           onExcludedDepartmentIdsChange={setExcludedDepartmentIdsHandler}
         />
-        <IsActiveToggle isActive={isActive} onIsActiveChange={setIsActive} />
+        <Toggle
+          size="sm"
+          variant="outline"
+          pressed={isActive}
+          onPressedChange={setIsActive}
+        >
+          <span>{isActive ? "Active" : "Archive"}</span>
+        </Toggle>
         <CreateLocationDialog />
       </div>
 
@@ -226,10 +275,24 @@ export function LocationTableWidget() {
       )}
 
       {deletingLocation && (
-        <DeleteLocationDialog
-          location={deletingLocation}
+        <DeleteDialog
+          entity={deletingLocation}
           open={deleteOpen}
           onOpenChange={setDeleteOpen}
+          onDeleteEntity={deleteLocation}
+          isPending={isDeleteLocationPending}
+          name="location"
+        />
+      )}
+
+      {restoringLocation && (
+        <RestoreDialog
+          entity={restoringLocation}
+          open={restoreOpen}
+          onOpenChange={setRestoreOpen}
+          onRestoreEntity={restoreLocation}
+          isPending={isRestoreLocationPending}
+          name="location"
         />
       )}
     </div>

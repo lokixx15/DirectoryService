@@ -13,5 +13,4 @@ export type GetPositionsRequest = {
   cursor?: string;
   departmentIds?: string[];
   search?: string;
-  isActive?: boolean;
 };

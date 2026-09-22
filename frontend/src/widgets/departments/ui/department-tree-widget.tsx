@@ -1,6 +1,5 @@
 "use client";
 
-import { useDepartmentFilters } from "@/features/departments/model/use-department-filters";
 import { useRootDepartments } from "@/features/departments/model/use-root-departments";
 import { DepartmentSelect } from "@/features/departments/ui/department-select/department-select";
 import { DepartmentTree } from "@/features/departments/ui/department-tree/department-tree";
@@ -12,13 +11,14 @@ import { NotFoundCard } from "@/shared/components/cards/not-found-card";
 import { ErrorCard } from "@/shared/components/errors/error-card";
 import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
-import { IsActiveToggle } from "@/shared/components/toggles/is-active-toggle";
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from "@/shared/components/ui/alert";
+import { Toggle } from "@/shared/components/ui/toggle";
 import { usePagination } from "@/shared/hooks/use-pagination";
+import { cn } from "@/shared/lib/utils";
 import { Info } from "lucide-react";
 import { useState } from "react";
 
@@ -33,10 +33,11 @@ export function DepartmentTreeWidget() {
 
   const { page, pageSize, onPageSizeChange } = usePagination(5);
 
-  const { isActive, setIsActive } = useDepartmentFilters();
+  const [isActiveOnly, setIsActiveOnly] = useState<boolean>(false);
 
   const {
     departments,
+    totalElements,
     isError: isDepartmentError,
     errors: departmentErrors,
     isFetching: isDepartmentFetching,
@@ -48,7 +49,7 @@ export function DepartmentTreeWidget() {
     prefetch: DEFAULT_CHILDREN_LIMIT,
     departmentIds,
     excludedDepartmentIds,
-    isActive,
+    isActiveOnly,
   });
 
   const [selectedId, setSelectedId] = useState("");
@@ -78,44 +79,51 @@ export function DepartmentTreeWidget() {
     );
   }
 
-  const hasMore = departments?.length === pageSize;
-
   return (
-    <div className="grid grid-cols-2 gap-10">
+    <div className="flex gap-5">
       <div className="flex flex-col gap-2">
-        <DepartmentSelect
-          addedDepartmentIds={departmentIds}
-          onAddedDepartmentIdsChange={setDepartmentIds}
-          excludedDepartmentIds={excludedDepartmentIds}
-          onExcludedDepartmentIdsChange={setExcludedDepartmentIds}
-          locationIds={locationIds}
-          filterActions={
-            <LocationMenu onLocationIdsChange={setLocationIds}>
-              Related locations
-            </LocationMenu>
-          }
-        />
-
-        <IsActiveToggle isActive={isActive} onIsActiveChange={setIsActive} />
+        <div className="flex gap-2">
+          <DepartmentSelect
+            addedDepartmentIds={departmentIds}
+            onAddedDepartmentIdsChange={setDepartmentIds}
+            excludedDepartmentIds={excludedDepartmentIds}
+            onExcludedDepartmentIdsChange={setExcludedDepartmentIds}
+            locationIds={locationIds}
+            filterActions={
+              <LocationMenu onLocationIdsChange={setLocationIds}>
+                Related locations
+              </LocationMenu>
+            }
+          />
+          <Toggle
+            size="sm"
+            variant="outline"
+            pressed={isActiveOnly}
+            onPressedChange={setIsActiveOnly}
+            className={cn("min-w-10", isActiveOnly && "w-25")}
+          >
+            <span>{isActiveOnly ? "Only active" : "All"}</span>
+          </Toggle>
+        </div>
 
         {departments && (
           <DepartmentTree
-            isActive={isActive}
             departments={departments}
             selectedId={selectedId}
             onSelectedId={setSelectedId}
+            isActiveOnly={isActiveOnly}
           />
         )}
 
         <LoadMoreButton
           pageSize={pageSize}
+          totalElements={totalElements}
           onPageSizeChange={onPageSizeChange}
           loading={isDepartmentFetching}
-          hasMore={hasMore}
         />
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 w-[50%]">
         {!selectedId ? (
           <Alert className="bg-muted/40 w-fit pr-5 mx-auto">
             <Info className="h-4 w-4 text-muted-foreground" />
@@ -128,7 +136,7 @@ export function DepartmentTreeWidget() {
           <SkeletonCard quantity={5} layoutClassName="grid grid-cols-1 gap-2" />
         ) : isPositionError || (positionErrors && positionErrors.length > 0) ? (
           <ErrorCard errors={positionErrors ?? []} refetch={positionRefetch} />
-        ) : (positions?.length && departments?.length) ? (
+        ) : positions?.length && departments?.length ? (
           <PositionList
             positions={positions}
             isFetchingNextPage={isFetchingNextPage}

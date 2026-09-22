@@ -1,8 +1,8 @@
 ﻿using DirectoryService.Application.Departments.Features.RestoreDepartment;
 using DirectoryService.Application.Locations.Features.CreateLocation;
-using DirectoryService.Application.Locations.Features.DeleteLocation;
 using DirectoryService.Application.Locations.Features.GetLocations;
 using DirectoryService.Application.Locations.Features.RestoreLocation;
+using DirectoryService.Application.Locations.Features.SoftDeleteLocation;
 using DirectoryService.Application.Locations.Features.UpdateLocation;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
@@ -73,12 +73,12 @@ public sealed class LocationsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<EndpointResult> DeleteLocation(
+    public async Task<EndpointResult> SoftDeleteLocation(
         [FromRoute] Guid id,
-        [FromServices] DeleteLocationHandler handler,
+        [FromServices] SoftDeleteLocationHandler handler,
         CancellationToken cancellationToken)
     {
-        var command = new DeleteLocationCommand(id);
+        var command = new SoftDeleteLocationCommand(id);
 
         return await handler.Handle(command, cancellationToken);
     }
