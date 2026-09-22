@@ -118,7 +118,7 @@ public sealed class GetRootDepartmentsWithChildrenHandler
             rootsWhereConditions.Add("d.is_active = @is_root_active");
 
             parameters.Add("is_child_active", query.Request.IsActiveOnly);
-            childrenWhereConditions.Add("r.is_active = @is_child_active");
+            childrenWhereConditions.Add("d.is_active = @is_child_active");
         }
 
         var rootsWhereClause = rootsWhereConditions.Any() ? "WHERE " + string.Join(" AND ", rootsWhereConditions) : string.Empty;
@@ -157,6 +157,9 @@ public sealed class GetRootDepartmentsWithChildrenHandler
             },
             tags: [CacheConstants.DEPARTMENTS_CACHE_TAG],
             cancellationToken: cancellationToken);
+
+        await _cache.RemoveByTagAsync(CacheConstants.DEPARTMENTS_CACHE_TAG, cancellationToken);
+        _logger.LogInformation("Invalidated all departments cache after delete using tag: {Tag}", CacheConstants.DEPARTMENTS_CACHE_TAG);
 
         return new PaginationResponse<DepartmentDto>(cachedData.Items, cachedData.TotalCount);
     }
