@@ -139,7 +139,7 @@ public sealed class PositionsRepository : IPositionsRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to restore position by id {PocationId}", positionId);
+            _logger.LogError(ex, "Failed to restore position by id {PositionId}", positionId);
             return GeneralErrors.DatabaseUpdateFailed("Failed to restore position by id");
         }
     }

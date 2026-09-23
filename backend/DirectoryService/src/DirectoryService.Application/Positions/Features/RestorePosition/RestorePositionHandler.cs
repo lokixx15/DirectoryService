@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using SharedService.Core.Abstractions;
 using SharedService.SharedKernel;
 
-namespace DirectoryService.Application.Departments.Features.RestoreDepartment;
+namespace DirectoryService.Application.Departments.Features.RestorePosition;
 
 public class RestorePositionHandler : ICommandHandler<RestorePositionCommand>
 {

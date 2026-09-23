@@ -24,7 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { StatusFilter } from "@/shared/components/filters/status-filter";
 import { DepartmentSelect } from "@/features/departments/ui/department-select/department-select";
 import { Button } from "@/shared/components/ui/button";
 import { useLocationFilters } from "@/features/locations/model/use-location-filters";
@@ -169,7 +168,6 @@ export function LocationTableWidget() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center w-full gap-2 flex-wrap">
         <SearchBar onSearch={setSearch} />
-        <StatusFilter onIsActive={setIsActive} />
         <DepartmentSelect
           key={addedDepartmentIds.join(",") + excludedDepartmentIds.join(",")}
           addedDepartmentIds={addedDepartmentIds}

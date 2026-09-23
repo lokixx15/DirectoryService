@@ -2,9 +2,11 @@
 using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedService.Core.Abstractions;
 using SharedService.Core.Validation;
@@ -15,17 +17,19 @@ namespace DirectoryService.Application.Locations.Features.GetLocations;
 public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationResponse<LocationDto>, Errors>, GetLocationsQuery>
 {
     private readonly IDbConnectionFactory _connectionFactory;
-
     private readonly IValidator<GetLocationsQuery> _validator;
+    private readonly HybridCache _cache;
     private readonly ILogger<GetLocationsHandler> _logger;
 
     public GetLocationsHandler(
         IDbConnectionFactory connectionFactory,
         IValidator<GetLocationsQuery> validator,
+        HybridCache cache,
         ILogger<GetLocationsHandler> logger)
     {
         _connectionFactory = connectionFactory;
         _validator = validator;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -82,8 +86,8 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
             whereConditions.Add("l.is_active = @is_active");
         }
 
-        parameters.Add("page_size", query.Request.pageSize);
-        parameters.Add("offset", (query.Request.Page - 1) * query.Request.pageSize);
+        parameters.Add("page_size", query.Request.PageSize);
+        parameters.Add("offset", (query.Request.Page - 1) * query.Request.PageSize);
 
         var orderBy = query.Request.OrderBy switch
         {
@@ -97,10 +101,23 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
         var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
         var orderByClause = $"ORDER BY {orderBy} {orderDirection}";
 
+        var key = $"{CacheConstants.LOCATIONS}" +
+          $"_page_{query.Request.Page}" +
+          $"_size_{query.Request.PageSize}" +
+          $"_search_{query.Request.Search}" +
+          $"_active_{query.Request.IsActive}" +
+          $"_ids_{query.Request.SelectedDepartmentIds}" +
+          $"_excl_{query.Request.ExcludedDepartmentIds}" +
+          $"_order_{query.Request.OrderBy}" +
+          $"_dir_{query.Request.OrderDirection}";
         long? totalCount = null!;
 
-        var locationDtos = await connection.QueryAsync<LocationDto, string, long, LocationDto>(
-            $"""
+        var locationDtos = await _cache.GetOrCreateAsync(
+            key,
+            async _ =>
+            {
+                return await connection.QueryAsync<LocationDto, string, long, LocationDto>(
+                    $"""
                 SELECT l.id,
                        l.name,
                        l.timezone,
@@ -114,16 +131,19 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
                 {orderByClause}
                 LIMIT @page_size OFFSET @offset
              """,
-            map: (lD, s, l) =>
-            {
-                var address = JsonSerializer.Deserialize<LocationAddressDto>(s);
+                    map: (lD, s, l) =>
+                    {
+                        var address = JsonSerializer.Deserialize<LocationAddressDto>(s);
 
-                totalCount ??= l;
+                        totalCount ??= l;
 
-                return lD with { Address = address! };
+                        return lD with { Address = address! };
+                    },
+                    parameters,
+                    splitOn: "address,total_count");
             },
-            parameters,
-            splitOn: "address,total_count");
+            tags: [CacheConstants.LOCATIONS_CACHE_TAG],
+            cancellationToken: cancellationToken);
 
         return new PaginationResponse<LocationDto>(locationDtos.ToList(), totalCount ?? 0);
     }

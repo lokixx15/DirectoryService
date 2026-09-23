@@ -158,9 +158,6 @@ public sealed class GetRootDepartmentsWithChildrenHandler
             tags: [CacheConstants.DEPARTMENTS_CACHE_TAG],
             cancellationToken: cancellationToken);
 
-        await _cache.RemoveByTagAsync(CacheConstants.DEPARTMENTS_CACHE_TAG, cancellationToken);
-        _logger.LogInformation("Invalidated all departments cache after delete using tag: {Tag}", CacheConstants.DEPARTMENTS_CACHE_TAG);
-
         return new PaginationResponse<DepartmentDto>(cachedData.Items, cachedData.TotalCount);
     }
 }

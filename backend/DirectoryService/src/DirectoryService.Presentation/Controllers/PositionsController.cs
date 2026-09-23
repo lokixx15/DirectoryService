@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application.Departments.Features.RestoreDepartment;
+using DirectoryService.Application.Departments.Features.RestorePosition;
 using DirectoryService.Application.Positions.Features.CreatePosition;
 using DirectoryService.Application.Positions.Features.GetPositions;
 using DirectoryService.Application.Positions.Features.RestorePosition;

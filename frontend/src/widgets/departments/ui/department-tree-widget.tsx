@@ -114,7 +114,7 @@ export function DepartmentTreeWidget() {
             departments={departments}
             selectedId={selectedId}
             onSelectedId={setSelectedId}
-            isActiveOnly={isActivePositionsOnly}
+            isActiveOnly={isActiveDepartmentsOnly}
           />
         )}
 
