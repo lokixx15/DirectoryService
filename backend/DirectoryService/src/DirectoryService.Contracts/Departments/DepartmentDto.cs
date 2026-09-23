@@ -20,5 +20,7 @@ public record DepartmentDto
 
     public DateTime UpdatedAt { get; init; }
 
-    public bool HasMoreChildren { get; init; }
+    public DateTime? DeletedAt { get; init; }
+
+    public bool HasMoreChildren { get; set; }
 }

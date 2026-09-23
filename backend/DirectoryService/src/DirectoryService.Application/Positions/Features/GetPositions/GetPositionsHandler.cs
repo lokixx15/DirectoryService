@@ -79,13 +79,13 @@ public sealed class GetPositionsHandler
             whereConditions.Add("p.name ILIKE '%' || @search || '%'");
         }
 
-        if (query.Request.IsActive != null)
+        parameters.Add("page_size", query.Request.PageSize + 1);
+
+        if (query.Request.IsActiveOnly != false)
         {
-            parameters.Add("is_active", query.Request.IsActive);
+            parameters.Add("is_active", query.Request.IsActiveOnly);
             whereConditions.Add("p.is_active = @is_active");
         }
-
-        parameters.Add("page_size", query.Request.PageSize + 1);
 
         var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
 

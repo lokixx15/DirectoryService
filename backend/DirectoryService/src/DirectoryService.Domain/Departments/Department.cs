@@ -139,7 +139,25 @@ public class Department
 
         Path = newPath.Value;
 
-        DeletedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+        DeletedAt = UpdatedAt;
+
+        return UnitResult.Success<Errors>();
+    }
+
+    public UnitResult<Errors> Restore()
+    {
+        IsActive = true;
+
+        var newPath = DepartmentPath.RestorePath(Path.Value);
+
+        if (newPath.IsFailure)
+            return newPath.Error;
+
+        Path = newPath.Value;
+
+        UpdatedAt = DateTime.UtcNow;
+        DeletedAt = null;
 
         return UnitResult.Success<Errors>();
     }

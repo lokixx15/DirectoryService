@@ -4,5 +4,5 @@ public record GetPositionsRequest(
     string? Cursor,
     Guid[]? DepartmentIds,
     string? Search,
-    bool? IsActive,
+    bool IsActiveOnly,
     int PageSize = 20);

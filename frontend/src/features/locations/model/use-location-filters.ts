@@ -12,6 +12,10 @@ export function useLocationFilters() {
   const addedDepartmentIds = searchParams.getAll("selectedDepartmentIds");
   const excludedDepartmentIds = searchParams.getAll("excludedDepartmentIds");
 
+  const rawIsActive = searchParams.get("isActive");
+  const isActive =
+    rawIsActive === "true" ? true : rawIsActive === "false" ? false : undefined;
+
   const pendingParamsRef = useRef<URLSearchParams | null>(null);
   const microtaskScheduledRef = useRef(false);
 
@@ -62,6 +66,15 @@ export function useLocationFilters() {
     [updateQueryParams],
   );
 
+  const setIsActive = useCallback(
+    (isActive: boolean | undefined) => {
+      updateQueryParams((params) => {
+        params.set("isActive", String(isActive));
+      }, false);
+    },
+    [updateQueryParams],
+  );
+
   const setAddedDepartmentIdsHandler = useCallback(
     (ids: string[]) => {
       updateQueryParams((params) => {
@@ -85,6 +98,8 @@ export function useLocationFilters() {
   return {
     pageIndex,
     setPage,
+    isActive,
+    setIsActive,
     addedDepartmentIds,
     excludedDepartmentIds,
     setAddedDepartmentIdsHandler,

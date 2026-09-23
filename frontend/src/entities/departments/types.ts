@@ -41,6 +41,7 @@ export type Department = {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
   hasMoreChildren: boolean;
 };
 
@@ -50,10 +51,12 @@ export type GetRootDepartmentsRequest = {
   prefetch: number;
   departmentIds: string[];
   excludedDepartmentIds: string[];
+  isActiveOnly: boolean;
 };
 
 export type GetChildrenDepartmentsRequest = {
   page: number;
   size: number;
   parentId: string;
+  isActiveOnly: boolean;
 };

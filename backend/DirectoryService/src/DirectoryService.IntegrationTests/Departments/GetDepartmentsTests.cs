@@ -81,9 +81,7 @@ public class GetDepartmentsTests : DirectoryBaseTests
             var query = new GetDepartmentsQuery(
                 new GetDepartmentsRequest(
                     "dep",
-                    parentDepartmentId,
                     [locationIds[0]],
-                    [departmentIds[3]],
                     true));
 
             return sut.Handle(query, cancellationToken);

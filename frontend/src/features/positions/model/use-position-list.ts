@@ -7,8 +7,8 @@ interface UsePositionsListProps {
   pageSize: number;
   departmentIds?: string[];
   search?: string;
-  isActive?: boolean;
   enabled?: boolean;
+  isActiveOnly: boolean;
 }
 
 interface UsePositionsListReturn {
@@ -27,8 +27,8 @@ export function usePositionList({
   pageSize,
   departmentIds,
   search,
-  isActive,
   enabled,
+  isActiveOnly,
 }: UsePositionsListProps): UsePositionsListReturn {
   const {
     data,
@@ -44,7 +44,7 @@ export function usePositionList({
       pageSize,
       departmentIds: departmentIds?.length ? departmentIds : undefined,
       search: search || undefined,
-      isActive: isActive,
+      isActiveOnly,
     }),
     enabled,
   });
