@@ -1,6 +1,4 @@
-﻿using DirectoryService.Application.Departments.Features.RestoreDepartment;
-using DirectoryService.Application.Departments.Features.RestorePosition;
-using DirectoryService.Application.Positions.Features.CreatePosition;
+﻿using DirectoryService.Application.Positions.Features.CreatePosition;
 using DirectoryService.Application.Positions.Features.GetPositions;
 using DirectoryService.Application.Positions.Features.RestorePosition;
 using DirectoryService.Application.Positions.Features.SoftDeletePosition;
@@ -38,7 +36,7 @@ public sealed class PositionsController : ControllerBase
     }
 
     [HttpPatch("{positionId:guid}/restore")]
-    public async Task<EndpointResult> RestoreDepartment(
+    public async Task<EndpointResult> RestorePosition(
         [FromRoute] Guid positionId,
         [FromServices] RestorePositionHandler handler,
         CancellationToken cancellationToken)
@@ -49,7 +47,7 @@ public sealed class PositionsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<EndpointResult> SoftDeleteLocation(
+    public async Task<EndpointResult> SoftDeletePosition(
         [FromRoute] Guid id,
         [FromServices] SoftDeletePositionHandler handler,
         CancellationToken cancellationToken)

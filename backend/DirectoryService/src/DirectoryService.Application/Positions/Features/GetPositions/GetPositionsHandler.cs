@@ -1,9 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Application.Caching;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Positions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedService.Core.Abstractions;
 using SharedService.Core.Validation;
@@ -16,15 +18,18 @@ public sealed class GetPositionsHandler
 {
     private readonly IDbConnectionFactory _connectionFactory;
     private readonly IValidator<GetPositionsQuery> _validator;
+    private readonly HybridCache _cache;
     private readonly ILogger<GetPositionsHandler> _logger;
 
     public GetPositionsHandler(
         IDbConnectionFactory connectionFactory,
         IValidator<GetPositionsQuery> validator,
+        HybridCache cache,
         ILogger<GetPositionsHandler> logger)
     {
         _connectionFactory = connectionFactory;
         _validator = validator;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -89,8 +94,19 @@ public sealed class GetPositionsHandler
 
         var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
 
-        var postionDtos = await connection.QueryAsync<PositionDto>(
-            $"""
+        var key = $"{CacheConstants.POSITIONS}" +
+          $"_cursor_{query.Request.Cursor}" +
+          $"_size_{query.Request.PageSize}" +
+          $"_search_{query.Request.Search}" +
+          $"_active_{query.Request.IsActiveOnly}" +
+          $"_ids_{query.Request.DepartmentIds}";
+
+        var positionDtos = await _cache.GetOrCreateAsync(
+            key,
+            async _ =>
+            {
+                return await connection.QueryAsync<PositionDto>(
+                    $"""
                 SELECT p.id,
                        p.name,
                        p.description,
@@ -103,9 +119,12 @@ public sealed class GetPositionsHandler
                 ORDER BY p.created_at DESC, p.id DESC
                 LIMIT @page_size
              """,
-            param: parameters);
+                    param: parameters);
+            },
+            tags: [CacheConstants.POSITIONS_CACHE_TAG],
+            cancellationToken: cancellationToken);
 
-        var positions = postionDtos.ToList();
+        var positions = positionDtos.ToList();
 
         var hasNextPage = positions.Count > query.Request.PageSize;
 

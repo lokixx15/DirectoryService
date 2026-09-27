@@ -1,13 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Caching;
-using DirectoryService.Application.Locations;
-using DirectoryService.Application.Locations.Features.RestoreLocation;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using SharedService.Core.Abstractions;
 using SharedService.SharedKernel;
 
-namespace DirectoryService.Application.Departments.Features.RestoreDepartment;
+namespace DirectoryService.Application.Locations.Features.RestoreLocation;
 
 public class RestoreLocationHandler : ICommandHandler<RestoreLocationCommand>
 {

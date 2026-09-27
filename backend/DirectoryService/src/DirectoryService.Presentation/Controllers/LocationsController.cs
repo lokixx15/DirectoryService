@@ -1,5 +1,4 @@
-﻿using DirectoryService.Application.Departments.Features.RestoreDepartment;
-using DirectoryService.Application.Locations.Features.CreateLocation;
+﻿using DirectoryService.Application.Locations.Features.CreateLocation;
 using DirectoryService.Application.Locations.Features.GetLocations;
 using DirectoryService.Application.Locations.Features.RestoreLocation;
 using DirectoryService.Application.Locations.Features.SoftDeleteLocation;
@@ -50,7 +49,7 @@ public sealed class LocationsController : ControllerBase
     }
 
     [HttpPatch("{locationId:guid}/restore")]
-    public async Task<EndpointResult> RestoreDepartment(
+    public async Task<EndpointResult> RestoreLocation(
         [FromRoute] Guid locationId,
         [FromServices] RestoreLocationHandler handler,
         CancellationToken cancellationToken)

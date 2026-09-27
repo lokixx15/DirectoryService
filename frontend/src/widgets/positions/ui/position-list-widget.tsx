@@ -6,7 +6,6 @@ import { usePositionList } from "@/features/positions/model/use-position-list";
 import { PositionList } from "@/features/positions/ui/position-list";
 import { NotFoundCard } from "@/shared/components/cards/not-found-card";
 import { ErrorCard } from "@/shared/components/errors/error-card";
-import { StatusFilter } from "@/shared/components/filters/status-filter";
 import { SearchBar } from "@/shared/components/search/search-bar";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
 import { ActiveToggle } from "@/shared/components/toggles/active-toggle";
@@ -49,7 +48,6 @@ export function PositionListWidget() {
       <div className="flex justify-between mb-3">
         <SearchBar onSearch={setSearch} />
         <div className="flex gap-2">
-          <StatusFilter onIsActive={setIsActive} />
           <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>
             Related departments
           </DepartmentMenu>
