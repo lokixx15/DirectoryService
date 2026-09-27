@@ -2,11 +2,12 @@ import { Location, formatAddress } from "@/entities/locations";
 import { FormatDate } from "@/shared/lib/format-date";
 import { Button } from "@/shared/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Pen, Trash } from "lucide-react";
+import { ArrowUpDown, Pen, Trash, Undo2 } from "lucide-react";
 
 export function createLocationColumns(
   onEdit: (location: Location) => void,
   onDelete: (location: Location) => void,
+  onRestore: (location: Location) => void,
 ): ColumnDef<Location>[] {
   return [
     {
@@ -71,6 +72,11 @@ export function createLocationColumns(
       cell: ({ row }) => FormatDate(row.original.updatedAt),
     },
     {
+      accessorKey: "deletedAt",
+      header: "Deleted",
+      cell: ({ row }) => FormatDate(row.original.deletedAt),
+    },
+    {
       id: "actions",
       cell: ({ row }) => {
         const location = row.original;
@@ -94,6 +100,26 @@ export function createLocationColumns(
               }}
             >
               <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
+    {
+      id: "restoreAction",
+      cell: ({ row }) => {
+        const location = row.original;
+
+        return (
+          <div className="flex items-center justify-end">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => {
+                onRestore(location);
+              }}
+            >
+              <Undo2 className="h-4 w-4" />
             </Button>
           </div>
         );

@@ -48,4 +48,16 @@ public record DepartmentPath
 
         return Result.Success<DepartmentPath, Errors>(newPathResult.Value);
     }
+
+    public static Result<DepartmentPath, Errors> RestorePath(string path)
+    {
+        var restoredPath = path.Replace("deleted-", string.Empty);
+
+        var newPathResult = Create(restoredPath);
+
+        if (newPathResult.IsFailure)
+            return newPathResult.Error;
+
+        return Result.Success<DepartmentPath, Errors>(newPathResult.Value);
+    }
 }

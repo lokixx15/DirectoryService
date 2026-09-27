@@ -6,6 +6,7 @@ export type Location = {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
 };
 
 export type LocationSummary = {

@@ -1,17 +1,11 @@
-import {
-  CalendarIcon,
-  HashIcon,
-  FolderTreeIcon,
-  CircleCheckIcon,
-  CircleXIcon,
-} from "lucide-react";
-
-import { Card, CardContent, CardHeader } from "@/shared/components/ui/card";
-import { Badge } from "@/shared/components/ui/badge";
 import { Department } from "@/entities/departments/types";
-import { FormatDate } from "@/shared/lib/format-date";
-import { ReactNode } from "react";
-import { cn } from "@/shared/lib/utils";
+import { ReactNode, useState } from "react";
+import { useDepartmentRestore } from "../../model/use-department-restore";
+import { useDepartmentDelete } from "../../model/use-department-delete";
+import { RestoreDialog } from "@/shared/components/dialogs/restore-dialog";
+import { DeleteDialog } from "@/shared/components/dialogs/delete-dialog";
+import { DepartmentTreeActiveCard } from "./department-tree-active-card";
+import { DepartmentTreeInactiveCard } from "./department-tree-inactive-card";
 
 interface DepartmentTreeCardProps {
   department: Department;
@@ -26,56 +20,69 @@ export function DepartmentTreeCard({
   isSelected,
   onClick,
 }: DepartmentTreeCardProps) {
+  const { restoreDepartment, isPending: isRestoreDepartmentPending } =
+    useDepartmentRestore();
+  const { deleteDepartment, isPending: isDeleteDepartmentPending } =
+    useDepartmentDelete();
+
+  const [restoreOpen, setRestoreOpen] = useState<boolean>(false);
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
+
+  const [restoringDepartment, setRestoringDepartment] = useState<Department>();
+  const [deletingDepartment, setDeletingDepartment] = useState<Department>();
+
+  const handleActiveSwitch = (nextActiveState: boolean) => {
+    if (nextActiveState) {
+      setRestoreOpen(true);
+      setRestoringDepartment(department);
+    } else {
+      setDeleteOpen(true);
+      setDeletingDepartment(department);
+    }
+  };
+
   return (
-    <Card
-      onClick={onClick}
-      className={cn(
-        "border-l-4 transition-colors mb-0.5 cursor-pointer select-none",
-        isSelected
-          ? "border-l-primary bg-primary/5"
-          : "border-l-primary/30 hover:border-l-primary hover:bg-muted/40",
+    <div>
+      {department.isActive ? (
+        <DepartmentTreeActiveCard
+          department={department}
+          isSelected={isSelected}
+          onClick={onClick}
+          onIsActiveChange={handleActiveSwitch}
+        >
+          {children}
+        </DepartmentTreeActiveCard>
+      ) : (
+        <DepartmentTreeInactiveCard
+          department={department}
+          onClick={onClick}
+          onIsActiveChange={handleActiveSwitch}
+        >
+          {children}
+        </DepartmentTreeInactiveCard>
       )}
-    >
-      <CardHeader className="flex flex-row items-center justify-between pb-2 mt-[-10]">
-        <div className="flex items-center gap-2 min-w-0">
-          <FolderTreeIcon className="size-4 shrink-0 text-muted-foreground" />
-          <span className="font-semibold truncate">{department.name}</span>
-          <Badge variant="secondary" className="shrink-0 text-xs">
-            {department.identifier}
-          </Badge>
-          {!department.isActive && (
-            <span className="text-[10px] text-muted-foreground">inactive</span>
-          )}
-        </div>
 
-        {children && <div onClick={(e) => e.stopPropagation()}>{children}</div>}
-      </CardHeader>
+      {deletingDepartment && (
+        <DeleteDialog
+          entity={deletingDepartment}
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          onDeleteEntity={deleteDepartment}
+          isPending={isDeleteDepartmentPending}
+          name="department"
+        />
+      )}
 
-      <CardContent className="pb-3">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <HashIcon className="size-3" />
-            depth: {department.depth}
-          </span>
-          <span className="flex items-center gap-1">
-            <FolderTreeIcon className="size-3" />
-            {department.path}
-          </span>
-          <span className="flex items-center gap-1">
-            <CalendarIcon className="size-3" />
-            {FormatDate(department.createdAt)}
-          </span>
-          <span className="flex items-center gap-1">
-            <CalendarIcon className="size-3" />
-            {FormatDate(department.updatedAt)}
-          </span>
-          {department.isActive ? (
-            <CircleCheckIcon className="size-3 text-green-600" />
-          ) : (
-            <CircleXIcon className="size-3 text-red-600" />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      {restoringDepartment && (
+        <RestoreDialog
+          entity={restoringDepartment}
+          open={restoreOpen}
+          onOpenChange={setRestoreOpen}
+          onRestoreEntity={restoreDepartment}
+          isPending={isRestoreDepartmentPending}
+          name="department"
+        />
+      )}
+    </div>
   );
 }

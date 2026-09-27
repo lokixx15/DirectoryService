@@ -57,6 +57,13 @@ export const locationsApi = {
 
     return response.data;
   },
+  restoreLocation: async (id: string) => {
+    const response = await apiClient.patch<Envelope>(
+      `directory/locations/${id}/restore`,
+    );
+
+    return response.data;
+  },
 };
 
 export const locationsQueryOptions = {
@@ -134,6 +141,15 @@ export const locationsQueryOptions = {
   deleteLocation: () => {
     return mutationOptions({
       mutationFn: locationsApi.deleteLocation,
+      onSettled: () =>
+        queryClient.invalidateQueries({
+          queryKey: [locationsQueryOptions.baseKey],
+        }),
+    });
+  },
+  restoreLocationOptions: () => {
+    return mutationOptions({
+      mutationFn: locationsApi.restoreLocation,
       onSettled: () =>
         queryClient.invalidateQueries({
           queryKey: [locationsQueryOptions.baseKey],

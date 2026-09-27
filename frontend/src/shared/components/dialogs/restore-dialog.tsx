@@ -10,30 +10,43 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/shared/components/ui/dialog";
-import { useDeleteLocation } from "../model/use-delete-location";
 import { Location } from "@/entities/locations";
 import { toast } from "sonner";
 import { isEnvelopeError } from "@/shared/api/errors";
+import { Department } from "@/entities/departments/types";
+import { Position } from "@/entities/positions/types";
 
-interface DeleteLocationDialogProps {
-  location: Location | null;
+interface RestoreDialogProps {
+  entity: Location | Department | Position | null | undefined;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onRestoreEntity: (
+    id: string,
+    options?: {
+      onSuccess?: () => void;
+      onError?: (errors: unknown) => void;
+    },
+  ) => void;
+  isPending: boolean;
+  name: string;
 }
 
-export function DeleteLocationDialog({
-  location,
+export function RestoreDialog({
+  entity,
   open,
   onOpenChange,
-}: DeleteLocationDialogProps) {
-  const { deleteLocation, isPending } = useDeleteLocation();
+  onRestoreEntity,
+  isPending,
+  name,
+}: RestoreDialogProps) {
+  if (!entity) return;
 
-  const onDelete = async () => {
-    if (!location) return;
-
-    await deleteLocation(location.id, {
+  const onRestore = async () => {
+    await onRestoreEntity(entity.id, {
       onSuccess: () => {
-        toast.success("Location deleted successfully");
+        toast.success(
+          `${name.charAt(0).toUpperCase() + name.slice(1)} restored successfully`,
+        );
         onOpenChange(false);
       },
       onError: (errors) => {
@@ -42,7 +55,7 @@ export function DeleteLocationDialog({
             toast.error(error.message);
           });
         } else {
-          toast.error("Failed to delete location");
+          toast.error(`Failed to restore ${name}`);
         }
       },
     });
@@ -52,18 +65,17 @@ export function DeleteLocationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Delete location</DialogTitle>
+          <DialogTitle>Restore {name}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete &quot;{location?.name}&quot;? This
-            action cannot be undone.
+            Are you sure you want to restore &quot;{entity.name}&quot;?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="destructive" disabled={isPending} onClick={onDelete}>
-            Delete
+          <Button variant="creative" disabled={isPending} onClick={onRestore}>
+            Restore
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -18,7 +18,7 @@ public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
             .LessThanOrEqualTo(10000)
                 .WithError(GeneralErrors.ValueIsNotValid("Page cannot exceed 10000", "Page"));
 
-        RuleFor(query => query.Request.pageSize)
+        RuleFor(query => query.Request.PageSize)
             .GreaterThan(0)
                 .WithError(GeneralErrors.ValueIsNotValid("Page size must be greater than 0", "Page size"))
             .LessThanOrEqualTo(150)

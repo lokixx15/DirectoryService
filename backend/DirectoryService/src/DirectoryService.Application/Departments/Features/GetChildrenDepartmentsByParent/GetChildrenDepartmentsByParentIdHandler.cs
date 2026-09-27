@@ -27,9 +27,10 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
              				   	      d.is_active,
              				   	      d.created_at,
              				   	      d.updated_at,
+                                      d.deleted_at,
                                       COUNT(*) OVER() AS total_count
              				   FROM departments AS d 
-             				   WHERE d.parent_id = @parent_id
+             				   {whereClause}
              				   LIMIT @children_limit OFFSET @offset
              )
              SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id))
@@ -58,7 +59,6 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
         CancellationToken cancellationToken)
     {
         var queryValidationResult = await _validator.ValidateAsync(query, cancellationToken);
-
         if (!queryValidationResult.IsValid)
         {
             _logger.LogError("Errors occurred when validating GetChildrenDepartmentsByParentIdQuery");
@@ -70,12 +70,24 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
         var parameters = new DynamicParameters();
 
         parameters.Add("parent_id", query.ParentId);
-        parameters.Add("children_limit", query.Size);
-        parameters.Add("offset", (query.Page - 1) * query.Size);
+        parameters.Add("children_limit", query.Request.Size);
+        parameters.Add("offset", (query.Request.Page - 1) * query.Request.Size);
+
+        var whereConditions = new List<string>() { "d.parent_id = @parent_id" };
+
+        if (query.Request.IsActiveOnly != false)
+        {
+            parameters.Add("is_root_active", query.Request.IsActiveOnly);
+            whereConditions.Add("d.is_active = @is_root_active");
+        }
+
+        var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
+
+        var finalSql = SQL.Replace("{whereClause}", whereClause);
 
         long? totalCount = null!;
 
-        var key = $"{CacheConstants.CHILDREN_DEPARTMENTS_CACHE_KEY}_parentid_{query.ParentId}_page_{query.Page}_pagesize_{query.Size}";
+        var key = $"{CacheConstants.CHILDREN_DEPARTMENTS_CACHE_KEY}_parentid_{query.ParentId}_page_{query.Request.Page}_pagesize_{query.Request.Size}_isactiveonly_{query.Request.IsActiveOnly}";
 
         var departmentDtos = await _cache.GetOrCreateAsync(
             key,
@@ -84,7 +96,7 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
                 using var connection = _connectionFactory.GetDbConnection();
 
                 var departmentDtos = await connection.QueryAsync<DepartmentDto, long, DepartmentDto>(
-                    SQL,
+                    finalSql,
                     map: (dD, l) =>
                     {
                         totalCount ??= l;

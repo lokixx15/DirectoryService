@@ -252,7 +252,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
 
             return UnitResult.Success<Error>();
         }
-        catch(OperationCanceledException ex)
+        catch (OperationCanceledException ex)
         {
             _logger.LogError(ex, "Operation was cancelled when deleting locations by department id");
             return GeneralErrors.OperationCancelled();
@@ -261,6 +261,31 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         {
             _logger.LogError(ex, "Failed to delete locations by department id");
             return GeneralErrors.DatabaseDeleteFailed("Failed to delete locations by department id");
+        }
+    }
+
+    public async Task<UnitResult<Error>> RestoreDepartmentByIdAsync(Guid departmentId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _dbContext.Departments
+                .Where(d => d.Id == departmentId)
+                .ExecuteUpdateAsync(d => d
+                    .SetProperty(p => p.IsActive, true)
+                    .SetProperty(p => p.UpdatedAt, DateTime.UtcNow)
+                    .SetProperty(p => p.DeletedAt, (DateTime?)null), cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when restoring department by id {DepartmentId}", departmentId);
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to restore department by id {DepartmentId}", departmentId);
+            return GeneralErrors.DatabaseUpdateFailed("Failed to restore department by id");
         }
     }
 }

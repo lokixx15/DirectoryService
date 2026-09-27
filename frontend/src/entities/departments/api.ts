@@ -10,7 +10,12 @@ import {
 } from "./types";
 import { Envelope } from "@/shared/api/envelope";
 import { PaginationResponse } from "@/shared/api/pagination-response";
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  mutationOptions,
+  queryOptions,
+} from "@tanstack/react-query";
+import { queryClient } from "@/shared/api/query-client";
 
 export const departmentsApi = {
   getDepartmentsSummary: async (request: GetDepartmentsSummaryRequest) => {
@@ -32,12 +37,11 @@ export const departmentsApi = {
     return response.data;
   },
   getRootDepartments: async (request: GetRootDepartmentsRequest) => {
-    const response = await apiClient.get<Envelope<Department[]>>(
-      "directory/departments/roots",
-      {
-        params: request,
-      },
-    );
+    const response = await apiClient.get<
+      Envelope<PaginationResponse<Department>>
+    >("directory/departments/roots", {
+      params: request,
+    });
 
     return response.data;
   },
@@ -47,6 +51,20 @@ export const departmentsApi = {
     >(`directory/departments/${request.parentId}/children`, {
       params: request,
     });
+
+    return response.data;
+  },
+  deleteDepartment: async (id: string) => {
+    const response = await apiClient.delete<Envelope>(
+      `directory/departments/${id}`,
+    );
+
+    return response.data;
+  },
+  restoreDepartment: async (id: string) => {
+    const response = await apiClient.patch<Envelope>(
+      `directory/departments/${id}/restore`,
+    );
 
     return response.data;
   },
@@ -106,7 +124,6 @@ export const departmentsQueryOptions = {
         orderBy,
         orderDirection,
       ],
-      placeholderData: keepPreviousData,
     });
   },
   getRootDepartments: ({
@@ -115,6 +132,7 @@ export const departmentsQueryOptions = {
     prefetch,
     departmentIds,
     excludedDepartmentIds,
+    isActiveOnly,
   }: GetRootDepartmentsRequest) => {
     return queryOptions({
       queryFn: async () =>
@@ -124,6 +142,7 @@ export const departmentsQueryOptions = {
           prefetch,
           departmentIds,
           excludedDepartmentIds,
+          isActiveOnly,
         }),
       queryKey: [
         departmentsQueryOptions.baseKey,
@@ -132,22 +151,49 @@ export const departmentsQueryOptions = {
         prefetch,
         departmentIds,
         excludedDepartmentIds,
+        isActiveOnly,
       ],
-      placeholderData: keepPreviousData,
     });
   },
-  getChildrenDepartments: (
-    { page, size, parentId }: GetChildrenDepartmentsRequest,
-  ) => {
+  getChildrenDepartments: ({
+    page,
+    size,
+    parentId,
+    isActiveOnly,
+  }: GetChildrenDepartmentsRequest) => {
     return queryOptions({
       queryFn: async () =>
         await departmentsApi.getChildrenDepartments({
           page: page + 1,
           size,
           parentId,
+          isActiveOnly,
         }),
-      queryKey: [departmentsQueryOptions.baseKey, page, size, parentId],
-      placeholderData: keepPreviousData,
+      queryKey: [
+        departmentsQueryOptions.baseKey,
+        page,
+        size,
+        parentId,
+        isActiveOnly,
+      ],
+    });
+  },
+  deleteDepartmentOptions: () => {
+    return mutationOptions({
+      mutationFn: departmentsApi.deleteDepartment,
+      onSettled: () =>
+        queryClient.invalidateQueries({
+          queryKey: [departmentsQueryOptions.baseKey],
+        }),
+    });
+  },
+  restoreDepartmentOptions: () => {
+    return mutationOptions({
+      mutationFn: departmentsApi.restoreDepartment,
+      onSettled: () =>
+        queryClient.invalidateQueries({
+          queryKey: [departmentsQueryOptions.baseKey],
+        }),
     });
   },
 };

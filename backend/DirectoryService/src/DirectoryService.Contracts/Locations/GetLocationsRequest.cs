@@ -6,6 +6,6 @@ public record GetLocationsRequest(
     string? Search,
     bool? IsActive,
     int Page = 1,
-    int pageSize = 20,
+    int PageSize = 20,
     string? OrderBy = "createdDate",
     string OrderDirection = "ASC");

@@ -154,53 +154,55 @@ public sealed class LocationsRepository : ILocationsRepository
         }
     }
 
-    public async Task<UnitResult<Error>> DeleteDepartmentLocationsByLocationIdAsync(
-        Guid locationId,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await _dbContext.DepartmentLocations
-                .Where(d => d.LocationId == locationId)
-                .ExecuteDeleteAsync(cancellationToken);
-
-            _logger.LogInformation("Department locations were deleted from the database");
-
-            return UnitResult.Success<Error>();
-        }
-        catch(OperationCanceledException ex)
-        {
-            _logger.LogError(ex, "Operation was cancelled when deleting department locations by location id");
-            return GeneralErrors.OperationCancelled();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to delete department locations by location id");
-            return GeneralErrors.DatabaseDeleteFailed("Failed to delete department locations by location id");
-        }
-    }
-
-    public async Task<UnitResult<Error>> DeleteByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
+    public async Task<UnitResult<Error>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         try
         {
             await _dbContext.Locations
-                .Where(l => l.Id == id)
-                .ExecuteDeleteAsync(cancellationToken);
+                .Where(d => d.Id == id)
+                .ExecuteUpdateAsync(l => l
+                    .SetProperty(p => p.IsActive, false)
+                    .SetProperty(p => p.DeletedAt, DateTime.UtcNow),
+                    cancellationToken);
+
+            _logger.LogInformation("Location was soft deleted");
 
             return UnitResult.Success<Error>();
         }
         catch (OperationCanceledException ex)
         {
-            _logger.LogError(ex, "Operation was cancelled when deletion location {LocationId}", id);
+            _logger.LogError(ex, "Operation was cancelled when soft deleting location");
             return GeneralErrors.OperationCancelled();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to delete location {LocationId}", id);
-            return GeneralErrors.DatabaseDeleteFailed("Failed to delete location");
+            _logger.LogError(ex, "Failed to soft delete location");
+            return GeneralErrors.DatabaseDeleteFailed("Failed to soft delete location");
+        }
+    }
+
+    public async Task<UnitResult<Error>> RestoreLocationByIdAsync(Guid locationId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _dbContext.Locations
+                .Where(l => l.Id == locationId)
+                .ExecuteUpdateAsync(l => l
+                    .SetProperty(p => p.IsActive, true)
+                    .SetProperty(p => p.UpdatedAt, DateTime.UtcNow)
+                    .SetProperty(p => p.DeletedAt, (DateTime?)null), cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Operation was cancelled when restoring location by id {LocationId}", locationId);
+            return GeneralErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to restore location by id {LocationId}", locationId);
+            return GeneralErrors.DatabaseUpdateFailed("Failed to restore location by id");
         }
     }
 }
