@@ -33,7 +33,7 @@ public class RestoreLocationHandler : ICommandHandler<RestoreLocationCommand>
         }
 
         await _cache.RemoveByTagAsync(CacheConstants.LOCATIONS_CACHE_TAG, cancellationToken);
-        _logger.LogInformation("Invalidated all locations cache after deletion using tag: {Tag}", CacheConstants.LOCATIONS_CACHE_TAG);
+        _logger.LogInformation("Invalidated all locations cache after restore using tag: {Tag}", CacheConstants.LOCATIONS_CACHE_TAG);
 
         return UnitResult.Success<Errors>();
     }
