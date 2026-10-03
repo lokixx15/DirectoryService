@@ -76,7 +76,6 @@ export const locationsQueryOptions = {
     orderDirection,
     isActive,
     selectedDepartmentIds,
-    excludedDepartmentIds,
   }: GetLocationsRequest) => {
     return queryOptions({
       queryFn: async () =>
@@ -88,7 +87,6 @@ export const locationsQueryOptions = {
           orderDirection,
           isActive,
           selectedDepartmentIds,
-          excludedDepartmentIds,
         }),
       queryKey: [
         locationsQueryOptions.baseKey,
@@ -99,7 +97,6 @@ export const locationsQueryOptions = {
         orderDirection,
         isActive,
         selectedDepartmentIds,
-        excludedDepartmentIds,
       ],
       placeholderData: keepPreviousData,
     });

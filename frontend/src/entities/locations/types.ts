@@ -30,7 +30,6 @@ export type GetLocationsRequest = {
   page: number;
   pageSize: number;
   selectedDepartmentIds?: string[];
-  excludedDepartmentIds?: string[];
   search?: string;
   isActive?: boolean;
   orderBy?: string;

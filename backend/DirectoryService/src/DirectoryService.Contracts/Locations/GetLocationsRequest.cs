@@ -2,7 +2,6 @@
 
 public record GetLocationsRequest(
     Guid[]? SelectedDepartmentIds,
-    Guid[]? ExcludedDepartmentIds,
     string? Search,
     bool? IsActive,
     int Page = 1,

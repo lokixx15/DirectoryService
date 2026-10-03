@@ -8,6 +8,7 @@ export type GetDepartmentsSummaryRequest = {
   page: number;
   pageSize: number;
   search?: string;
+  excludedId?: string;
 };
 
 export type DepartmentStandard = {
@@ -50,7 +51,6 @@ export type GetRootDepartmentsRequest = {
   size: number;
   prefetch: number;
   departmentIds: string[];
-  excludedDepartmentIds: string[];
   isActiveOnly: boolean;
 };
 
@@ -59,4 +59,9 @@ export type GetChildrenDepartmentsRequest = {
   size: number;
   parentId: string;
   isActiveOnly: boolean;
+};
+
+export type updateDepartmentParentRequest = {
+  id: string;
+  parentId?: string;
 };

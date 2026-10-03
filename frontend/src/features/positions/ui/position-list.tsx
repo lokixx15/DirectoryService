@@ -15,6 +15,7 @@ interface PositionListProps {
   hasNextPage: boolean;
   fetchNextPage: () => void;
   layoutClassName?: string;
+  showActivityToggle?: boolean;
 }
 
 export function PositionList({
@@ -23,6 +24,7 @@ export function PositionList({
   hasNextPage,
   fetchNextPage,
   layoutClassName,
+  showActivityToggle = true,
 }: PositionListProps) {
   const cursorRef: RefCallback<HTMLDivElement> = useCallback(
     (el) => {
@@ -81,12 +83,14 @@ export function PositionList({
               key={p.id}
               position={p}
               handleActiveSwitch={handleActiveSwitch}
+              showActivityToggle={showActivityToggle}
             />
           ) : (
             <InactivePositionCard
               key={p.id}
               position={p}
               handleActiveSwitch={handleActiveSwitch}
+              showActivityToggle={showActivityToggle}
             />
           );
         })}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRootDepartments } from "@/features/departments/model/use-root-departments";
-import { DepartmentSelect } from "@/features/departments/ui/department-select/department-select";
+import { DepartmentMultiSelect } from "@/features/departments/ui/department-select/department-multi-select";
 import { DepartmentTree } from "@/features/departments/ui/department-tree/department-tree";
 import { DepartmentTreeSkeleton } from "@/features/departments/ui/department-tree/department-tree-skeleton";
 import { LocationMenu } from "@/features/locations/ui/location-menu";
@@ -26,9 +26,6 @@ const DEFAULT_CHILDREN_LIMIT = 3;
 
 export function DepartmentTreeWidget() {
   const [departmentIds, setDepartmentIds] = useState<string[]>([]);
-  const [excludedDepartmentIds, setExcludedDepartmentIds] = useState<string[]>(
-    [],
-  );
   const [locationIds, setLocationIds] = useState<string[]>([]);
 
   const { page, pageSize, onPageSizeChange } = usePagination(5);
@@ -52,7 +49,6 @@ export function DepartmentTreeWidget() {
     size: pageSize,
     prefetch: DEFAULT_CHILDREN_LIMIT,
     departmentIds,
-    excludedDepartmentIds,
     isActiveOnly: isActiveDepartmentsOnly,
   });
 
@@ -88,11 +84,9 @@ export function DepartmentTreeWidget() {
     <div className="flex gap-5">
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
-          <DepartmentSelect
+          <DepartmentMultiSelect
             addedDepartmentIds={departmentIds}
             onAddedDepartmentIdsChange={setDepartmentIds}
-            excludedDepartmentIds={excludedDepartmentIds}
-            onExcludedDepartmentIdsChange={setExcludedDepartmentIds}
             locationIds={locationIds}
             filterActions={
               <LocationMenu onLocationIdsChange={setLocationIds}>
@@ -156,6 +150,7 @@ export function DepartmentTreeWidget() {
               hasNextPage={hasNextPage}
               fetchNextPage={fetchNextPage}
               layoutClassName="flex flex-col gap-3"
+              showActivityToggle={false}
             />
           </div>
         ) : (

@@ -94,12 +94,16 @@ public sealed class GetPositionsHandler
 
         var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
 
+        var departmentIds = query.Request.DepartmentIds != null
+            ? string.Join(",", query.Request.DepartmentIds)
+            : "null";
+
         var key = $"{CacheConstants.POSITIONS}" +
           $"_cursor_{query.Request.Cursor}" +
           $"_size_{query.Request.PageSize}" +
           $"_search_{query.Request.Search}" +
           $"_active_{query.Request.IsActiveOnly}" +
-          $"_ids_{query.Request.DepartmentIds}";
+          $"_ids_{departmentIds}";
 
         var positionDtos = await _cache.GetOrCreateAsync(
             key,

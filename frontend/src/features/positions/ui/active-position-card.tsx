@@ -12,11 +12,13 @@ import { FormatDate } from "@/shared/lib/format-date";
 interface ActivePositionCardProps {
   position: Position;
   handleActiveSwitch: (value: boolean) => void;
+  showActivityToggle?: boolean;
 }
 
 export function ActivePositionCard({
   position,
   handleActiveSwitch,
+  showActivityToggle = true,
 }: ActivePositionCardProps) {
   return (
     <Card
@@ -38,10 +40,12 @@ export function ActivePositionCard({
         <div className="flex flex-col gap-x-4 gap-y-1.5 text-xs">
           <span>Created: {FormatDate(position.createdAt)}</span>
           <span>Updated: {FormatDate(position.updatedAt)}</span>
-          <ActivitySwitcher
-            isActive={position.isActive}
-            onIsActiveChange={handleActiveSwitch}
-          />
+          {showActivityToggle && (
+            <ActivitySwitcher
+              isActive={position.isActive}
+              onIsActiveChange={handleActiveSwitch}
+            />
+          )}
         </div>
       </CardContent>
     </Card>

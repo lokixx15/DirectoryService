@@ -61,8 +61,6 @@ export function DepartmentTreeNode({
     return merged;
   }, [nestedChildrenDepartments, prefetchedChildren]);
 
-  const hasChildren = department.hasMoreChildren;
-
   const isSelected = selectedId === department.id;
   const handleSelect = () => onSelectId(department.id);
 
@@ -70,7 +68,7 @@ export function DepartmentTreeNode({
     return <ErrorCard errors={errors ?? []} refetch={refetch} />;
   }
 
-  if (!hasChildren) {
+  if (!department.hasMoreChildren || !department.isActive) {
     return (
       <DepartmentTreeCard
         department={department}

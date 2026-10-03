@@ -62,18 +62,6 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
                                 """);
         }
 
-        if (query.Request.ExcludedDepartmentIds != null)
-        {
-            parameters.Add("excluded_department_ids", query.Request.ExcludedDepartmentIds);
-            whereConditions.Add("""
-                        NOT EXISTS(
-                            SELECT 1
-                            FROM department_location AS dl
-                            WHERE dl.location_id = l.id AND 
-                            dl.department_id = ANY(@excluded_department_ids))
-                        """);
-        }
-
         if (!string.IsNullOrEmpty(query.Request.Search))
         {
             parameters.Add("search", query.Request.Search);
@@ -101,13 +89,16 @@ public sealed class GetLocationsHandler : IQueryHandler<Result<PaginationRespons
         var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
         var orderByClause = $"ORDER BY {orderBy} {orderDirection}";
 
+        var selectedDepartmentIds = query.Request.SelectedDepartmentIds != null
+            ? string.Join(", ", query.Request.SelectedDepartmentIds)
+            : "null";
+
         var key = $"{CacheConstants.LOCATIONS}" +
           $"_page_{query.Request.Page}" +
           $"_size_{query.Request.PageSize}" +
           $"_search_{query.Request.Search}" +
           $"_active_{query.Request.IsActive}" +
-          $"_ids_{query.Request.SelectedDepartmentIds}" +
-          $"_excl_{query.Request.ExcludedDepartmentIds}" +
+          $"_ids_{selectedDepartmentIds}" +
           $"_order_{query.Request.OrderBy}" +
           $"_dir_{query.Request.OrderDirection}";
         long? totalCount = null!;

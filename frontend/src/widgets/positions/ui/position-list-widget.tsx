@@ -1,6 +1,6 @@
 "use client";
 
-import { DepartmentMenu } from "@/features/departments/ui/department-menu";
+import { DepartmentMultiSelect } from "@/features/departments/ui/department-select/department-multi-select";
 import { usePositionFilters } from "@/features/positions/model/use-position-filters";
 import { usePositionList } from "@/features/positions/model/use-position-list";
 import { PositionList } from "@/features/positions/ui/position-list";
@@ -48,9 +48,10 @@ export function PositionListWidget() {
       <div className="flex justify-between mb-3">
         <SearchBar onSearch={setSearch} />
         <div className="flex gap-2">
-          <DepartmentMenu onDepartmentIdsChange={setDepartmentIds}>
-            Related departments
-          </DepartmentMenu>
+          <DepartmentMultiSelect
+            addedDepartmentIds={departmentIds}
+            onAddedDepartmentIdsChange={setDepartmentIds}
+          />
           <ActiveToggle
             isActive={isActive || false}
             onIsActiveChange={setIsActive}

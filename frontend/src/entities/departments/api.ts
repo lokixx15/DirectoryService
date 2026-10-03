@@ -7,6 +7,7 @@ import {
   GetDepartmentsRequest,
   GetDepartmentsSummaryRequest,
   GetRootDepartmentsRequest,
+  updateDepartmentParentRequest,
 } from "./types";
 import { Envelope } from "@/shared/api/envelope";
 import { PaginationResponse } from "@/shared/api/pagination-response";
@@ -68,6 +69,16 @@ export const departmentsApi = {
 
     return response.data;
   },
+  updateParent: async ({ id, ...body }: updateDepartmentParentRequest) => {
+    const response = await apiClient.put<Envelope>(
+      `directory/departments/${id}/parent`,
+      {
+        ...body,
+      },
+    );
+
+    return response.data;
+  },
 };
 
 export const departmentsQueryOptions = {
@@ -76,6 +87,7 @@ export const departmentsQueryOptions = {
     page,
     pageSize,
     search,
+    excludedId,
   }: GetDepartmentsSummaryRequest) => {
     return queryOptions({
       queryFn: async () =>
@@ -83,6 +95,7 @@ export const departmentsQueryOptions = {
           page: page + 1,
           pageSize,
           search,
+          excludedId,
         }),
       queryKey: [
         departmentsQueryOptions.baseKey,
@@ -90,6 +103,7 @@ export const departmentsQueryOptions = {
         page,
         pageSize,
         search,
+        excludedId,
       ],
       placeholderData: keepPreviousData,
     });
@@ -131,7 +145,6 @@ export const departmentsQueryOptions = {
     size,
     prefetch,
     departmentIds,
-    excludedDepartmentIds,
     isActiveOnly,
   }: GetRootDepartmentsRequest) => {
     return queryOptions({
@@ -141,7 +154,6 @@ export const departmentsQueryOptions = {
           size,
           prefetch,
           departmentIds,
-          excludedDepartmentIds,
           isActiveOnly,
         }),
       queryKey: [
@@ -150,7 +162,6 @@ export const departmentsQueryOptions = {
         size,
         prefetch,
         departmentIds,
-        excludedDepartmentIds,
         isActiveOnly,
       ],
     });
@@ -194,6 +205,16 @@ export const departmentsQueryOptions = {
         queryClient.invalidateQueries({
           queryKey: [departmentsQueryOptions.baseKey],
         }),
+    });
+  },
+  updateDepartmentParent: () => {
+    return mutationOptions({
+      mutationFn: departmentsApi.updateParent,
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: [departmentsQueryOptions.baseKey],
+        });
+      },
     });
   },
 };

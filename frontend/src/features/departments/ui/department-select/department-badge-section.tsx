@@ -8,26 +8,19 @@ interface DepartmentBadgeSectionProps {
   departments: DepartmentStandard[];
   onRemove: (id: string) => void;
   onClear: () => void;
-  variant: "added" | "excluded";
 }
-
-const variantStyles = {
-  added: "bg-primary/10 text-primary",
-  excluded: "bg-destructive/10 text-destructive",
-} as const;
 
 export function DepartmentBadgeSection({
   departments,
   onRemove,
   onClear,
-  variant,
 }: DepartmentBadgeSectionProps) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 min-w-0">
       {departments.map((dep) => (
         <span
           key={dep.id}
-          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium whitespace-nowrap ${variantStyles[variant]}`}
+          className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium whitespace-nowrap bg-primary/10 text-primary"
         >
           {dep.name}
           <Button

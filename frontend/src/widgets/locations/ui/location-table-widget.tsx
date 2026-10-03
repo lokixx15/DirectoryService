@@ -24,7 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { DepartmentSelect } from "@/features/departments/ui/department-select/department-select";
 import { Button } from "@/shared/components/ui/button";
 import { useLocationFilters } from "@/features/locations/model/use-location-filters";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -37,6 +36,7 @@ import { RestoreDialog } from "@/shared/components/dialogs/restore-dialog";
 import { useDeleteLocation } from "@/features/locations/model/use-delete-location";
 import { useRestoreLocation } from "@/features/locations/model/use-restore-location";
 import { Toggle } from "@/shared/components/ui/toggle";
+import { DepartmentMultiSelect } from "@/features/departments/ui/department-select/department-multi-select";
 
 export function LocationTableWidget() {
   const { pageSize, onPageSizeChange } = usePagination(10);
@@ -75,7 +75,6 @@ export function LocationTableWidget() {
       sorting,
       isActive,
       selectedDepartmentIds: addedDepartmentIds,
-      excludedDepartmentIds,
     });
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -168,12 +167,10 @@ export function LocationTableWidget() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center w-full gap-2 flex-wrap">
         <SearchBar onSearch={setSearch} />
-        <DepartmentSelect
+        <DepartmentMultiSelect
           key={addedDepartmentIds.join(",") + excludedDepartmentIds.join(",")}
           addedDepartmentIds={addedDepartmentIds}
           onAddedDepartmentIdsChange={setAddedDepartmentIdsHandler}
-          excludedDepartmentIds={excludedDepartmentIds}
-          onExcludedDepartmentIdsChange={setExcludedDepartmentIdsHandler}
         />
         <Toggle
           size="sm"

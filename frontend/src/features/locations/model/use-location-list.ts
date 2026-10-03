@@ -19,7 +19,6 @@ interface UseLocationListProps {
   sorting?: SortingState;
   isActive?: boolean;
   selectedDepartmentIds: string[];
-  excludedDepartmentIds: string[];
 }
 
 export function useLocationList({
@@ -29,7 +28,6 @@ export function useLocationList({
   sorting,
   isActive,
   selectedDepartmentIds,
-  excludedDepartmentIds,
 }: UseLocationListProps): UseLocationListReturn {
   const queryOptions = locationsQueryOptions.getLocationsOptions({
     page: page,
@@ -40,8 +38,6 @@ export function useLocationList({
     isActive: isActive,
     selectedDepartmentIds:
       selectedDepartmentIds.length > 0 ? selectedDepartmentIds : undefined,
-    excludedDepartmentIds:
-      excludedDepartmentIds.length > 0 ? excludedDepartmentIds : undefined,
   });
 
   const { data, isPending, refetch } = useQuery(queryOptions);

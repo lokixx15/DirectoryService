@@ -33,7 +33,7 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
              				   {whereClause}
              				   LIMIT @children_limit OFFSET @offset
              )
-             SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id))
+             SELECT *, (EXISTS(SELECT 1 FROM departments WHERE parent_id = children.id)) AS has_more_children
              FROM children;
              """;
 
@@ -95,16 +95,17 @@ public sealed class GetChildrenDepartmentsByParentIdHandler
             {
                 using var connection = _connectionFactory.GetDbConnection();
 
-                var departmentDtos = await connection.QueryAsync<DepartmentDto, long, DepartmentDto>(
+                var departmentDtos = await connection.QueryAsync<DepartmentDto, long, bool, DepartmentDto>(
                     finalSql,
-                    map: (dD, l) =>
+                    map: (dD, l, b) =>
                     {
                         totalCount ??= l;
+                        dD.HasMoreChildren = b;
 
                         return dD;
                     },
                     parameters,
-                    splitOn: "total_count");
+                    splitOn: "total_count,has_more_children");
 
                 return departmentDtos.ToList();
             },

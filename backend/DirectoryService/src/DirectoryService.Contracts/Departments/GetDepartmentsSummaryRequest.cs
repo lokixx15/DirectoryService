@@ -2,5 +2,6 @@
 
 public record GetDepartmentsSummaryRequest(
     string? Search,
+    Guid? ExcludedId,
     int Page = 1,
-    int pageSize = 20);
+    int PageSize = 20);

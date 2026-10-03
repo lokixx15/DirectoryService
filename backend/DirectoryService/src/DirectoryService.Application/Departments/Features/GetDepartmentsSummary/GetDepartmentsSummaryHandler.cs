@@ -44,16 +44,24 @@ public sealed class GetDepartmentsSummaryHandler : IQueryHandler<Result<Paginati
         using var connection = _connectionFactory.GetDbConnection();
 
         var parameters = new DynamicParameters();
-        parameters.Add("page_size", query.Request.pageSize);
-        parameters.Add("offset", (query.Request.Page - 1) * query.Request.pageSize);
+        parameters.Add("page_size", query.Request.PageSize);
+        parameters.Add("offset", (query.Request.Page - 1) * query.Request.PageSize);
 
-        string whereCondition = string.Empty;
+        var whereConditions = new List<string>();
 
         if (!string.IsNullOrEmpty(query.Request.Search))
         {
             parameters.Add("search", query.Request.Search);
-            whereCondition = "WHERE name ILIKE '%' || @search || '%'";
+            whereConditions.Add("name ILIKE '%' || @search || '%'");
         }
+
+        if (query.Request.ExcludedId != null)
+        {
+            parameters.Add("excluded_id", query.Request.ExcludedId);
+            whereConditions.Add("NOT(SELECT path FROM departments WHERE id = @excluded_id)  @> path");
+        }
+
+        var whereClause = whereConditions.Any() ? "WHERE " + string.Join(" AND ", whereConditions) : string.Empty;
 
         long? totalCount = null;
 
@@ -64,7 +72,7 @@ public sealed class GetDepartmentsSummaryHandler : IQueryHandler<Result<Paginati
                        identifier,
                        COUNT(*) OVER() AS total_count
                 FROM departments
-                {whereCondition}
+                {whereClause}
                 LIMIT @page_size OFFSET @offset
              """,
             map: (dSD, l) =>

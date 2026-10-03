@@ -4,7 +4,6 @@ import { ReactNode, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { usePagination } from "@/shared/hooks/use-pagination";
 import { ChevronDown } from "lucide-react";
-import { useDepartmentSelect } from "../../model/use-department-select";
 import { ErrorCard } from "@/shared/components/errors/error-card";
 import { useDepartments } from "../../model/use-departments";
 import { SkeletonCard } from "@/shared/components/skeletons/skeleton-card";
@@ -17,29 +16,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import { DepartmentSelectItem } from "./department-select-item";
 import { DepartmentFilters } from "./department-filters";
 import { DepartmentBadgeSection } from "./department-badge-section";
-import { DepartmentActions } from "./department-actions";
 import { useDebounce } from "@/shared/hooks/use-debounce";
+import { useDepartmentMultiSelect } from "../../model/use-department-select";
+import { DepartmentSelectItem } from "./department-select-item";
+import { LoadMoreButton } from "@/shared/components/pagination/load-more-button";
 
-interface DepartmentSelectProps {
+interface DepartmentMultiSelectProps {
   addedDepartmentIds: string[];
-  excludedDepartmentIds: string[];
   onAddedDepartmentIdsChange: (ids: string[]) => void;
-  onExcludedDepartmentIdsChange: (ids: string[]) => void;
   locationIds?: string[];
   filterActions?: ReactNode;
 }
 
-export function DepartmentSelect({
+export function DepartmentMultiSelect({
   addedDepartmentIds,
-  excludedDepartmentIds,
   onAddedDepartmentIdsChange,
-  onExcludedDepartmentIdsChange,
   locationIds,
   filterActions,
-}: DepartmentSelectProps) {
+}: DepartmentMultiSelectProps) {
   const { page, pageSize, onPageSizeChange } = usePagination(10);
   const [search, setSearch] = useState<string>();
   const debouncedSearch = useDebounce(search, 400);
@@ -68,20 +64,13 @@ export function DepartmentSelect({
     open,
     onOpenDropdown,
     selectedAddedDepartments,
-    selectedExcludedDepartments,
     addDepartment,
     removeAddedDepartment,
     clearSelectedAddedDepartments,
-    addExcludedDepartment,
-    removeExcludedDepartment,
-    clearExcludedDepartments,
     applySelectedAddedDepartments,
-    applySelectedExcludedDepartments,
-  } = useDepartmentSelect({
+  } = useDepartmentMultiSelect({
     onAddedChange: onAddedDepartmentIdsChange,
-    onExcludeChange: onExcludedDepartmentIdsChange,
     initialAdded: addedDepartmentIds,
-    initialExcluded: excludedDepartmentIds,
   });
 
   if (isError) {
@@ -93,10 +82,7 @@ export function DepartmentSelect({
   }
 
   const hasPendingSelections =
-    selectedAddedDepartments.length > 0 ||
-    selectedExcludedDepartments.length > 0 ||
-    addedDepartmentIds.length > 0 ||
-    excludedDepartmentIds.length > 0;
+    selectedAddedDepartments.length > 0 || addedDepartmentIds.length > 0;
 
   return (
     <DropdownMenu open={open} onOpenChange={onOpenDropdown}>
@@ -122,34 +108,40 @@ export function DepartmentSelect({
           {departments?.length ? (
             <DropdownMenuGroup className="w-full max-h-60 overflow-y-auto">
               {departments.map((department) => {
-                const isAdded = selectedAddedDepartments.some(
-                  (id) => id === department.id,
-                );
-                const isExcluded = selectedExcludedDepartments.some(
-                  (id) => id === department.id,
+                const isSelected = selectedAddedDepartments.includes(
+                  department.id,
                 );
 
                 return (
                   <DropdownMenuItem
-                    onSelect={(e) => e.preventDefault()}
                     key={department.id}
-                    className="flex items-start gap-1 p-2 justify-between rounded-sm m-1 cursor-default select-none outline-none transition-colors data-highlighted:bg-slate-50"
-                    style={{
-                      backgroundColor: isAdded
-                        ? "#f0fdf4"
-                        : isExcluded
-                          ? "#fef2f2"
-                          : undefined,
+                    onSelect={(e) => {
+                      e.preventDefault();
+
+                      if (isSelected) {
+                        removeAddedDepartment(department.id);
+                      } else {
+                        addDepartment(department.id);
+                      }
                     }}
+                    className={`flex items-start gap-1 p-2 justify-between rounded-sm m-1 cursor-default select-none outline-none transition-colors 
+                    ${
+                      isSelected
+                        ? "bg-green-100/75 text-green-900 data-highlighted:bg-green-200"
+                        : "data-highlighted:bg-slate-50"
+                    }`}
                   >
-                    <DepartmentSelectItem
-                      department={department}
-                      onAddClick={addDepartment}
-                      onExcludeClick={addExcludedDepartment}
-                    />
+                    <DepartmentSelectItem department={department} />
                   </DropdownMenuItem>
                 );
               })}
+              <LoadMoreButton
+                totalElements={totalCount}
+                pageSize={pageSize}
+                onPageSizeChange={onPageSizeChange}
+                className="w-full"
+                loading={isFetching}
+              />
             </DropdownMenuGroup>
           ) : (
             <NotFoundCard
@@ -158,7 +150,7 @@ export function DepartmentSelect({
             />
           )}
 
-          <div className="grid grid-cols-[1fr_auto_1fr] items-start w-full gap-2 pt-2 border-t border-border">
+          <div className="grid items-start w-full gap-2 pt-2 border-t border-border">
             <DepartmentBadgeSection
               departments={
                 departments?.filter((d) =>
@@ -167,31 +159,17 @@ export function DepartmentSelect({
               }
               onRemove={removeAddedDepartment}
               onClear={clearSelectedAddedDepartments}
-              variant="added"
             />
 
-            <DepartmentActions
-              totalCount={totalCount}
-              pageSize={pageSize}
-              isFetching={isFetching}
-              showApply={hasPendingSelections}
-              onPageSizeChange={onPageSizeChange}
-              onApply={() => {
-                applySelectedAddedDepartments();
-                applySelectedExcludedDepartments();
-              }}
-            />
-
-            <DepartmentBadgeSection
-              departments={
-                departments?.filter((d) =>
-                  new Set(selectedExcludedDepartments).has(d.id),
-                ) || []
-              }
-              onRemove={removeExcludedDepartment}
-              onClear={clearExcludedDepartments}
-              variant="excluded"
-            />
+            {hasPendingSelections && (
+              <Button
+                onClick={applySelectedAddedDepartments}
+                variant="creative"
+                className="mt-1"
+              >
+                Apply
+              </Button>
+            )}
           </div>
         </div>
       </DropdownMenuContent>
