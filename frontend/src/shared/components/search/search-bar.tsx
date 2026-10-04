@@ -6,9 +6,10 @@ import { Input } from "@/shared/components/ui/input";
 
 interface SearchBarProps {
   onSearch: (value: string) => void;
+  className?: string;
 }
 
-export function SearchBar({ onSearch }: SearchBarProps) {
+export function SearchBar({ onSearch, className }: SearchBarProps) {
   const [value, setValue] = useState("");
   const debouncedValue = useDebounce(value, 300);
 
@@ -22,7 +23,8 @@ export function SearchBar({ onSearch }: SearchBarProps) {
       value={value}
       onChange={(e) => setValue(e.target.value)}
       placeholder="Search..."
-      className="flex-1 min-w-50 max-w-100 rounded-md border-border"
+      className={`flex-1 min-w-50 max-w-100 rounded-md border-border ${className}`}
+      onKeyDown={(e) => e.stopPropagation()}
     />
   );
 }

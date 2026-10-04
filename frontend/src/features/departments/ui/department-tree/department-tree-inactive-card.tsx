@@ -4,9 +4,11 @@ import { Department } from "@/entities/departments/types";
 import { FormatDate } from "@/shared/lib/format-date";
 import { ActivitySwitcher } from "@/shared/components/switches/activity-switcher";
 import { ReactNode } from "react";
+import { cn } from "@/shared/lib/utils";
 
 interface DepartmentTreeInactiveCardProps {
   department: Department;
+  isSelected?: boolean;
   onClick?: () => void;
   onIsActiveChange: (isActive: boolean) => void;
   children?: ReactNode;
@@ -14,6 +16,7 @@ interface DepartmentTreeInactiveCardProps {
 
 export function DepartmentTreeInactiveCard({
   department,
+  isSelected,
   onClick,
   onIsActiveChange,
   children,
@@ -21,7 +24,12 @@ export function DepartmentTreeInactiveCard({
   return (
     <Card
       onClick={onClick}
-      className="border-l-4 transition-colors mb-0.5 cursor-pointer select-none"
+      className={cn(
+        "border-l-4 transition-colors mb-0.5 cursor-pointer select-none",
+        isSelected
+          ? "border-l-red-500 bg-red-500/5"
+          : "border-l-red-500/30 hover:border-l-red-500 hover:bg-muted/40",
+      )}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2 mt-[-10]">
         <div className="flex items-center gap-2 min-w-0">

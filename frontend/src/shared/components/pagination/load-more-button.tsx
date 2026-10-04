@@ -21,7 +21,6 @@ const styles = `
 
 interface LoadMoreButtonProps {
   totalElements?: number;
-  hasMore?: boolean;
   pageSize: number;
   onPageSizeChange: (pageSize: number) => void;
   onPointerEnter?: () => void;
@@ -33,7 +32,6 @@ interface LoadMoreButtonProps {
 
 export function LoadMoreButton({
   totalElements,
-  hasMore,
   pageSize,
   onPageSizeChange,
   onPointerEnter,
@@ -57,7 +55,7 @@ export function LoadMoreButton({
     ? true
     : totalElements !== undefined
       ? pageSize < totalElements
-      : (hasMore ?? true);
+      : true;
 
   if (!shouldRender) {
     return null;

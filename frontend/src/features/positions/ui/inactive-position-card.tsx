@@ -12,16 +12,18 @@ import { FormatDate } from "@/shared/lib/format-date";
 interface InactivePositionCardProps {
   position: Position;
   handleActiveSwitch: (value: boolean) => void;
+  showActivityToggle?: boolean;
 }
 
 export function InactivePositionCard({
   position,
   handleActiveSwitch,
+  showActivityToggle = true,
 }: InactivePositionCardProps) {
   return (
     <Card
       key={position.id}
-      className="transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-l-4 border-l-muted-foreground/50"
+      className="transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-l-4 border-l-red-500"
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
@@ -32,10 +34,12 @@ export function InactivePositionCard({
       <CardContent>
         <div className="flex flex-col gap-x-4 gap-y-1.5 text-xs">
           <span>Deleted: {FormatDate(position.deletedAt)}</span>
-          <ActivitySwitcher
-            isActive={position.isActive}
-            onIsActiveChange={handleActiveSwitch}
-          />
+          {showActivityToggle && (
+            <ActivitySwitcher
+              isActive={position.isActive}
+              onIsActiveChange={handleActiveSwitch}
+            />
+          )}
         </div>
       </CardContent>
     </Card>

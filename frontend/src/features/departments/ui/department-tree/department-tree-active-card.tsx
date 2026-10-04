@@ -1,4 +1,9 @@
-import { CalendarIcon, FolderTreeIcon, HashIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  CircleArrowRight,
+  FolderTreeIcon,
+  HashIcon,
+} from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card";
 import { Department } from "@/entities/departments/types";
 import { Badge } from "@/shared/components/ui/badge";
@@ -6,6 +11,7 @@ import { ReactNode } from "react";
 import { FormatDate } from "@/shared/lib/format-date";
 import { ActivitySwitcher } from "@/shared/components/switches/activity-switcher";
 import { cn } from "@/shared/lib/utils";
+import { Button } from "@/shared/components/ui/button";
 
 interface DepartmentTreeActiveCardProps {
   department: Department;
@@ -13,6 +19,7 @@ interface DepartmentTreeActiveCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   onIsActiveChange: (isActive: boolean) => void;
+  onUpdateParentDialogChange: (isOpen: boolean) => void;
 }
 
 export function DepartmentTreeActiveCard({
@@ -21,6 +28,7 @@ export function DepartmentTreeActiveCard({
   isSelected,
   onClick,
   onIsActiveChange,
+  onUpdateParentDialogChange,
 }: DepartmentTreeActiveCardProps) {
   return (
     <Card
@@ -62,10 +70,21 @@ export function DepartmentTreeActiveCard({
             <CalendarIcon className="size-3" />
             {FormatDate(department.updatedAt)}
           </span>
-          <ActivitySwitcher
-            isActive={department.isActive}
-            onIsActiveChange={onIsActiveChange}
-          />
+          <div className="flex items-center">
+            <ActivitySwitcher
+              isActive={department.isActive}
+              onIsActiveChange={onIsActiveChange}
+            />
+            <Button
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdateParentDialogChange(true);
+              }}
+            >
+              <CircleArrowRight color="black" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

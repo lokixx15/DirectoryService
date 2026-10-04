@@ -6,6 +6,8 @@ import { RestoreDialog } from "@/shared/components/dialogs/restore-dialog";
 import { DeleteDialog } from "@/shared/components/dialogs/delete-dialog";
 import { DepartmentTreeActiveCard } from "./department-tree-active-card";
 import { DepartmentTreeInactiveCard } from "./department-tree-inactive-card";
+import { UpdateParentDialog } from "../update-parent-dialog";
+import { useDepartmentParentUpdate } from "../../model/use-department-parent-update";
 
 interface DepartmentTreeCardProps {
   department: Department;
@@ -24,12 +26,17 @@ export function DepartmentTreeCard({
     useDepartmentRestore();
   const { deleteDepartment, isPending: isDeleteDepartmentPending } =
     useDepartmentDelete();
+  const { updateParent, isPending: isUpdateDepartmentParentPending } =
+    useDepartmentParentUpdate();
 
   const [restoreOpen, setRestoreOpen] = useState<boolean>(false);
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
+  const [updateParentOpen, setUpdateParentOpen] = useState<boolean>(false);
 
   const [restoringDepartment, setRestoringDepartment] = useState<Department>();
   const [deletingDepartment, setDeletingDepartment] = useState<Department>();
+  const [updatingParentDepartment, setUpdatingParentDepartment] =
+    useState<Department>();
 
   const handleActiveSwitch = (nextActiveState: boolean) => {
     if (nextActiveState) {
@@ -41,6 +48,11 @@ export function DepartmentTreeCard({
     }
   };
 
+  const handleUpdatingParent = (value: boolean) => {
+    setUpdateParentOpen(value);
+    setUpdatingParentDepartment(department);
+  };
+
   return (
     <div>
       {department.isActive ? (
@@ -49,12 +61,14 @@ export function DepartmentTreeCard({
           isSelected={isSelected}
           onClick={onClick}
           onIsActiveChange={handleActiveSwitch}
+          onUpdateParentDialogChange={handleUpdatingParent}
         >
           {children}
         </DepartmentTreeActiveCard>
       ) : (
         <DepartmentTreeInactiveCard
           department={department}
+          isSelected={isSelected}
           onClick={onClick}
           onIsActiveChange={handleActiveSwitch}
         >
@@ -81,6 +95,16 @@ export function DepartmentTreeCard({
           onRestoreEntity={restoreDepartment}
           isPending={isRestoreDepartmentPending}
           name="department"
+        />
+      )}
+
+      {updatingParentDepartment && (
+        <UpdateParentDialog
+          department={department}
+          open={updateParentOpen}
+          onOpenChange={setUpdateParentOpen}
+          onUpdateParent={updateParent}
+          isPending={isUpdateDepartmentParentPending}
         />
       )}
     </div>
