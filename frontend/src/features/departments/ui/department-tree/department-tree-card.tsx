@@ -26,7 +26,7 @@ export function DepartmentTreeCard({
     useDepartmentRestore();
   const { deleteDepartment, isPending: isDeleteDepartmentPending } =
     useDepartmentDelete();
-  const { updateParent } =
+  const { updateParent, isPending: isUpdateDepartmentParentPending } =
     useDepartmentParentUpdate();
 
   const [restoreOpen, setRestoreOpen] = useState<boolean>(false);
@@ -104,6 +104,7 @@ export function DepartmentTreeCard({
           open={updateParentOpen}
           onOpenChange={setUpdateParentOpen}
           onUpdateParent={updateParent}
+          isPending={isUpdateDepartmentParentPending}
         />
       )}
     </div>

@@ -8,5 +8,6 @@ export const useDepartmentParentUpdate = () => {
 
   return {
     updateParent: mutation.mutate,
+    isPending: mutation.isPending,
   };
 };

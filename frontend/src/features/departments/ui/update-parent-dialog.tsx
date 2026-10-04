@@ -27,6 +27,7 @@ interface UpdateParentDialogProps {
       onError?: (errors: unknown) => void;
     },
   ) => void;
+  isPending: boolean;
 }
 
 export function UpdateParentDialog({
@@ -34,6 +35,7 @@ export function UpdateParentDialog({
   open,
   onOpenChange,
   onUpdateParent,
+  isPending,
 }: UpdateParentDialogProps) {
   const [newParent, setNewParent] = useState<DepartmentSummary>();
   const [isRootSelected, setIsRootSelected] = useState<boolean>(false);
@@ -88,7 +90,9 @@ export function UpdateParentDialog({
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <div>
-            <Button onClick={updateParent}>Apply</Button>
+            <Button onClick={updateParent} disabled={isPending}>
+              Apply
+            </Button>
           </div>
         </DialogFooter>
       </DialogContent>
